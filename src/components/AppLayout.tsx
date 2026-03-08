@@ -38,7 +38,7 @@ const AppLayout = () => {
         <div className="bg-primary rounded-lg p-1.5">
           <BookOpen className="h-5 w-5 text-primary-foreground" />
         </div>
-        <h1 className="text-lg font-display font-bold text-foreground flex-1">Student Hub</h1>
+        <h1 className="text-lg font-display font-bold text-foreground flex-1">StudyFlow</h1>
         <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="shrink-0">
           <Search className="h-5 w-5" />
         </Button>

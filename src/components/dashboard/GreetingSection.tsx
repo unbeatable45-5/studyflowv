@@ -36,7 +36,7 @@ const GreetingSection = () => {
         <div className="flex items-center gap-2 bg-primary/10 rounded-lg px-3 py-2 mb-2">
           <PartyPopper className="h-5 w-5 text-primary" />
           <p className="text-sm font-medium text-primary">
-            Welcome to Student Hub! Start by exploring the tools below.
+            Welcome to StudyFlow! Start by exploring the tools below.
           </p>
         </div>
       )}
