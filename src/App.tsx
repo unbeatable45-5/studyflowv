@@ -12,6 +12,7 @@ import NoteOrganizer from "./pages/NoteOrganizer";
 import RevisionPlanner from "./pages/RevisionPlanner";
 import FlashcardGenerator from "./pages/FlashcardGenerator";
 import PdfExport from "./pages/PdfExport";
+import PdfSummarizer from "./pages/PdfSummarizer";
 import Tutorial from "./pages/Tutorial";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
