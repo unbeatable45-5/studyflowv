@@ -78,7 +78,17 @@ const NoteOrganizer = () => {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">Organized Notes</CardTitle>
-              <OutputActions text={output} title="Organized Notes" />
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => navigate(`/pdf-export?source=note-organizer&title=${encodeURIComponent("Organized Notes")}&content=${encodeURIComponent(output)}`)}
+                >
+                  <FileDown className="h-4 w-4" /> PDF
+                </Button>
+                <OutputActions text={output} title="Organized Notes" />
+              </div>
             </div>
           </CardHeader>
           <CardContent>
