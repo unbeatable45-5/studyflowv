@@ -9,6 +9,7 @@ const navItems = [
   { to: "/planner", icon: CalendarDays, label: "Planner" },
   { to: "/flashcards", icon: Layers, label: "Cards" },
   { to: "/pdf-summarizer", icon: FileUp, label: "PDF" },
+];
 
 const BottomNav = () => {
   const { pathname } = useLocation();
