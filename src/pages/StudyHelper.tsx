@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { saveOutput } from "@/lib/saved-outputs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -29,7 +30,7 @@ const StudyHelper = () => {
       },
       onDone: () => {
         setLoading(false);
-        localStorage.setItem("lastStudy", JSON.stringify({ topic, output: fullText, date: new Date().toISOString() }));
+        saveOutput("study-helper", { topic }, fullText);
       },
       onError: (err) => {
         setLoading(false);

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { saveOutput } from "@/lib/saved-outputs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,7 +29,7 @@ const NoteOrganizer = () => {
       },
       onDone: () => {
         setLoading(false);
-        localStorage.setItem("lastNotes", JSON.stringify({ output: fullText, date: new Date().toISOString() }));
+        saveOutput("note-organizer", { preview: notes.slice(0, 100) }, fullText);
       },
       onError: (err) => {
         setLoading(false);

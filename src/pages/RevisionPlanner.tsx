@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { saveOutput } from "@/lib/saved-outputs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -62,7 +63,7 @@ const RevisionPlanner = () => {
       },
       onDone: () => {
         setLoading(false);
-        localStorage.setItem("lastPlan", JSON.stringify({ output: fullText, date: new Date().toISOString() }));
+        saveOutput("revision-planner", { courses: courseData, hoursPerDay: hours[0] }, fullText);
       },
       onError: (err) => {
         setLoading(false);
