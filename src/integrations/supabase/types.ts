@@ -41,6 +41,42 @@ export type Database = {
         }
         Relationships: []
       }
+      reminders: {
+        Row: {
+          completed: boolean
+          created_at: string
+          description: string | null
+          due_at: string
+          id: string
+          reminder_type: Database["public"]["Enums"]["reminder_type"]
+          repeat: Database["public"]["Enums"]["reminder_repeat"]
+          title: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          due_at: string
+          id?: string
+          reminder_type?: Database["public"]["Enums"]["reminder_type"]
+          repeat?: Database["public"]["Enums"]["reminder_repeat"]
+          title: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          due_at?: string
+          id?: string
+          reminder_type?: Database["public"]["Enums"]["reminder_type"]
+          repeat?: Database["public"]["Enums"]["reminder_repeat"]
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       saved_outputs: {
         Row: {
           created_at: string
@@ -82,7 +118,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      reminder_repeat: "none" | "daily" | "weekly"
+      reminder_type: "study_session" | "exam_countdown" | "task"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -209,6 +246,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      reminder_repeat: ["none", "daily", "weekly"],
+      reminder_type: ["study_session", "exam_countdown", "task"],
+    },
   },
 } as const

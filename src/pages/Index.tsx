@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp, FilePlus, FolderOpen, BookOpen } from "lucide-react";
+import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp, FilePlus, FolderOpen, BookOpen, Bell } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRecentOutputs } from "@/lib/saved-outputs";
@@ -78,6 +78,14 @@ const tools = [
     description: "Browse all your materials organized by subject",
     color: "bg-primary/10 text-primary",
     tool: "organizer",
+  },
+  {
+    to: "/reminders",
+    icon: Bell,
+    title: "Reminders",
+    description: "Set study sessions, exam countdowns & task reminders",
+    color: "bg-destructive/10 text-destructive",
+    tool: "reminders",
   },
 ];
 
