@@ -88,6 +88,18 @@ const subjectTheme: Record<string, { icon: typeof Calculator; bg: string; text: 
 
 const getSubjectTheme = (subject: string) =>
   subjectTheme[subject] || subjectTheme["Uncategorized"];
+
+const toolIcons: Record<string, typeof Lightbulb> = {
+  "study-helper": Lightbulb,
+  "note-organizer": FileText,
+  "revision-planner": CalendarDays,
+  "flashcard-generator": Layers,
+  "pdf-export": FileDown,
+  "pdf-summarizer": FileUp,
+  "pdf-builder": FilePlus,
+};
+
+const toolLabels: Record<string, string> = {
   "study-helper": "Study Notes",
   "note-organizer": "Organized Notes",
   "revision-planner": "Revision Plan",
