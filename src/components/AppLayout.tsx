@@ -37,6 +37,11 @@ const AppLayout = () => {
         <Button variant="ghost" size="icon" onClick={() => setDark(!dark)} className="shrink-0">
           {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </Button>
+        <Link to="/profile">
+          <Button variant="ghost" size="icon" className="shrink-0">
+            <UserCircle className="h-5 w-5" />
+          </Button>
+        </Link>
         <Button variant="ghost" size="icon" onClick={handleSignOut} className="shrink-0">
           <LogOut className="h-5 w-5" />
         </Button>
