@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { saveOutput } from "@/lib/saved-outputs";
 import { Button } from "@/components/ui/button";
