@@ -31,6 +31,14 @@ const tools = [
     color: "bg-warning/10 text-warning",
     tool: "revision-planner",
   },
+  {
+    to: "/flashcards",
+    icon: Layers,
+    title: "Flashcard Generator",
+    description: "Create interactive flashcards on any topic",
+    color: "bg-purple-500/10 text-purple-500",
+    tool: "flashcard-generator",
+  },
 ];
 
 const toolMeta: Record<string, { icon: typeof Lightbulb; color: string; label: string; to: string }> = {
