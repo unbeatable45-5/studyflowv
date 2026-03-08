@@ -9,7 +9,7 @@ interface OutputActionsProps {
   title?: string;
 }
 
-const OutputActions = ({ text, title = "Student Hub" }: OutputActionsProps) => {
+const OutputActions = ({ text, title = "StudyFlow" }: OutputActionsProps) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {

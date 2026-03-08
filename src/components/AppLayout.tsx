@@ -1,17 +1,20 @@
 import { Outlet } from "react-router-dom";
 import { Link } from "react-router-dom";
 import BottomNav from "./BottomNav";
-import { BookOpen, Moon, Sun, LogOut, UserCircle, Search } from "lucide-react";
+import { BookOpen, Moon, Sun, LogOut, UserCircle, Search, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePremium } from "@/contexts/PremiumContext";
 import NotificationBell from "./NotificationBell";
 import GlobalSearch from "./GlobalSearch";
+import UpgradeDialog from "./UpgradeDialog";
 import { useReminderNotifications } from "@/hooks/use-reminder-notifications";
 import { toast } from "@/hooks/use-toast";
 
 const AppLayout = () => {
   const { signOut } = useAuth();
+  const { isPremium, promptUpgrade } = usePremium();
   useReminderNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
   const [dark, setDark] = useState(() => {
@@ -38,7 +41,16 @@ const AppLayout = () => {
         <div className="bg-primary rounded-lg p-1.5">
           <BookOpen className="h-5 w-5 text-primary-foreground" />
         </div>
-        <h1 className="text-lg font-display font-bold text-foreground flex-1">Student Hub</h1>
+        <h1 className="text-lg font-display font-bold text-foreground flex-1">StudyFlow</h1>
+        {isPremium ? (
+          <span className="flex items-center gap-1 text-[10px] font-semibold text-warning bg-warning/10 px-2 py-0.5 rounded-full">
+            <Crown className="h-3 w-3" /> PRO
+          </span>
+        ) : (
+          <Button variant="ghost" size="sm" onClick={promptUpgrade} className="gap-1 text-xs text-warning hover:text-warning shrink-0 px-2">
+            <Crown className="h-3.5 w-3.5" /> Pro
+          </Button>
+        )}
         <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="shrink-0">
           <Search className="h-5 w-5" />
         </Button>
@@ -62,6 +74,7 @@ const AppLayout = () => {
 
       <BottomNav />
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+      <UpgradeDialog />
     </div>
   );
 };
