@@ -14,6 +14,7 @@ const NoteOrganizer = () => {
   const [notes, setNotes] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleOrganize = async () => {
     if (!notes.trim()) return;

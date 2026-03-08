@@ -84,7 +84,17 @@ const StudyHelper = () => {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">Results</CardTitle>
-              <OutputActions text={output} title={`Study: ${topic}`} />
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => navigate(`/pdf-export?source=study-helper&title=${encodeURIComponent(`Study: ${topic}`)}&content=${encodeURIComponent(output)}`)}
+                >
+                  <FileDown className="h-4 w-4" /> PDF
+                </Button>
+                <OutputActions text={output} title={`Study: ${topic}`} />
+              </div>
             </div>
           </CardHeader>
           <CardContent>
