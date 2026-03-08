@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import AppLayout from "./components/AppLayout";
 import Index from "./pages/Index";
-import Profile from "./pages/Profile";
+import Profile from "@/pages/Profile";
 import StudyHelper from "./pages/StudyHelper";
 import NoteOrganizer from "./pages/NoteOrganizer";
 import RevisionPlanner from "./pages/RevisionPlanner";
