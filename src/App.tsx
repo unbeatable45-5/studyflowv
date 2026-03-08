@@ -13,6 +13,7 @@ import RevisionPlanner from "./pages/RevisionPlanner";
 import FlashcardGenerator from "./pages/FlashcardGenerator";
 import PdfExport from "./pages/PdfExport";
 import PdfSummarizer from "./pages/PdfSummarizer";
+import HistoryPage from "./pages/HistoryPage";
 import Tutorial from "./pages/Tutorial";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -57,6 +58,7 @@ const App = () => (
               <Route path="/flashcards" element={<FlashcardGenerator />} />
               <Route path="/pdf-export" element={<PdfExport />} />
               <Route path="/pdf-summarizer" element={<PdfSummarizer />} />
+              <Route path="/history" element={<HistoryPage />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
             <Route path="*" element={<NotFound />} />
