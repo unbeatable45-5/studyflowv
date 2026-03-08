@@ -55,6 +55,14 @@ const tools = [
     color: "bg-success/10 text-success",
     tool: "pdf-summarizer",
   },
+  {
+    to: "/pdf-builder",
+    icon: FilePlus,
+    title: "Custom PDF Builder",
+    description: "Create multi-page PDFs with your own notes",
+    color: "bg-warning/10 text-warning",
+    tool: "pdf-builder",
+  },
 ];
 
 const toolMeta: Record<string, { icon: typeof Lightbulb; color: string; label: string; to: string }> = {
