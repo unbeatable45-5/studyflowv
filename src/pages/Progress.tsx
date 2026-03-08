@@ -184,7 +184,7 @@ const Progress = () => {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         {statCards.map(({ icon: Icon, label, value, suffix, color }) => (
           <Card key={label}>
             <CardContent className="p-4 flex items-center gap-3">
