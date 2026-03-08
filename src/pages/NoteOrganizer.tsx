@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import OutputActions from "@/components/OutputActions";
 import { streamAI } from "@/lib/streaming";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText, Loader2, FileDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const NoteOrganizer = () => {
