@@ -14,16 +14,34 @@ const PRESETS = [
 ];
 
 const ReviewTimer = () => {
+  const { user } = useAuth();
   const [totalSeconds, setTotalSeconds] = useState(15 * 60);
   const [secondsLeft, setSecondsLeft] = useState(15 * 60);
   const [running, setRunning] = useState(false);
   const [finished, setFinished] = useState(false);
+  const [saved, setSaved] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const clear = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = null;
   }, []);
+
+  const saveSession = useCallback(async (durationSeconds: number) => {
+    if (!user || saved) return;
+    const minutes = Math.round(durationSeconds / 60);
+    if (minutes < 1) return;
+    setSaved(true);
+    const { error } = await supabase.from("pomodoro_sessions").insert({
+      user_id: user.id,
+      duration_minutes: minutes,
+      label: "Lecture Review",
+    });
+    if (error) {
+      console.error("Failed to save session:", error);
+      setSaved(false);
+    }
+  }, [user, saved]);
 
   useEffect(() => {
     if (!running) { clear(); return; }
