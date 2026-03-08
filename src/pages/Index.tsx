@@ -8,6 +8,14 @@ import { formatDistanceToNow } from "date-fns";
 
 const tools = [
   {
+    to: "/study-mode",
+    icon: BookOpen,
+    title: "Study Mode",
+    description: "Generate a full study session with summary, flashcards, quiz & plan",
+    color: "bg-accent text-accent-foreground",
+    tool: "study-mode",
+  },
+  {
     to: "/study",
     icon: Lightbulb,
     title: "Quick Study Helper",

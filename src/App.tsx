@@ -64,6 +64,7 @@ const App = () => (
               <Route path="/history" element={<HistoryPage />} />
               <Route path="/pdf-builder" element={<CustomPdfBuilder />} />
               <Route path="/organizer" element={<StudyOrganizer />} />
+              <Route path="/study-mode" element={<StudyMode />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
             <Route path="*" element={<NotFound />} />
