@@ -48,7 +48,7 @@ const Tutorial = () => {
           <h1 className="text-xl font-display font-bold">Getting Started</h1>
         </div>
         <p className="text-sm text-muted-foreground">
-          Learn how to use Student Hub in 3 simple steps.
+          Learn how to use StudyFlow in 3 simple steps.
         </p>
       </div>
 

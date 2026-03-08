@@ -53,7 +53,7 @@ const Signup = () => {
             <BookOpen className="h-6 w-6 text-primary-foreground" />
           </div>
           <CardTitle className="font-display text-2xl">Create account</CardTitle>
-          <CardDescription>Join Student Hub for free</CardDescription>
+          <CardDescription>Join StudyFlow for free</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button variant="outline" className="w-full gap-2" onClick={handleGoogleLogin}>

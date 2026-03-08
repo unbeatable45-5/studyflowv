@@ -45,7 +45,7 @@ const Login = () => {
             <BookOpen className="h-6 w-6 text-primary-foreground" />
           </div>
           <CardTitle className="font-display text-2xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to Student Hub</CardDescription>
+          <CardDescription>Sign in to StudyFlow</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button variant="outline" className="w-full gap-2" onClick={handleGoogleLogin}>
