@@ -155,6 +155,20 @@ const Progress = () => {
       suffix: "",
       color: "text-accent-foreground bg-accent",
     },
+    {
+      icon: Clock,
+      label: "Focus Time",
+      value: Math.round(stats.totalFocusMinutes / 60) || stats.totalFocusMinutes,
+      suffix: stats.totalFocusMinutes >= 60 ? "hours" : "min",
+      color: "text-primary bg-primary/10",
+    },
+    {
+      icon: Target,
+      label: "Pomodoros",
+      value: pomodoros.length,
+      suffix: "",
+      color: "text-destructive bg-destructive/10",
+    },
   ];
 
   return (
