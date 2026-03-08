@@ -13,6 +13,7 @@ import {
   GraduationCap, Loader2, FileDown, Upload, FileUp,
   BookOpen, Layers, HelpCircle, ListChecks, CheckCircle2,
 } from "lucide-react";
+import ReviewTimer from "@/components/lecture/ReviewTimer";
 import { toast } from "@/hooks/use-toast";
 import * as pdfjsLib from "pdfjs-dist";
 
@@ -270,6 +271,9 @@ const LectureCapture = () => {
               </TabsContent>
             ))}
           </Tabs>
+
+          {/* Review Timer */}
+          {generated && <ReviewTimer />}
         </div>
       )}
     </div>
