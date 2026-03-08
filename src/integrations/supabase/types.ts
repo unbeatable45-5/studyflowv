@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      pomodoro_sessions: {
+        Row: {
+          completed_at: string
+          duration_minutes: number
+          id: string
+          label: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          duration_minutes: number
+          id?: string
+          label?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          duration_minutes?: number
+          id?: string
+          label?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

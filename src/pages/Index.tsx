@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp, FilePlus, FolderOpen, BookOpen, Bell } from "lucide-react";
+import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp, FilePlus, FolderOpen, BookOpen, Bell, Timer } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRecentOutputs } from "@/lib/saved-outputs";
@@ -86,6 +86,14 @@ const tools = [
     description: "Set study sessions, exam countdowns & task reminders",
     color: "bg-destructive/10 text-destructive",
     tool: "reminders",
+  },
+  {
+    to: "/pomodoro",
+    icon: Timer,
+    title: "Pomodoro Timer",
+    description: "Stay focused with timed study & break sessions",
+    color: "bg-destructive/10 text-destructive",
+    tool: "pomodoro",
   },
 ];
 
