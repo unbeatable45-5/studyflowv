@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
-import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getRecentOutputs } from "@/lib/saved-outputs";
+import { formatDistanceToNow } from "date-fns";
 
 const tools = [
   {
@@ -10,6 +13,7 @@ const tools = [
     title: "Quick Study Helper",
     description: "Get concise explanations and practice questions on any topic",
     color: "bg-primary/10 text-primary",
+    tool: "study-helper",
   },
   {
     to: "/notes",
@@ -17,6 +21,7 @@ const tools = [
     title: "Mini Note Organizer",
     description: "Paste your notes and get organized bullet-point summaries",
     color: "bg-success/10 text-success",
+    tool: "note-organizer",
   },
   {
     to: "/planner",
@@ -24,10 +29,35 @@ const tools = [
     title: "Revision Planner",
     description: "Create a personalized daily/weekly study schedule",
     color: "bg-warning/10 text-warning",
+    tool: "revision-planner",
   },
 ];
 
+const toolMeta: Record<string, { icon: typeof Lightbulb; color: string; label: string; to: string }> = {
+  "study-helper": { icon: Lightbulb, color: "text-primary", label: "Study Helper", to: "/study" },
+  "note-organizer": { icon: FileText, color: "text-success", label: "Note Organizer", to: "/notes" },
+  "revision-planner": { icon: CalendarDays, color: "text-warning", label: "Revision Planner", to: "/planner" },
+};
+
+interface SavedOutput {
+  id: string;
+  tool: string;
+  input_data: any;
+  output_text: string;
+  created_at: string;
+}
+
 const Index = () => {
+  const [recents, setRecents] = useState<SavedOutput[]>([]);
+  const [loadingRecents, setLoadingRecents] = useState(true);
+
+  useEffect(() => {
+    getRecentOutputs(undefined, 5).then((data) => {
+      setRecents(data as SavedOutput[]);
+      setLoadingRecents(false);
+    });
+  }, []);
+
   return (
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
       {/* Welcome */}
@@ -58,6 +88,63 @@ const Index = () => {
             </Card>
           </Link>
         ))}
+      </div>
+
+      {/* Recent Activity */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Clock className="h-4 w-4 text-muted-foreground" />
+          <h2 className="font-display font-semibold text-foreground">Recent Activity</h2>
+        </div>
+
+        {loadingRecents ? (
+          <div className="space-y-2">
+            <Skeleton className="h-16 w-full rounded-lg" />
+            <Skeleton className="h-16 w-full rounded-lg" />
+          </div>
+        ) : recents.length === 0 ? (
+          <Card className="border-dashed">
+            <CardContent className="p-4 text-center text-sm text-muted-foreground">
+              No results yet. Try one of the tools above!
+            </CardContent>
+          </Card>
+        ) : (
+          recents.map((item) => {
+            const meta = toolMeta[item.tool];
+            if (!meta) return null;
+            const Icon = meta.icon;
+            const preview = item.output_text.slice(0, 80).replace(/\n/g, " ");
+            const inputLabel =
+              item.tool === "study-helper"
+                ? (item.input_data as any)?.topic
+                : item.tool === "note-organizer"
+                ? "Notes"
+                : "Study Plan";
+
+            return (
+              <Link key={item.id} to={meta.to}>
+                <Card className="hover:shadow-sm transition-shadow cursor-pointer mb-2">
+                  <CardContent className="p-3 flex items-start gap-3">
+                    <Icon className={`h-4 w-4 mt-0.5 shrink-0 ${meta.color}`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-medium text-foreground truncate">
+                          {inputLabel}
+                        </p>
+                        <span className="text-[11px] text-muted-foreground shrink-0">
+                          {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                        {preview}…
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            );
+          })
+        )}
       </div>
 
       {/* Tutorial Link */}
