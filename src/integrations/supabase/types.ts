@@ -44,25 +44,31 @@ export type Database = {
       saved_outputs: {
         Row: {
           created_at: string
+          custom_title: string | null
           id: string
           input_data: Json
           output_text: string
+          subject: string | null
           tool: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          custom_title?: string | null
           id?: string
           input_data?: Json
           output_text: string
+          subject?: string | null
           tool: string
           user_id: string
         }
         Update: {
           created_at?: string
+          custom_title?: string | null
           id?: string
           input_data?: Json
           output_text?: string
+          subject?: string | null
           tool?: string
           user_id?: string
         }
