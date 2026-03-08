@@ -109,9 +109,10 @@ const Progress = () => {
       .slice(0, 5);
 
     const completedTasks = reminders.filter(r => r.completed).length;
+    const totalFocusMinutes = pomodoros.reduce((sum, p) => sum + p.duration_minutes, 0);
 
-    return { streak, totalSessions: outputs.length, thisWeek, completedTasks, weeklyData, toolBreakdown };
-  }, [outputs, reminders]);
+    return { streak, totalSessions: outputs.length, thisWeek, completedTasks, weeklyData, toolBreakdown, totalFocusMinutes, focusData };
+  }, [outputs, reminders, pomodoros]);
 
   if (loading) {
     return (
