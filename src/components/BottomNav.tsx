@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Lightbulb, FileText, CalendarDays, Layers } from "lucide-react";
+import { Home, Lightbulb, FileText, CalendarDays, Layers, FileUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
