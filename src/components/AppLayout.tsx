@@ -74,6 +74,7 @@ const AppLayout = () => {
 
       <BottomNav />
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
+      <UpgradeDialog />
     </div>
   );
 };
