@@ -8,13 +8,15 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import OutputActions from "@/components/OutputActions";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { saveOutput } from "@/lib/saved-outputs";
 import { toast } from "@/hooks/use-toast";
 import {
   Layers, Loader2, RotateCcw, ChevronLeft, ChevronRight,
-  Shuffle, Play, CheckCircle2, XCircle, Trophy, ArrowLeft,
+  Shuffle, Play, CheckCircle2, XCircle, Trophy, ArrowLeft, Brain,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 interface Flashcard {
   front: string;
