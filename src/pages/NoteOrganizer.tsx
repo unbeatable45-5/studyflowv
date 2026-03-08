@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { saveOutput } from "@/lib/saved-outputs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import AIThinking from "@/components/AIThinking";
 import OutputActions from "@/components/OutputActions";
 import { streamAI } from "@/lib/streaming";
 import { FileText, Loader2, FileDown } from "lucide-react";
