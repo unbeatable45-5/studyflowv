@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line, CartesianGrid } from "recharts";
 import { Flame, BookOpen, CheckCircle2, TrendingUp, Calendar, Trophy, Clock, Target } from "lucide-react";
 import { format, subDays, startOfDay, differenceInCalendarDays, parseISO, isToday } from "date-fns";
+import CalendarHeatmap from "@/components/progress/CalendarHeatmap";
 
 const toolLabels: Record<string, string> = {
   "study-helper": "Study Helper",
@@ -64,7 +65,7 @@ const Progress = () => {
   }, [user]);
 
   const stats = useMemo(() => {
-    const empty = { streak: 0, totalSessions: 0, thisWeek: 0, completedTasks: 0, weeklyData: [], toolBreakdown: [], totalFocusMinutes: 0, focusData: [] };
+    const empty = { streak: 0, totalSessions: 0, thisWeek: 0, completedTasks: 0, weeklyData: [], toolBreakdown: [], totalFocusMinutes: 0, focusData: [], activityMap: {} as Record<string, number> };
     if (outputs.length === 0 && pomodoros.length === 0) return empty;
 
     const activeDays = new Set([
@@ -111,7 +112,18 @@ const Progress = () => {
     const completedTasks = reminders.filter(r => r.completed).length;
     const totalFocusMinutes = pomodoros.reduce((sum, p) => sum + p.duration_minutes, 0);
 
-    return { streak, totalSessions: outputs.length, thisWeek, completedTasks, weeklyData, toolBreakdown, totalFocusMinutes, focusData };
+    // Build activity map for heatmap
+    const activityMap: Record<string, number> = {};
+    outputs.forEach(o => {
+      const d = format(parseISO(o.created_at), "yyyy-MM-dd");
+      activityMap[d] = (activityMap[d] || 0) + 1;
+    });
+    pomodoros.forEach(p => {
+      const d = format(parseISO(p.completed_at), "yyyy-MM-dd");
+      activityMap[d] = (activityMap[d] || 0) + 1;
+    });
+
+    return { streak, totalSessions: outputs.length, thisWeek, completedTasks, weeklyData, toolBreakdown, totalFocusMinutes, focusData, activityMap };
   }, [outputs, reminders, pomodoros]);
 
   if (loading) {
@@ -258,6 +270,9 @@ const Progress = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Calendar Heatmap */}
+      <CalendarHeatmap activityMap={stats.activityMap} />
 
       {/* Focus Time Chart */}
       {stats.focusData.some((d: any) => d.minutes > 0) && (
