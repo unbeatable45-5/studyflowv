@@ -66,6 +66,7 @@ const App = () => (
               <Route path="/pdf-builder" element={<CustomPdfBuilder />} />
               <Route path="/organizer" element={<StudyOrganizer />} />
               <Route path="/study-mode" element={<StudyMode />} />
+              <Route path="/reminders" element={<Reminders />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
             <Route path="*" element={<NotFound />} />

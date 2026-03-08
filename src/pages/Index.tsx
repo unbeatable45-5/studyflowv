@@ -79,6 +79,14 @@ const tools = [
     color: "bg-primary/10 text-primary",
     tool: "organizer",
   },
+  {
+    to: "/reminders",
+    icon: Bell,
+    title: "Reminders",
+    description: "Set study sessions, exam countdowns & task reminders",
+    color: "bg-destructive/10 text-destructive",
+    tool: "reminders",
+  },
 ];
 
 const toolMeta: Record<string, { icon: typeof Lightbulb; color: string; label: string; to: string }> = {
