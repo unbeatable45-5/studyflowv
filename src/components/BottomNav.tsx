@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Lightbulb, FileText, CalendarDays, Layers } from "lucide-react";
+import { Home, Lightbulb, FileText, CalendarDays, Layers, FileUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -8,6 +8,7 @@ const navItems = [
   { to: "/notes", icon: FileText, label: "Notes" },
   { to: "/planner", icon: CalendarDays, label: "Planner" },
   { to: "/flashcards", icon: Layers, label: "Cards" },
+  { to: "/pdf-summarizer", icon: FileUp, label: "PDF" },
 ];
 
 const BottomNav = () => {
