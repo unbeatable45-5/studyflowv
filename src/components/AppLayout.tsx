@@ -1,17 +1,19 @@
 import { Outlet } from "react-router-dom";
 import { Link } from "react-router-dom";
 import BottomNav from "./BottomNav";
-import { BookOpen, Moon, Sun, LogOut, UserCircle } from "lucide-react";
+import { BookOpen, Moon, Sun, LogOut, UserCircle, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from "./NotificationBell";
+import GlobalSearch from "./GlobalSearch";
 import { useReminderNotifications } from "@/hooks/use-reminder-notifications";
 import { toast } from "@/hooks/use-toast";
 
 const AppLayout = () => {
   const { signOut } = useAuth();
   useReminderNotifications();
+  const [searchOpen, setSearchOpen] = useState(false);
   const [dark, setDark] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("theme") === "dark" ||
@@ -37,6 +39,9 @@ const AppLayout = () => {
           <BookOpen className="h-5 w-5 text-primary-foreground" />
         </div>
         <h1 className="text-lg font-display font-bold text-foreground flex-1">Student Hub</h1>
+        <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="shrink-0">
+          <Search className="h-5 w-5" />
+        </Button>
         <Button variant="ghost" size="icon" onClick={() => setDark(!dark)} className="shrink-0">
           {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </Button>
@@ -56,6 +61,7 @@ const AppLayout = () => {
       </main>
 
       <BottomNav />
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );
 };
