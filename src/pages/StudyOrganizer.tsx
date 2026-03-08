@@ -108,6 +108,7 @@ const toolLabels: Record<string, string> = {
   "pdf-export": "PDF Export",
   "pdf-summarizer": "PDF Summary",
   "pdf-builder": "Custom PDF",
+  "study-mode": "Study Session",
 };
 
 interface SavedItem {
