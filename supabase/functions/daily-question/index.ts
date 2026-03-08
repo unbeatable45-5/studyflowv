@@ -9,56 +9,27 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { topics, mode } = await req.json();
+    const body = await req.json();
+    const { topics, mode, question, answer } = body;
     const topicList = topics?.length ? topics.join(", ") : "general knowledge, science, mathematics, history";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const isCheck = mode === "check";
+    let systemPrompt: string;
+    let userContent: string;
 
-    const systemPrompt = isCheck
-      ? `You are a study tutor. The student answered a question. Evaluate their answer. Return JSON:
-{
-  "correct": true/false,
-  "explanation": "Brief explanation of why it's correct or incorrect and the right answer"
-}
-Return ONLY valid JSON, no markdown.`
-      : `You are a study question generator. Generate ONE study question based on these topics: ${topicList}.
-Pick a random topic from the list. Return JSON:
-{
-  "topic": "the chosen topic",
-  "question": "the question text",
-  "type": "multiple_choice",
-  "options": ["A) ...", "B) ...", "C) ...", "D) ..."],
-  "correct_answer": "A",
-  "hint": "a brief hint"
-}
-Return ONLY valid JSON, no markdown.`;
-
-    const userContent = isCheck
-      ? `Question: ${(await req.json().catch(() => ({ question: "", answer: "" }))).question || ""}\nStudent's answer: ${(await req.json().catch(() => ({ answer: "" }))).answer || ""}`
-      : "Generate a question now.";
-
-    // Re-parse body for check mode
-    let messages;
-    if (isCheck) {
-      const body = await req.json().catch(() => null);
-      // Body already parsed above, use topics/mode from first parse
-      const reqBody = JSON.parse(await req.text().catch(() => "{}"));
-      messages = [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: `Question: ${reqBody.question}\nStudent's answer: ${reqBody.answer}` },
-      ];
+    if (mode === "check") {
+      systemPrompt = `You are a study tutor. Evaluate the student's answer. Return ONLY valid JSON with no markdown fences:
+{"correct": true_or_false, "explanation": "Brief explanation of why correct/incorrect and the right answer"}`;
+      userContent = `Question: ${question}\nStudent's answer: ${answer}`;
     } else {
-      messages = [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: "Generate a question now." },
-      ];
+      systemPrompt = `You are a study question generator. Generate ONE study question from these topics: ${topicList}.
+Return ONLY valid JSON with no markdown fences:
+{"topic": "chosen topic", "question": "question text", "type": "multiple_choice", "options": ["A) ...", "B) ...", "C) ...", "D) ..."], "correct_answer": "A", "hint": "a brief hint"}`;
+      userContent = "Generate a study question now.";
     }
 
-    // Actually need to re-read body properly
-    // Since we already consumed req.json() above, let's restructure
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -69,7 +40,7 @@ Return ONLY valid JSON, no markdown.`;
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: isCheck ? `Evaluate this answer` : "Generate a question now." },
+          { role: "user", content: userContent },
         ],
       }),
     });
@@ -95,7 +66,17 @@ Return ONLY valid JSON, no markdown.`;
     const aiData = await response.json();
     const content = aiData.choices?.[0]?.message?.content || "";
 
-    return new Response(JSON.stringify({ result: content }), {
+    // Try to parse JSON from the content
+    let parsed;
+    try {
+      // Remove possible markdown fences
+      const clean = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+      parsed = JSON.parse(clean);
+    } catch {
+      parsed = { raw: content };
+    }
+
+    return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
