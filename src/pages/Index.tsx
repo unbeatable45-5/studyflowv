@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown } from "lucide-react";
+import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRecentOutputs } from "@/lib/saved-outputs";
@@ -46,6 +46,14 @@ const tools = [
     description: "Download your study notes as a professional PDF",
     color: "bg-destructive/10 text-destructive",
     tool: "pdf-export",
+  },
+  {
+    to: "/pdf-summarizer",
+    icon: FileUp,
+    title: "PDF Summarizer",
+    description: "Upload a PDF and get an AI-powered summary",
+    color: "bg-success/10 text-success",
+    tool: "pdf-summarizer",
   },
 ];
 
