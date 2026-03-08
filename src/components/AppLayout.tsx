@@ -9,7 +9,7 @@ import { usePremium } from "@/contexts/PremiumContext";
 import NotificationBell from "./NotificationBell";
 import GlobalSearch from "./GlobalSearch";
 import UpgradeDialog from "./UpgradeDialog";
-import { useReminderNotifications } from "@/hooks/use-reminder-notifications";
+import { usePaystackVerify } from "@/hooks/use-paystack-verify";
 import { toast } from "@/hooks/use-toast";
 
 const AppLayout = () => {
