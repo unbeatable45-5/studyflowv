@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      flashcard_reviews: {
+        Row: {
+          card_back: string
+          card_front: string
+          created_at: string
+          ease_factor: number
+          id: string
+          interval_days: number
+          last_reviewed_at: string | null
+          next_review_at: string
+          repetitions: number
+          topic: string
+          user_id: string
+        }
+        Insert: {
+          card_back: string
+          card_front: string
+          created_at?: string
+          ease_factor?: number
+          id?: string
+          interval_days?: number
+          last_reviewed_at?: string | null
+          next_review_at?: string
+          repetitions?: number
+          topic: string
+          user_id: string
+        }
+        Update: {
+          card_back?: string
+          card_front?: string
+          created_at?: string
+          ease_factor?: number
+          id?: string
+          interval_days?: number
+          last_reviewed_at?: string | null
+          next_review_at?: string
+          repetitions?: number
+          topic?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pomodoro_sessions: {
         Row: {
           completed_at: string
