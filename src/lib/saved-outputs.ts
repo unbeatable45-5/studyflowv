@@ -4,12 +4,12 @@ export async function saveOutput(tool: string, inputData: Record<string, unknown
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return;
 
-  await supabase.from("saved_outputs").insert({
+  await supabase.from("saved_outputs").insert([{
     user_id: user.id,
     tool,
-    input_data: inputData,
+    input_data: inputData as any,
     output_text: outputText,
-  });
+  }]);
 }
 
 export async function getRecentOutputs(tool?: string, limit = 5) {
