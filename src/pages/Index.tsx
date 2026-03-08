@@ -47,6 +47,14 @@ const tools = [
     color: "bg-destructive/10 text-destructive",
     tool: "pdf-export",
   },
+  {
+    to: "/pdf-summarizer",
+    icon: FileUp,
+    title: "PDF Summarizer",
+    description: "Upload a PDF and get an AI-powered summary",
+    color: "bg-success/10 text-success",
+    tool: "pdf-summarizer",
+  },
 ];
 
 const toolMeta: Record<string, { icon: typeof Lightbulb; color: string; label: string; to: string }> = {
