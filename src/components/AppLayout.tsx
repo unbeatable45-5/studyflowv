@@ -1,17 +1,19 @@
 import { Outlet } from "react-router-dom";
 import { Link } from "react-router-dom";
 import BottomNav from "./BottomNav";
-import { BookOpen, Moon, Sun, LogOut, UserCircle } from "lucide-react";
+import { BookOpen, Moon, Sun, LogOut, UserCircle, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from "./NotificationBell";
+import GlobalSearch from "./GlobalSearch";
 import { useReminderNotifications } from "@/hooks/use-reminder-notifications";
 import { toast } from "@/hooks/use-toast";
 
 const AppLayout = () => {
   const { signOut } = useAuth();
   useReminderNotifications();
+  const [searchOpen, setSearchOpen] = useState(false);
   const [dark, setDark] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("theme") === "dark" ||
