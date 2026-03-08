@@ -120,7 +120,7 @@ const StudyMode = () => {
   const handleDownload = () => {
     if (!output) return;
     const label = inputMode === "topic" ? topic : pdfFileName || "Study Session";
-    generatePdf(label, output);
+    generatePdf({ title: label, content: output, source: "custom" });
   };
 
   const sections = parseSections(output);
