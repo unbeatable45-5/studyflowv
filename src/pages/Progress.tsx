@@ -25,10 +25,16 @@ interface ReminderRow {
   completed: boolean;
 }
 
+interface PomodoroRow {
+  completed_at: string;
+  duration_minutes: number;
+}
+
 const Progress = () => {
   const { user } = useAuth();
   const [outputs, setOutputs] = useState<OutputRow[]>([]);
   const [reminders, setReminders] = useState<ReminderRow[]>([]);
+  const [pomodoros, setPomodoros] = useState<PomodoroRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,9 +50,15 @@ const Progress = () => {
         .from("reminders")
         .select("completed")
         .eq("user_id", user.id),
-    ]).then(([outputsRes, remindersRes]) => {
+      supabase
+        .from("pomodoro_sessions")
+        .select("completed_at, duration_minutes")
+        .eq("user_id", user.id)
+        .order("completed_at", { ascending: true }),
+    ]).then(([outputsRes, remindersRes, pomodoroRes]) => {
       setOutputs((outputsRes.data as OutputRow[]) ?? []);
       setReminders((remindersRes.data as ReminderRow[]) ?? []);
+      setPomodoros((pomodoroRes.data as PomodoroRow[]) ?? []);
       setLoading(false);
     });
   }, [user]);
