@@ -112,7 +112,18 @@ const Progress = () => {
     const completedTasks = reminders.filter(r => r.completed).length;
     const totalFocusMinutes = pomodoros.reduce((sum, p) => sum + p.duration_minutes, 0);
 
-    return { streak, totalSessions: outputs.length, thisWeek, completedTasks, weeklyData, toolBreakdown, totalFocusMinutes, focusData };
+    // Build activity map for heatmap
+    const activityMap: Record<string, number> = {};
+    outputs.forEach(o => {
+      const d = format(parseISO(o.created_at), "yyyy-MM-dd");
+      activityMap[d] = (activityMap[d] || 0) + 1;
+    });
+    pomodoros.forEach(p => {
+      const d = format(parseISO(p.completed_at), "yyyy-MM-dd");
+      activityMap[d] = (activityMap[d] || 0) + 1;
+    });
+
+    return { streak, totalSessions: outputs.length, thisWeek, completedTasks, weeklyData, toolBreakdown, totalFocusMinutes, focusData, activityMap };
   }, [outputs, reminders, pomodoros]);
 
   if (loading) {
