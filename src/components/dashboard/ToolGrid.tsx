@@ -7,22 +7,23 @@ const tools = [
   { to: "/planner", icon: CalendarDays, title: "Revision Planner", color: "bg-warning/10 text-warning" },
   { to: "/flashcards", icon: Layers, title: "Flashcards", color: "bg-accent text-accent-foreground" },
   { to: "/spaced-review", icon: Brain, title: "Spaced Review", color: "bg-success/10 text-success" },
+  { to: "/lecture-capture", icon: GraduationCap, title: "Lecture Capture", color: "bg-success/10 text-success" },
   { to: "/pdf-export", icon: FileDown, title: "PDF Export", color: "bg-destructive/10 text-destructive" },
   { to: "/reminders", icon: Bell, title: "Reminders", color: "bg-destructive/10 text-destructive" },
-  { to: "/pomodoro", icon: Timer, title: "Pomodoro", color: "bg-success/10 text-success" },
+  { to: "/pomodoro", icon: Timer, title: "Pomodoro", color: "bg-primary/10 text-primary" },
 ];
 
 const ToolGrid = () => (
   <div className="space-y-3">
     <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">More Tools</h2>
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-4 gap-3">
       {tools.map(({ to, icon: Icon, title, color }) => (
         <Link key={to} to={to}>
-          <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border/60 hover:shadow-md hover:border-primary/30 transition-all duration-200">
+          <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-card border border-border/60 hover:shadow-md hover:border-primary/30 transition-all duration-200">
             <div className={`rounded-xl p-2.5 ${color}`}>
               <Icon className="h-5 w-5" />
             </div>
-            <span className="text-xs font-medium text-foreground text-center">{title}</span>
+            <span className="text-[10px] font-medium text-foreground text-center leading-tight">{title}</span>
           </div>
         </Link>
       ))}

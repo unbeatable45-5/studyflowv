@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
 import { Download, Smartphone } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,9 +11,26 @@ import DailyChallenge from "@/components/dashboard/DailyChallenge";
 import ToolGrid from "@/components/dashboard/ToolGrid";
 import StreakWidget from "@/components/dashboard/StreakWidget";
 import NotificationPrompt from "@/components/dashboard/NotificationPrompt";
+import UpgradePrompt from "@/components/dashboard/UpgradePrompt";
+import Onboarding from "@/components/Onboarding";
 
 const Index = () => {
   const { canInstall, install } = usePwaInstall();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    const seen = localStorage.getItem("onboarding_completed");
+    if (!seen) setShowOnboarding(true);
+  }, []);
+
+  const completeOnboarding = () => {
+    localStorage.setItem("onboarding_completed", "true");
+    setShowOnboarding(false);
+  };
+
+  if (showOnboarding) {
+    return <Onboarding onComplete={completeOnboarding} />;
+  }
 
   return (
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6 animate-fade-in">
@@ -44,6 +62,7 @@ const Index = () => {
       <RecentActivity />
       <StudyLibrary />
       <ToolGrid />
+      <UpgradePrompt />
     </div>
   );
 };
