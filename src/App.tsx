@@ -19,6 +19,7 @@ import StudyOrganizer from "./pages/StudyOrganizer";
 import StudyMode from "./pages/StudyMode";
 import Reminders from "./pages/Reminders";
 import Progress from "./pages/Progress";
+import Pomodoro from "./pages/Pomodoro";
 import Tutorial from "./pages/Tutorial";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
