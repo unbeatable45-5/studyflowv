@@ -79,6 +79,7 @@ const App = () => (
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/spaced-review" element={<SpacedReview />} />
                 <Route path="/lecture-capture" element={<LectureCapture />} />
+                <Route path="/subscription" element={<Subscription />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
