@@ -131,8 +131,34 @@ const Reminders = () => {
   const activeReminders = reminders.filter(r => !r.completed);
   const completedReminders = reminders.filter(r => r.completed);
 
+  const [notifPermission, setNotifPermission] = useState<string>(getNotificationPermission());
+
+  const handleEnableNotifications = async () => {
+    const result = await requestNotificationPermission();
+    setNotifPermission(result);
+    if (result === "granted") {
+      toast({ title: "Notifications enabled!", description: "You'll get alerts when reminders are due." });
+    } else {
+      toast({ title: "Notifications blocked", description: "Enable them in your browser settings.", variant: "destructive" });
+    }
+  };
+
   return (
     <div className="px-4 py-6 max-w-lg mx-auto space-y-5">
+      {/* Notification Permission Banner */}
+      {notifPermission !== "granted" && notifPermission !== "unsupported" && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="p-3 flex items-center gap-3">
+            <BellRing className="h-5 w-5 text-primary shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground">Enable push notifications</p>
+              <p className="text-xs text-muted-foreground">Get alerted when your reminders are due, even in the background.</p>
+            </div>
+            <Button size="sm" onClick={handleEnableNotifications}>Enable</Button>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">

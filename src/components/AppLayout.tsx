@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import NotificationBell from "./NotificationBell";
+import { useReminderNotifications } from "@/hooks/use-reminder-notifications";
 import { toast } from "@/hooks/use-toast";
 
 const AppLayout = () => {
