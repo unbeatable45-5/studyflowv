@@ -16,6 +16,7 @@ const AppLayout = () => {
   const { signOut } = useAuth();
   const { isPremium, promptUpgrade } = usePremium();
   useReminderNotifications();
+  usePaystackVerify(() => window.location.reload());
   const [searchOpen, setSearchOpen] = useState(false);
   const [dark, setDark] = useState(() => {
     if (typeof window !== "undefined") {
