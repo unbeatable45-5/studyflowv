@@ -62,6 +62,7 @@ const App = () => (
               <Route path="/pdf-summarizer" element={<PdfSummarizer />} />
               <Route path="/history" element={<HistoryPage />} />
               <Route path="/pdf-builder" element={<CustomPdfBuilder />} />
+              <Route path="/organizer" element={<StudyOrganizer />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
             <Route path="*" element={<NotFound />} />
