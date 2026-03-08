@@ -51,7 +51,8 @@ const ReviewTimer = () => {
           clear();
           setRunning(false);
           setFinished(true);
-          toast({ title: "⏰ Time's up!", description: "Great review session!" });
+          toast({ title: "⏰ Time's up!", description: "Great review session! Session saved." });
+          saveSession(totalSeconds);
           return 0;
         }
         return prev - 1;
