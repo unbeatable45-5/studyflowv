@@ -58,6 +58,7 @@ const App = () => (
               <Route path="/flashcards" element={<FlashcardGenerator />} />
               <Route path="/pdf-export" element={<PdfExport />} />
               <Route path="/pdf-summarizer" element={<PdfSummarizer />} />
+              <Route path="/history" element={<HistoryPage />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
             <Route path="*" element={<NotFound />} />
