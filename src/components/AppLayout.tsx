@@ -14,6 +14,7 @@ import { toast } from "@/hooks/use-toast";
 
 const AppLayout = () => {
   const { signOut } = useAuth();
+  const { isPremium, promptUpgrade } = usePremium();
   useReminderNotifications();
   const [searchOpen, setSearchOpen] = useState(false);
   const [dark, setDark] = useState(() => {
