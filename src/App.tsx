@@ -15,6 +15,7 @@ import PdfExport from "./pages/PdfExport";
 import PdfSummarizer from "./pages/PdfSummarizer";
 import HistoryPage from "./pages/HistoryPage";
 import CustomPdfBuilder from "./pages/CustomPdfBuilder";
+import StudyOrganizer from "./pages/StudyOrganizer";
 import Tutorial from "./pages/Tutorial";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
