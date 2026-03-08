@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { saveOutput } from "@/lib/saved-outputs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import AIThinking from "@/components/AIThinking";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import OutputActions from "@/components/OutputActions";
 import { streamAI } from "@/lib/streaming";
