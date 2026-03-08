@@ -70,6 +70,7 @@ const ReviewTimer = () => {
     setSecondsLeft(s);
     setRunning(false);
     setFinished(false);
+    setSaved(false);
     clear();
   };
 
@@ -77,6 +78,7 @@ const ReviewTimer = () => {
     setSecondsLeft(totalSeconds);
     setRunning(false);
     setFinished(false);
+    setSaved(false);
     clear();
   };
 
