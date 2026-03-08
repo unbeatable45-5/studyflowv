@@ -8,6 +8,8 @@ import RecentActivity from "@/components/dashboard/RecentActivity";
 import StudyLibrary from "@/components/dashboard/StudyLibrary";
 import DailyChallenge from "@/components/dashboard/DailyChallenge";
 import ToolGrid from "@/components/dashboard/ToolGrid";
+import StreakWidget from "@/components/dashboard/StreakWidget";
+import NotificationPrompt from "@/components/dashboard/NotificationPrompt";
 
 const Index = () => {
   const { canInstall, install } = usePwaInstall();
@@ -15,6 +17,8 @@ const Index = () => {
   return (
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6 animate-fade-in">
       <GreetingSection />
+
+      <StreakWidget />
 
       {canInstall && (
         <Card className="border-primary/30 bg-primary/5 overflow-hidden">
@@ -32,6 +36,8 @@ const Index = () => {
           </CardContent>
         </Card>
       )}
+
+      <NotificationPrompt />
 
       <QuickActions />
       <DailyChallenge />
