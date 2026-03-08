@@ -349,6 +349,22 @@ const FlashcardGenerator = () => {
           </div>
         </div>
       )}
+
+      {/* Spaced Review Link */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="p-4 flex items-center gap-3">
+          <div className="rounded-xl p-2.5 bg-primary/10">
+            <Brain className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-display font-semibold text-foreground text-sm">Spaced Review</h3>
+            <p className="text-xs text-muted-foreground">Review cards at optimal intervals</p>
+          </div>
+          <Button size="sm" variant="outline" asChild>
+            <Link to="/spaced-review">Review</Link>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };
