@@ -63,7 +63,7 @@ const RevisionPlanner = () => {
       },
       onDone: () => {
         setLoading(false);
-        localStorage.setItem("lastPlan", JSON.stringify({ output: fullText, date: new Date().toISOString() }));
+        saveOutput("revision-planner", { courses: courseData, hoursPerDay: hours[0] }, fullText);
       },
       onError: (err) => {
         setLoading(false);

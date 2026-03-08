@@ -29,7 +29,7 @@ const NoteOrganizer = () => {
       },
       onDone: () => {
         setLoading(false);
-        localStorage.setItem("lastNotes", JSON.stringify({ output: fullText, date: new Date().toISOString() }));
+        saveOutput("note-organizer", { preview: notes.slice(0, 100) }, fullText);
       },
       onError: (err) => {
         setLoading(false);
