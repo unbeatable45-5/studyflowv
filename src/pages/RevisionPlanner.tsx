@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { saveOutput } from "@/lib/saved-outputs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import AIThinking from "@/components/AIThinking";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -162,13 +162,7 @@ const RevisionPlanner = () => {
         Generate Study Plan
       </Button>
 
-      {loading && !output && (
-        <div className="space-y-3">
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-5/6" />
-        </div>
-      )}
+      {loading && !output && <AIThinking message="Creating your study plan" />}
 
       {output && (
         <Card className="animate-fade-in">

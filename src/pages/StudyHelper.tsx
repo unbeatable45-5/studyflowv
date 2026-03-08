@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { saveOutput } from "@/lib/saved-outputs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import AIThinking from "@/components/AIThinking";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import OutputActions from "@/components/OutputActions";
 import { streamAI } from "@/lib/streaming";
@@ -68,15 +68,7 @@ const StudyHelper = () => {
         </Button>
       </div>
 
-      {/* Loading skeleton */}
-      {loading && !output && (
-        <div className="space-y-3">
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-5/6" />
-          <Skeleton className="h-4 w-2/3" />
-        </div>
-      )}
+      {loading && !output && <AIThinking message="Generating explanation" />}
 
       {/* Output */}
       {output && (

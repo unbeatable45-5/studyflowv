@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { BookOpen, Upload, Sparkles, FileDown, Save, ChevronDown, ChevronUp } from "lucide-react";
+import AIThinking from "@/components/AIThinking";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -201,6 +202,9 @@ const StudyMode = () => {
               <Sparkles className="h-4 w-4 mr-2" />
               {loading ? "Generating..." : "Generate Study Session"}
             </Button>
+            {loading && !hasOutput && (
+              <AIThinking message="Generating study session" />
+            )}
           </CardContent>
         )}
       </Card>
