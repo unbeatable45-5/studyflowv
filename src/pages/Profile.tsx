@@ -244,6 +244,26 @@ const Profile = () => {
         </CardContent>
       </Card>
 
+      {/* Subscription link */}
+      <Link to="/subscription">
+        <Card className="hover:bg-muted/80 transition-colors cursor-pointer">
+          <CardContent className="pt-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`rounded-lg p-2 ${isPremium ? "bg-warning/15" : "bg-muted"}`}>
+                <Crown className={`h-4 w-4 ${isPremium ? "text-warning" : "text-muted-foreground"}`} />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">Subscription</p>
+                <p className="text-xs text-muted-foreground">
+                  {isPremium ? "StudyFlow Pro — Active" : "Free Plan"}
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </CardContent>
+        </Card>
+      </Link>
+
       <Card className="bg-muted/50">
         <CardContent className="pt-6">
           <p className="text-sm text-muted-foreground">
