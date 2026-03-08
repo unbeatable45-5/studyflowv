@@ -146,25 +146,25 @@ const Profile = () => {
           <form onSubmit={handleSave} className="space-y-6">
             {/* Avatar */}
             <div className="flex flex-col items-center gap-3">
-              <div className="relative group">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="relative cursor-pointer rounded-full"
+              >
                 <Avatar className="h-24 w-24 border-2 border-border">
                   <AvatarImage src={avatarUrl} alt={displayName} />
                   <AvatarFallback className="text-xl font-display bg-primary/10 text-primary">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                  className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 active:opacity-100 focus:opacity-100 transition-opacity cursor-pointer"
-                >
+                <span className="absolute bottom-0 right-0 bg-primary rounded-full p-1.5 border-2 border-card shadow-sm">
                   {uploading ? (
-                    <Loader2 className="h-6 w-6 text-white animate-spin" />
+                    <Loader2 className="h-4 w-4 text-primary-foreground animate-spin" />
                   ) : (
-                    <Camera className="h-6 w-6 text-white" />
+                    <Camera className="h-4 w-4 text-primary-foreground" />
                   )}
-                </button>
+                </span>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -172,8 +172,8 @@ const Profile = () => {
                   onChange={handleAvatarUpload}
                   className="hidden"
                 />
-              </div>
-              <p className="text-xs text-muted-foreground">Click to upload a photo (max 2MB)</p>
+              </button>
+              <p className="text-xs text-muted-foreground">Tap to upload a photo (max 2MB)</p>
             </div>
 
             {/* Display name */}
