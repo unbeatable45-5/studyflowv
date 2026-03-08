@@ -26,6 +26,26 @@ import {
   ChevronRight,
   X,
   Check,
+  Calculator,
+  Leaf,
+  FlaskConical,
+  Atom,
+  Monitor,
+  Landmark,
+  Globe,
+  BookOpen,
+  BookMarked,
+  TrendingUp,
+  Briefcase,
+  Brain,
+  GraduationCap,
+  Palette,
+  Music,
+  Languages,
+  Scale,
+  HeartPulse,
+  Wrench,
+  HelpCircle,
 } from "lucide-react";
 import {
   Select,
@@ -41,6 +61,33 @@ const SUBJECTS = [
   "Business Studies", "Psychology", "Philosophy", "Art", "Music",
   "Foreign Languages", "Law", "Medicine", "Engineering", "General Studies",
 ];
+
+const subjectTheme: Record<string, { icon: typeof Calculator; bg: string; text: string; badge: string }> = {
+  Mathematics:       { icon: Calculator,   bg: "bg-[hsl(220,72%,50%)]/10", text: "text-primary",            badge: "bg-[hsl(220,72%,50%)]/15 text-primary" },
+  Biology:           { icon: Leaf,          bg: "bg-[hsl(152,60%,42%)]/10", text: "text-success",            badge: "bg-[hsl(152,60%,42%)]/15 text-success" },
+  Chemistry:         { icon: FlaskConical,  bg: "bg-[hsl(280,60%,50%)]/10", text: "text-[hsl(280,60%,50%)]", badge: "bg-[hsl(280,60%,50%)]/15 text-[hsl(280,60%,50%)]" },
+  Physics:           { icon: Atom,          bg: "bg-[hsl(200,80%,50%)]/10", text: "text-[hsl(200,80%,50%)]", badge: "bg-[hsl(200,80%,50%)]/15 text-[hsl(200,80%,50%)]" },
+  "Computer Science":{ icon: Monitor,       bg: "bg-[hsl(170,60%,40%)]/10", text: "text-[hsl(170,60%,40%)]", badge: "bg-[hsl(170,60%,40%)]/15 text-[hsl(170,60%,40%)]" },
+  History:           { icon: Landmark,      bg: "bg-[hsl(38,92%,50%)]/10",  text: "text-warning",            badge: "bg-[hsl(38,92%,50%)]/15 text-warning" },
+  Geography:         { icon: Globe,         bg: "bg-[hsl(160,50%,45%)]/10", text: "text-[hsl(160,50%,45%)]", badge: "bg-[hsl(160,50%,45%)]/15 text-[hsl(160,50%,45%)]" },
+  English:           { icon: BookOpen,      bg: "bg-[hsl(340,65%,50%)]/10", text: "text-[hsl(340,65%,50%)]", badge: "bg-[hsl(340,65%,50%)]/15 text-[hsl(340,65%,50%)]" },
+  Literature:        { icon: BookMarked,    bg: "bg-[hsl(320,50%,50%)]/10", text: "text-[hsl(320,50%,50%)]", badge: "bg-[hsl(320,50%,50%)]/15 text-[hsl(320,50%,50%)]" },
+  Economics:         { icon: TrendingUp,    bg: "bg-[hsl(45,80%,45%)]/10",  text: "text-[hsl(45,80%,45%)]",  badge: "bg-[hsl(45,80%,45%)]/15 text-[hsl(45,80%,45%)]" },
+  "Business Studies":{ icon: Briefcase,     bg: "bg-[hsl(215,25%,50%)]/10", text: "text-[hsl(215,25%,50%)]", badge: "bg-[hsl(215,25%,50%)]/15 text-[hsl(215,25%,50%)]" },
+  Psychology:        { icon: Brain,         bg: "bg-[hsl(260,50%,55%)]/10", text: "text-[hsl(260,50%,55%)]", badge: "bg-[hsl(260,50%,55%)]/15 text-[hsl(260,50%,55%)]" },
+  Philosophy:        { icon: GraduationCap, bg: "bg-[hsl(30,40%,50%)]/10",  text: "text-[hsl(30,40%,50%)]",  badge: "bg-[hsl(30,40%,50%)]/15 text-[hsl(30,40%,50%)]" },
+  Art:               { icon: Palette,       bg: "bg-[hsl(0,84%,60%)]/10",   text: "text-destructive",        badge: "bg-[hsl(0,84%,60%)]/15 text-destructive" },
+  Music:             { icon: Music,         bg: "bg-[hsl(290,45%,55%)]/10", text: "text-[hsl(290,45%,55%)]", badge: "bg-[hsl(290,45%,55%)]/15 text-[hsl(290,45%,55%)]" },
+  "Foreign Languages":{ icon: Languages,    bg: "bg-[hsl(190,60%,45%)]/10", text: "text-[hsl(190,60%,45%)]", badge: "bg-[hsl(190,60%,45%)]/15 text-[hsl(190,60%,45%)]" },
+  Law:               { icon: Scale,         bg: "bg-[hsl(210,30%,40%)]/10", text: "text-[hsl(210,30%,40%)]", badge: "bg-[hsl(210,30%,40%)]/15 text-[hsl(210,30%,40%)]" },
+  Medicine:          { icon: HeartPulse,    bg: "bg-[hsl(0,70%,55%)]/10",   text: "text-[hsl(0,70%,55%)]",   badge: "bg-[hsl(0,70%,55%)]/15 text-[hsl(0,70%,55%)]" },
+  Engineering:       { icon: Wrench,        bg: "bg-[hsl(25,70%,50%)]/10",  text: "text-[hsl(25,70%,50%)]",  badge: "bg-[hsl(25,70%,50%)]/15 text-[hsl(25,70%,50%)]" },
+  "General Studies": { icon: HelpCircle,    bg: "bg-muted",                 text: "text-muted-foreground",   badge: "bg-muted text-muted-foreground" },
+  Uncategorized:     { icon: FolderOpen,    bg: "bg-muted",                 text: "text-muted-foreground",   badge: "bg-muted text-muted-foreground" },
+};
+
+const getSubjectTheme = (subject: string) =>
+  subjectTheme[subject] || subjectTheme["Uncategorized"];
 
 const toolIcons: Record<string, typeof Lightbulb> = {
   "study-helper": Lightbulb,
@@ -261,6 +308,8 @@ const StudyOrganizer = () => {
         <div className="space-y-2">
           {grouped.map(([subject, subjectItems]) => {
             const isOpen = openFolders.has(subject);
+            const theme = getSubjectTheme(subject);
+            const SubjectIcon = theme.icon;
             return (
               <Card key={subject} className="overflow-hidden">
                 {/* Folder header */}
@@ -269,13 +318,15 @@ const StudyOrganizer = () => {
                   onClick={() => toggleFolder(subject)}
                 >
                   {isOpen ? (
-                    <ChevronDown className="h-4 w-4 text-primary shrink-0" />
+                    <ChevronDown className={`h-4 w-4 shrink-0 ${theme.text}`} />
                   ) : (
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   )}
-                  <FolderOpen className={`h-4 w-4 shrink-0 ${isOpen ? "text-primary" : "text-muted-foreground"}`} />
+                  <div className={`rounded-lg p-1.5 ${theme.bg}`}>
+                    <SubjectIcon className={`h-4 w-4 ${theme.text}`} />
+                  </div>
                   <span className="text-sm font-medium text-foreground flex-1">{subject}</span>
-                  <span className="text-[11px] text-muted-foreground bg-muted rounded-full px-2 py-0.5">
+                  <span className={`text-[11px] rounded-full px-2 py-0.5 ${theme.badge}`}>
                     {subjectItems.length}
                   </span>
                 </button>
