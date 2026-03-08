@@ -11,6 +11,7 @@ import StudyHelper from "./pages/StudyHelper";
 import NoteOrganizer from "./pages/NoteOrganizer";
 import RevisionPlanner from "./pages/RevisionPlanner";
 import FlashcardGenerator from "./pages/FlashcardGenerator";
+import PdfExport from "./pages/PdfExport";
 import Tutorial from "./pages/Tutorial";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -53,6 +54,7 @@ const App = () => (
               <Route path="/planner" element={<RevisionPlanner />} />
               <Route path="/tutorial" element={<Tutorial />} />
               <Route path="/flashcards" element={<FlashcardGenerator />} />
+              <Route path="/pdf-export" element={<PdfExport />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
             <Route path="*" element={<NotFound />} />

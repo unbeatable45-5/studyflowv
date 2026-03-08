@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers } from "lucide-react";
+import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRecentOutputs } from "@/lib/saved-outputs";
@@ -36,8 +36,16 @@ const tools = [
     icon: Layers,
     title: "Flashcard Generator",
     description: "Create interactive flashcards on any topic",
-    color: "bg-purple-500/10 text-purple-500",
+    color: "bg-accent text-accent-foreground",
     tool: "flashcard-generator",
+  },
+  {
+    to: "/pdf-export",
+    icon: FileDown,
+    title: "PDF Export",
+    description: "Download your study notes as a professional PDF",
+    color: "bg-destructive/10 text-destructive",
+    tool: "pdf-export",
   },
 ];
 

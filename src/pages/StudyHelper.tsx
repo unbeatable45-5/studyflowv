@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { saveOutput } from "@/lib/saved-outputs";
 import { Button } from "@/components/ui/button";
@@ -7,13 +8,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import OutputActions from "@/components/OutputActions";
 import { streamAI } from "@/lib/streaming";
-import { Lightbulb, Loader2 } from "lucide-react";
+import { Lightbulb, Loader2, FileDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const StudyHelper = () => {
   const [topic, setTopic] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleGenerate = async () => {
     if (!topic.trim()) return;
@@ -82,7 +84,17 @@ const StudyHelper = () => {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">Results</CardTitle>
-              <OutputActions text={output} title={`Study: ${topic}`} />
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => navigate(`/pdf-export?source=study-helper&title=${encodeURIComponent(`Study: ${topic}`)}&content=${encodeURIComponent(output)}`)}
+                >
+                  <FileDown className="h-4 w-4" /> PDF
+                </Button>
+                <OutputActions text={output} title={`Study: ${topic}`} />
+              </div>
             </div>
           </CardHeader>
           <CardContent>

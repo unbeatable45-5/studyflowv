@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { saveOutput } from "@/lib/saved-outputs";
 import { Button } from "@/components/ui/button";
@@ -6,13 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import OutputActions from "@/components/OutputActions";
 import { streamAI } from "@/lib/streaming";
-import { FileText, Loader2 } from "lucide-react";
+import { FileText, Loader2, FileDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const NoteOrganizer = () => {
   const [notes, setNotes] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleOrganize = async () => {
     if (!notes.trim()) return;
@@ -76,7 +78,17 @@ const NoteOrganizer = () => {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">Organized Notes</CardTitle>
-              <OutputActions text={output} title="Organized Notes" />
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => navigate(`/pdf-export?source=note-organizer&title=${encodeURIComponent("Organized Notes")}&content=${encodeURIComponent(output)}`)}
+                >
+                  <FileDown className="h-4 w-4" /> PDF
+                </Button>
+                <OutputActions text={output} title="Organized Notes" />
+              </div>
             </div>
           </CardHeader>
           <CardContent>
