@@ -271,6 +271,9 @@ const Progress = () => {
         </CardContent>
       </Card>
 
+      {/* Calendar Heatmap */}
+      <CalendarHeatmap activityMap={stats.activityMap} />
+
       {/* Focus Time Chart */}
       {stats.focusData.some((d: any) => d.minutes > 0) && (
         <Card>
