@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp, FilePlus } from "lucide-react";
+import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp, FilePlus, FolderOpen } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRecentOutputs } from "@/lib/saved-outputs";
@@ -62,6 +62,14 @@ const tools = [
     description: "Create multi-page PDFs with your own notes",
     color: "bg-warning/10 text-warning",
     tool: "pdf-builder",
+  },
+  {
+    to: "/organizer",
+    icon: FolderOpen,
+    title: "Study Organizer",
+    description: "Browse all your materials organized by subject",
+    color: "bg-primary/10 text-primary",
+    tool: "organizer",
   },
 ];
 
