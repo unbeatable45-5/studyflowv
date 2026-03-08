@@ -308,6 +308,8 @@ const StudyOrganizer = () => {
         <div className="space-y-2">
           {grouped.map(([subject, subjectItems]) => {
             const isOpen = openFolders.has(subject);
+            const theme = getSubjectTheme(subject);
+            const SubjectIcon = theme.icon;
             return (
               <Card key={subject} className="overflow-hidden">
                 {/* Folder header */}
@@ -316,13 +318,15 @@ const StudyOrganizer = () => {
                   onClick={() => toggleFolder(subject)}
                 >
                   {isOpen ? (
-                    <ChevronDown className="h-4 w-4 text-primary shrink-0" />
+                    <ChevronDown className={`h-4 w-4 shrink-0 ${theme.text}`} />
                   ) : (
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   )}
-                  <FolderOpen className={`h-4 w-4 shrink-0 ${isOpen ? "text-primary" : "text-muted-foreground"}`} />
+                  <div className={`rounded-lg p-1.5 ${theme.bg}`}>
+                    <SubjectIcon className={`h-4 w-4 ${theme.text}`} />
+                  </div>
                   <span className="text-sm font-medium text-foreground flex-1">{subject}</span>
-                  <span className="text-[11px] text-muted-foreground bg-muted rounded-full px-2 py-0.5">
+                  <span className={`text-[11px] rounded-full px-2 py-0.5 ${theme.badge}`}>
                     {subjectItems.length}
                   </span>
                 </button>
