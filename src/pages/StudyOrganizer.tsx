@@ -97,6 +97,7 @@ const toolIcons: Record<string, typeof Lightbulb> = {
   "pdf-export": FileDown,
   "pdf-summarizer": FileUp,
   "pdf-builder": FilePlus,
+  "study-mode": BookOpen,
 };
 
 const toolLabels: Record<string, string> = {
