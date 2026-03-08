@@ -64,52 +64,41 @@ const Progress = () => {
   }, [user]);
 
   const stats = useMemo(() => {
-    if (outputs.length === 0) {
-      return { streak: 0, totalSessions: 0, thisWeek: 0, completedTasks: 0, weeklyData: [], toolBreakdown: [] };
-    }
+    const empty = { streak: 0, totalSessions: 0, thisWeek: 0, completedTasks: 0, weeklyData: [], toolBreakdown: [], totalFocusMinutes: 0, focusData: [] };
+    if (outputs.length === 0 && pomodoros.length === 0) return empty;
 
-    // Unique active days
-    const activeDays = new Set(
-      outputs.map(o => format(parseISO(o.created_at), "yyyy-MM-dd"))
-    );
+    const activeDays = new Set([
+      ...outputs.map(o => format(parseISO(o.created_at), "yyyy-MM-dd")),
+      ...pomodoros.map(p => format(parseISO(p.completed_at), "yyyy-MM-dd")),
+    ]);
 
-    // Current streak
     let streak = 0;
     const today = startOfDay(new Date());
     let checkDate = today;
-
-    // Check if today has activity, if not start from yesterday
     if (!activeDays.has(format(checkDate, "yyyy-MM-dd"))) {
       checkDate = subDays(checkDate, 1);
     }
-
     while (activeDays.has(format(checkDate, "yyyy-MM-dd"))) {
       streak++;
       checkDate = subDays(checkDate, 1);
     }
 
-    // This week sessions
     const weekStart = subDays(today, 6);
-    const thisWeek = outputs.filter(o => {
-      const d = parseISO(o.created_at);
-      return d >= weekStart;
-    }).length;
+    const thisWeek = outputs.filter(o => parseISO(o.created_at) >= weekStart).length;
 
-    // Weekly data (last 7 days)
     const weeklyData = [];
+    const focusData = [];
     for (let i = 6; i >= 0; i--) {
       const day = subDays(today, i);
       const dayStr = format(day, "yyyy-MM-dd");
       const count = outputs.filter(o => format(parseISO(o.created_at), "yyyy-MM-dd") === dayStr).length;
-      weeklyData.push({
-        day: format(day, "EEE"),
-        date: format(day, "MMM d"),
-        sessions: count,
-        isToday: i === 0,
-      });
+      const focusMins = pomodoros
+        .filter(p => format(parseISO(p.completed_at), "yyyy-MM-dd") === dayStr)
+        .reduce((sum, p) => sum + p.duration_minutes, 0);
+      weeklyData.push({ day: format(day, "EEE"), date: format(day, "MMM d"), sessions: count, isToday: i === 0 });
+      focusData.push({ day: format(day, "EEE"), date: format(day, "MMM d"), minutes: focusMins, isToday: i === 0 });
     }
 
-    // Tool breakdown
     const toolCounts: Record<string, number> = {};
     outputs.forEach(o => {
       toolCounts[o.tool] = (toolCounts[o.tool] || 0) + 1;
