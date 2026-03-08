@@ -114,6 +114,7 @@ interface SavedOutput {
 }
 
 const Index = () => {
+  const { canInstall, isInstalled, install } = usePwaInstall();
   const [recents, setRecents] = useState<SavedOutput[]>([]);
   const [loadingRecents, setLoadingRecents] = useState(true);
 
