@@ -42,6 +42,15 @@ const AppLayout = () => {
           <BookOpen className="h-5 w-5 text-primary-foreground" />
         </div>
         <h1 className="text-lg font-display font-bold text-foreground flex-1">StudyFlow</h1>
+        {isPremium ? (
+          <span className="flex items-center gap-1 text-[10px] font-semibold text-warning bg-warning/10 px-2 py-0.5 rounded-full">
+            <Crown className="h-3 w-3" /> PRO
+          </span>
+        ) : (
+          <Button variant="ghost" size="sm" onClick={promptUpgrade} className="gap-1 text-xs text-warning hover:text-warning shrink-0 px-2">
+            <Crown className="h-3.5 w-3.5" /> Pro
+          </Button>
+        )}
         <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="shrink-0">
           <Search className="h-5 w-5" />
         </Button>
