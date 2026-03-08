@@ -65,13 +65,7 @@ const NoteOrganizer = () => {
         Organize Notes
       </Button>
 
-      {loading && !output && (
-        <div className="space-y-3">
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-5/6" />
-        </div>
-      )}
+      {loading && !output && <AIThinking message="Organizing your notes" />}
 
       {output && (
         <Card className="animate-fade-in">

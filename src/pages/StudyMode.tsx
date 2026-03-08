@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { BookOpen, Upload, Sparkles, FileDown, Save, ChevronDown, ChevronUp } from "lucide-react";
+import AIThinking from "@/components/AIThinking";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";

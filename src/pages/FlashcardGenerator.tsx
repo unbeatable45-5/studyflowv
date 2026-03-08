@@ -2,8 +2,7 @@ import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import AIThinking from "@/components/AIThinking";
-import { Slider } from "@/components/ui/slider";
+import AIThinking from "@/components/AIThinkingimport { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import OutputActions from "@/components/OutputActions";
@@ -159,7 +158,7 @@ const FlashcardGenerator = () => {
         <Slider value={count} onValueChange={setCount} min={3} max={12} step={1} />
       </div>
 
-      {loading && <Skeleton className="h-48 w-full rounded-xl" />}
+      {loading && <Skcards.length === 0 && <AIThinking message="Creating flashcards>}
 
       {/* Quiz finished screen */}
       {mode === "quiz" && quizFinished && (
