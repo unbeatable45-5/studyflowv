@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
+import { Link } from "react-router-dom";
 import BottomNav from "./BottomNav";
-import { BookOpen, Moon, Sun, LogOut } from "lucide-react";
+import { BookOpen, Moon, Sun, LogOut, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -36,6 +37,11 @@ const AppLayout = () => {
         <Button variant="ghost" size="icon" onClick={() => setDark(!dark)} className="shrink-0">
           {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </Button>
+        <Link to="/profile">
+          <Button variant="ghost" size="icon" className="shrink-0">
+            <UserCircle className="h-5 w-5" />
+          </Button>
+        </Link>
         <Button variant="ghost" size="icon" onClick={handleSignOut} className="shrink-0">
           <LogOut className="h-5 w-5" />
         </Button>
