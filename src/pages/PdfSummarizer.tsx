@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Skeleton } from "@/components/ui/skeleton";
+import AIThinking from "@/components/AIThinking";
 import OutputActions from "@/components/OutputActions";
 import { streamAI } from "@/lib/streaming";
 import { saveOutput } from "@/lib/saved-outputs";
