@@ -1,12 +1,20 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp, FilePlus, FolderOpen } from "lucide-react";
+import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp, FilePlus, FolderOpen, BookOpen } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRecentOutputs } from "@/lib/saved-outputs";
 import { formatDistanceToNow } from "date-fns";
 
 const tools = [
+  {
+    to: "/study-mode",
+    icon: BookOpen,
+    title: "Study Mode",
+    description: "Generate a full study session with summary, flashcards, quiz & plan",
+    color: "bg-accent text-accent-foreground",
+    tool: "study-mode",
+  },
   {
     to: "/study",
     icon: Lightbulb,

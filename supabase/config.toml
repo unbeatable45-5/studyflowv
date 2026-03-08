@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.detect-subject]
 verify_jwt = false
+
+[functions.study-mode]
+verify_jwt = false

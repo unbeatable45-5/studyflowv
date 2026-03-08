@@ -16,6 +16,7 @@ import PdfSummarizer from "./pages/PdfSummarizer";
 import HistoryPage from "./pages/HistoryPage";
 import CustomPdfBuilder from "./pages/CustomPdfBuilder";
 import StudyOrganizer from "./pages/StudyOrganizer";
+import StudyMode from "./pages/StudyMode";
 import Tutorial from "./pages/Tutorial";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -63,6 +64,7 @@ const App = () => (
               <Route path="/history" element={<HistoryPage />} />
               <Route path="/pdf-builder" element={<CustomPdfBuilder />} />
               <Route path="/organizer" element={<StudyOrganizer />} />
+              <Route path="/study-mode" element={<StudyMode />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
             <Route path="*" element={<NotFound />} />

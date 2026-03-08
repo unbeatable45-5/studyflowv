@@ -97,6 +97,7 @@ const toolIcons: Record<string, typeof Lightbulb> = {
   "pdf-export": FileDown,
   "pdf-summarizer": FileUp,
   "pdf-builder": FilePlus,
+  "study-mode": BookOpen,
 };
 
 const toolLabels: Record<string, string> = {
@@ -107,6 +108,7 @@ const toolLabels: Record<string, string> = {
   "pdf-export": "PDF Export",
   "pdf-summarizer": "PDF Summary",
   "pdf-builder": "Custom PDF",
+  "study-mode": "Study Session",
 };
 
 interface SavedItem {
