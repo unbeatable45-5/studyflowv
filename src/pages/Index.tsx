@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp } from "lucide-react";
+import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp, FilePlus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRecentOutputs } from "@/lib/saved-outputs";
@@ -54,6 +54,14 @@ const tools = [
     description: "Upload a PDF and get an AI-powered summary",
     color: "bg-success/10 text-success",
     tool: "pdf-summarizer",
+  },
+  {
+    to: "/pdf-builder",
+    icon: FilePlus,
+    title: "Custom PDF Builder",
+    description: "Create multi-page PDFs with your own notes",
+    color: "bg-warning/10 text-warning",
+    tool: "pdf-builder",
   },
 ];
 
