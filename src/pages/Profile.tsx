@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePremium } from "@/contexts/PremiumContext";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -9,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
-import { User, Loader2, Camera, X, Plus } from "lucide-react";
+import { User, Loader2, Camera, X, Plus, Crown, ChevronRight } from "lucide-react";
 
 const SUBJECT_OPTIONS = [
   "Mathematics", "Physics", "Chemistry", "Biology", "Computer Science",
@@ -20,6 +22,7 @@ const SUBJECT_OPTIONS = [
 
 const Profile = () => {
   const { user } = useAuth();
+  const { isPremium } = usePremium();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -240,6 +243,26 @@ const Profile = () => {
           </form>
         </CardContent>
       </Card>
+
+      {/* Subscription link */}
+      <Link to="/subscription">
+        <Card className="hover:bg-muted/80 transition-colors cursor-pointer">
+          <CardContent className="pt-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`rounded-lg p-2 ${isPremium ? "bg-warning/15" : "bg-muted"}`}>
+                <Crown className={`h-4 w-4 ${isPremium ? "text-warning" : "text-muted-foreground"}`} />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">Subscription</p>
+                <p className="text-xs text-muted-foreground">
+                  {isPremium ? "StudyFlow Pro — Active" : "Free Plan"}
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </CardContent>
+        </Card>
+      </Link>
 
       <Card className="bg-muted/50">
         <CardContent className="pt-6">

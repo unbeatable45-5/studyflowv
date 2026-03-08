@@ -24,6 +24,7 @@ import Pomodoro from "./pages/Pomodoro";
 import Tutorial from "./pages/Tutorial";
 import SpacedReview from "./pages/SpacedReview";
 import LectureCapture from "./pages/LectureCapture";
+import Subscription from "./pages/Subscription";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -78,6 +79,7 @@ const App = () => (
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/spaced-review" element={<SpacedReview />} />
                 <Route path="/lecture-capture" element={<LectureCapture />} />
+                <Route path="/subscription" element={<Subscription />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
