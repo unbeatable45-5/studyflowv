@@ -80,7 +80,7 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [todayUsage, setTodayUsage] = useState({ summaries: 0, pdfs: 0, daily_questions: 0 });
 
-  // Check premium status — will be wired to Stripe later
+  // Check premium status from subscriptions table
   useEffect(() => {
     if (!user) {
       setIsPremium(false);
@@ -88,10 +88,19 @@ export const PremiumProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    // For now, check a simple flag. This will be replaced by Stripe subscription check.
     const checkPremium = async () => {
-      // TODO: Replace with Stripe subscription status check
-      setIsPremium(false);
+      const { data } = await supabase
+        .from("subscriptions")
+        .select("status, current_period_end")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (data && data.status === "active" && data.current_period_end) {
+        const isValid = new Date(data.current_period_end) > new Date();
+        setIsPremium(isValid);
+      } else {
+        setIsPremium(false);
+      }
       setLoading(false);
     };
 
