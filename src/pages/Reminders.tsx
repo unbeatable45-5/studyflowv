@@ -11,10 +11,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Bell, CalendarDays, Clock, Plus, Trash2, BookOpen, GraduationCap, CheckSquare, Loader2 } from "lucide-react";
+import { Bell, BellRing, CalendarDays, Clock, Plus, Trash2, BookOpen, GraduationCap, CheckSquare, Loader2 } from "lucide-react";
 import { format, isPast, isToday, isTomorrow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { requestNotificationPermission, getNotificationPermission } from "@/hooks/use-reminder-notifications";
 
 interface Reminder {
   id: string;
