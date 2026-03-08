@@ -10,12 +10,14 @@ import NotificationBell from "./NotificationBell";
 import GlobalSearch from "./GlobalSearch";
 import UpgradeDialog from "./UpgradeDialog";
 import { useReminderNotifications } from "@/hooks/use-reminder-notifications";
+import { usePaystackVerify } from "@/hooks/use-paystack-verify";
 import { toast } from "@/hooks/use-toast";
 
 const AppLayout = () => {
   const { signOut } = useAuth();
   const { isPremium, promptUpgrade } = usePremium();
   useReminderNotifications();
+  usePaystackVerify(() => window.location.reload());
   const [searchOpen, setSearchOpen] = useState(false);
   const [dark, setDark] = useState(() => {
     if (typeof window !== "undefined") {

@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { usePremium } from "@/contexts/PremiumContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Crown, Zap, Brain, FileText, Layers, BarChart3, Download, Users, Sparkles, Check } from "lucide-react";
+import { Crown, Zap, Brain, FileText, Layers, BarChart3, Download, Users, Sparkles, Check, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const features = [
   { icon: Zap, label: "Unlimited AI summaries" },
@@ -16,6 +20,37 @@ const features = [
 
 const UpgradeDialog = () => {
   const { showUpgradeDialog, setShowUpgradeDialog } = usePremium();
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly">("monthly");
+
+  const handlePaystackCheckout = async () => {
+    if (!user) {
+      toast({ title: "Please sign in first", variant: "destructive" });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("paystack-initialize", {
+        body: { plan: selectedPlan },
+      });
+
+      if (error) throw error;
+
+      if (data?.authorization_url) {
+        // Store reference for verification on return
+        localStorage.setItem("paystack_reference", data.reference);
+        window.location.href = data.authorization_url;
+      } else {
+        throw new Error("No authorization URL returned");
+      }
+    } catch (err: any) {
+      toast({ title: "Payment failed", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
@@ -41,15 +76,54 @@ const UpgradeDialog = () => {
         </div>
 
         <div className="space-y-3 pt-2">
-          <div className="text-center">
-            <span className="text-3xl font-display font-bold text-foreground">$9.99</span>
-            <span className="text-sm text-muted-foreground">/month</span>
+          {/* Plan toggle */}
+          <div className="flex gap-2 p-1 bg-muted rounded-lg">
+            <button
+              onClick={() => setSelectedPlan("monthly")}
+              className={`flex-1 text-sm py-2 rounded-md font-medium transition-colors ${
+                selectedPlan === "monthly"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground"
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setSelectedPlan("yearly")}
+              className={`flex-1 text-sm py-2 rounded-md font-medium transition-colors ${
+                selectedPlan === "yearly"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground"
+              }`}
+            >
+              Yearly <span className="text-xs text-success">Save 33%</span>
+            </button>
           </div>
-          <Button className="w-full gap-2 bg-gradient-to-r from-warning to-primary hover:opacity-90 text-white" size="lg" disabled>
-            <Crown className="h-4 w-4" /> Coming Soon
+
+          <div className="text-center">
+            <span className="text-3xl font-display font-bold text-foreground">
+              {selectedPlan === "monthly" ? "₦9,990" : "₦79,990"}
+            </span>
+            <span className="text-sm text-muted-foreground">
+              /{selectedPlan === "monthly" ? "month" : "year"}
+            </span>
+          </div>
+
+          <Button
+            className="w-full gap-2 bg-gradient-to-r from-warning to-primary hover:opacity-90 text-white"
+            size="lg"
+            onClick={handlePaystackCheckout}
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Crown className="h-4 w-4" />
+            )}
+            {loading ? "Processing..." : "Upgrade Now"}
           </Button>
           <p className="text-[11px] text-center text-muted-foreground">
-            Cancel anytime · 7-day free trial
+            Cancel anytime · Secured by Paystack
           </p>
         </div>
       </DialogContent>
