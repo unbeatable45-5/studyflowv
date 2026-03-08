@@ -259,6 +259,40 @@ const Progress = () => {
         </CardContent>
       </Card>
 
+      {/* Focus Time Chart */}
+      {stats.focusData.some((d: any) => d.minutes > 0) && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              Focus Time (minutes)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pb-4">
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={stats.focusData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} width={24} />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (!active || !payload?.length) return null;
+                    const d = payload[0].payload;
+                    return (
+                      <div className="bg-popover text-popover-foreground border rounded-lg px-3 py-2 shadow-md text-xs">
+                        <p className="font-medium">{d.date}</p>
+                        <p>{d.minutes} min focused</p>
+                      </div>
+                    );
+                  }}
+                />
+                <Line type="monotone" dataKey="minutes" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: "hsl(var(--primary))", r: 3 }} activeDot={{ r: 5 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Tool Breakdown */}
       {stats.toolBreakdown.length > 0 && (
         <Card>
