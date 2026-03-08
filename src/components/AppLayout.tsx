@@ -61,6 +61,7 @@ const AppLayout = () => {
       </main>
 
       <BottomNav />
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </div>
   );
 };
