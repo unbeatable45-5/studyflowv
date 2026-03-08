@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Timer, Play, Pause, RotateCcw, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const PRESETS = [
   { label: "5 min", seconds: 5 * 60 },
@@ -12,16 +14,34 @@ const PRESETS = [
 ];
 
 const ReviewTimer = () => {
+  const { user } = useAuth();
   const [totalSeconds, setTotalSeconds] = useState(15 * 60);
   const [secondsLeft, setSecondsLeft] = useState(15 * 60);
   const [running, setRunning] = useState(false);
   const [finished, setFinished] = useState(false);
+  const [saved, setSaved] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const clear = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = null;
   }, []);
+
+  const saveSession = useCallback(async (durationSeconds: number) => {
+    if (!user || saved) return;
+    const minutes = Math.round(durationSeconds / 60);
+    if (minutes < 1) return;
+    setSaved(true);
+    const { error } = await supabase.from("pomodoro_sessions").insert({
+      user_id: user.id,
+      duration_minutes: minutes,
+      label: "Lecture Review",
+    });
+    if (error) {
+      console.error("Failed to save session:", error);
+      setSaved(false);
+    }
+  }, [user, saved]);
 
   useEffect(() => {
     if (!running) { clear(); return; }
@@ -31,7 +51,8 @@ const ReviewTimer = () => {
           clear();
           setRunning(false);
           setFinished(true);
-          toast({ title: "⏰ Time's up!", description: "Great review session!" });
+          toast({ title: "⏰ Time's up!", description: "Great review session! Session saved." });
+          saveSession(totalSeconds);
           return 0;
         }
         return prev - 1;
@@ -49,6 +70,7 @@ const ReviewTimer = () => {
     setSecondsLeft(s);
     setRunning(false);
     setFinished(false);
+    setSaved(false);
     clear();
   };
 
@@ -56,6 +78,7 @@ const ReviewTimer = () => {
     setSecondsLeft(totalSeconds);
     setRunning(false);
     setFinished(false);
+    setSaved(false);
     clear();
   };
 
