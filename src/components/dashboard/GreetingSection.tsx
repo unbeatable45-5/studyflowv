@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Sparkles } from "lucide-react";
+import { Sparkles, PartyPopper } from "lucide-react";
 
 const GreetingSection = () => {
   const { user } = useAuth();
   const [displayName, setDisplayName] = useState<string>("");
+  const [isNewUser, setIsNewUser] = useState(false);
 
   useEffect(() => {
     if (!user) return;
+
+    // Check if user signed up today
+    const createdAt = new Date(user.created_at);
+    const now = new Date();
+    const diffHours = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+    setIsNewUser(diffHours < 24);
+
     supabase
       .from("profiles")
       .select("display_name")
@@ -24,6 +32,14 @@ const GreetingSection = () => {
 
   return (
     <div className="space-y-1">
+      {isNewUser && (
+        <div className="flex items-center gap-2 bg-primary/10 rounded-lg px-3 py-2 mb-2">
+          <PartyPopper className="h-5 w-5 text-primary" />
+          <p className="text-sm font-medium text-primary">
+            Welcome to Student Hub! Start by exploring the tools below.
+          </p>
+        </div>
+      )}
       <h1 className="text-2xl font-display font-bold text-foreground">
         {greeting}, {displayName}! 👋
       </h1>
