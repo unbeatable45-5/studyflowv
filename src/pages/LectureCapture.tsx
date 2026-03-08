@@ -271,6 +271,9 @@ const LectureCapture = () => {
               </TabsContent>
             ))}
           </Tabs>
+
+          {/* Review Timer */}
+          {generated && <ReviewTimer />}
         </div>
       )}
     </div>
