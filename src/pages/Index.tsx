@@ -63,6 +63,14 @@ const tools = [
     color: "bg-warning/10 text-warning",
     tool: "pdf-builder",
   },
+  {
+    to: "/organizer",
+    icon: FolderOpen,
+    title: "Study Organizer",
+    description: "Browse all your materials organized by subject",
+    color: "bg-primary/10 text-primary",
+    tool: "organizer",
+  },
 ];
 
 const toolMeta: Record<string, { icon: typeof Lightbulb; color: string; label: string; to: string }> = {
