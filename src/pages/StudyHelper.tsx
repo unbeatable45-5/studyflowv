@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import OutputActions from "@/components/OutputActions";
 import { streamAI } from "@/lib/streaming";
-import { Lightbulb, Loader2 } from "lucide-react";
+import { Lightbulb, Loader2, FileDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const StudyHelper = () => {
