@@ -22,6 +22,7 @@ const SUBJECT_OPTIONS = [
 
 const Profile = () => {
   const { user } = useAuth();
+  const { isPremium } = usePremium();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
