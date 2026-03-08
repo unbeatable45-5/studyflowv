@@ -65,7 +65,7 @@ const Progress = () => {
   }, [user]);
 
   const stats = useMemo(() => {
-    const empty = { streak: 0, totalSessions: 0, thisWeek: 0, completedTasks: 0, weeklyData: [], toolBreakdown: [], totalFocusMinutes: 0, focusData: [] };
+    const empty = { streak: 0, totalSessions: 0, thisWeek: 0, completedTasks: 0, weeklyData: [], toolBreakdown: [], totalFocusMinutes: 0, focusData: [], activityMap: {} as Record<string, number> };
     if (outputs.length === 0 && pomodoros.length === 0) return empty;
 
     const activeDays = new Set([
