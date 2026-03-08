@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line, CartesianGrid } from "recharts";
 import { Flame, BookOpen, CheckCircle2, TrendingUp, Calendar, Trophy, Clock, Target } from "lucide-react";
 import { format, subDays, startOfDay, differenceInCalendarDays, parseISO, isToday } from "date-fns";
+import CalendarHeatmap from "@/components/progress/CalendarHeatmap";
 
 const toolLabels: Record<string, string> = {
   "study-helper": "Study Helper",
