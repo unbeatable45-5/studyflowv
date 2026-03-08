@@ -27,6 +27,7 @@ type Mode = "browse" | "quiz";
 type QuizResult = "correct" | "wrong" | null;
 
 const FlashcardGenerator = () => {
+  const { user } = useAuth();
   const [topic, setTopic] = useState("");
   const [count, setCount] = useState([6]);
   const [cards, setCards] = useState<Flashcard[]>([]);
