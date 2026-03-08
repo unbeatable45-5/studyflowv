@@ -39,6 +39,9 @@ const AppLayout = () => {
           <BookOpen className="h-5 w-5 text-primary-foreground" />
         </div>
         <h1 className="text-lg font-display font-bold text-foreground flex-1">Student Hub</h1>
+        <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="shrink-0">
+          <Search className="h-5 w-5" />
+        </Button>
         <Button variant="ghost" size="icon" onClick={() => setDark(!dark)} className="shrink-0">
           {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </Button>
