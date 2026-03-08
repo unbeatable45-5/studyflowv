@@ -159,7 +159,7 @@ const FlashcardGenerator = () => {
         <Slider value={count} onValueChange={setCount} min={3} max={12} step={1} />
       </div>
 
-      {loading && <Skcards.length === 0 && <AIThinking message="Creating flashcards>}
+      {loading && cards.length === 0 && <AIThinking message="Creating flashcards" />}
 
       {/* Quiz finished screen */}
       {mode === "quiz" && quizFinished && (
