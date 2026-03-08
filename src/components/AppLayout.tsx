@@ -11,6 +11,7 @@ import { toast } from "@/hooks/use-toast";
 
 const AppLayout = () => {
   const { signOut } = useAuth();
+  useReminderNotifications();
   const [dark, setDark] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("theme") === "dark" ||
