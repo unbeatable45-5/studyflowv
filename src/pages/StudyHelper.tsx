@@ -15,6 +15,7 @@ const StudyHelper = () => {
   const [topic, setTopic] = useState("");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleGenerate = async () => {
     if (!topic.trim()) return;
