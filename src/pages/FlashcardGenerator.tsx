@@ -8,13 +8,15 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import OutputActions from "@/components/OutputActions";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { saveOutput } from "@/lib/saved-outputs";
 import { toast } from "@/hooks/use-toast";
 import {
   Layers, Loader2, RotateCcw, ChevronLeft, ChevronRight,
-  Shuffle, Play, CheckCircle2, XCircle, Trophy, ArrowLeft,
+  Shuffle, Play, CheckCircle2, XCircle, Trophy, ArrowLeft, Brain,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 interface Flashcard {
   front: string;
@@ -25,6 +27,7 @@ type Mode = "browse" | "quiz";
 type QuizResult = "correct" | "wrong" | null;
 
 const FlashcardGenerator = () => {
+  const { user } = useAuth();
   const [topic, setTopic] = useState("");
   const [count, setCount] = useState([6]);
   const [cards, setCards] = useState<Flashcard[]>([]);
@@ -58,6 +61,17 @@ const FlashcardGenerator = () => {
           .map((c: Flashcard, i: number) => `Card ${i + 1}:\nQ: ${c.front}\nA: ${c.back}`)
           .join("\n\n");
         saveOutput("study-helper", { topic, type: "flashcards" }, text);
+
+        // Save to spaced repetition system
+        if (user) {
+          const rows = data.flashcards.map((c: Flashcard) => ({
+            user_id: user.id,
+            topic: topic.trim(),
+            card_front: c.front,
+            card_back: c.back,
+          }));
+          await supabase.from("flashcard_reviews" as any).insert(rows);
+        }
       } else {
         toast({ title: "Error", description: "Failed to generate flashcards", variant: "destructive" });
       }
@@ -335,6 +349,22 @@ const FlashcardGenerator = () => {
           </div>
         </div>
       )}
+
+      {/* Spaced Review Link */}
+      <Card className="border-primary/20 bg-primary/5">
+        <CardContent className="p-4 flex items-center gap-3">
+          <div className="rounded-xl p-2.5 bg-primary/10">
+            <Brain className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-display font-semibold text-foreground text-sm">Spaced Review</h3>
+            <p className="text-xs text-muted-foreground">Review cards at optimal intervals</p>
+          </div>
+          <Button size="sm" variant="outline" asChild>
+            <Link to="/spaced-review">Review</Link>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };

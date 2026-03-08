@@ -3,8 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { Flame, BookOpen, CheckCircle2, TrendingUp, Calendar, Trophy } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line, CartesianGrid } from "recharts";
+import { Flame, BookOpen, CheckCircle2, TrendingUp, Calendar, Trophy, Clock, Target } from "lucide-react";
 import { format, subDays, startOfDay, differenceInCalendarDays, parseISO, isToday } from "date-fns";
 
 const toolLabels: Record<string, string> = {
@@ -25,10 +25,16 @@ interface ReminderRow {
   completed: boolean;
 }
 
+interface PomodoroRow {
+  completed_at: string;
+  duration_minutes: number;
+}
+
 const Progress = () => {
   const { user } = useAuth();
   const [outputs, setOutputs] = useState<OutputRow[]>([]);
   const [reminders, setReminders] = useState<ReminderRow[]>([]);
+  const [pomodoros, setPomodoros] = useState<PomodoroRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,60 +50,55 @@ const Progress = () => {
         .from("reminders")
         .select("completed")
         .eq("user_id", user.id),
-    ]).then(([outputsRes, remindersRes]) => {
+      supabase
+        .from("pomodoro_sessions")
+        .select("completed_at, duration_minutes")
+        .eq("user_id", user.id)
+        .order("completed_at", { ascending: true }),
+    ]).then(([outputsRes, remindersRes, pomodoroRes]) => {
       setOutputs((outputsRes.data as OutputRow[]) ?? []);
       setReminders((remindersRes.data as ReminderRow[]) ?? []);
+      setPomodoros((pomodoroRes.data as PomodoroRow[]) ?? []);
       setLoading(false);
     });
   }, [user]);
 
   const stats = useMemo(() => {
-    if (outputs.length === 0) {
-      return { streak: 0, totalSessions: 0, thisWeek: 0, completedTasks: 0, weeklyData: [], toolBreakdown: [] };
-    }
+    const empty = { streak: 0, totalSessions: 0, thisWeek: 0, completedTasks: 0, weeklyData: [], toolBreakdown: [], totalFocusMinutes: 0, focusData: [] };
+    if (outputs.length === 0 && pomodoros.length === 0) return empty;
 
-    // Unique active days
-    const activeDays = new Set(
-      outputs.map(o => format(parseISO(o.created_at), "yyyy-MM-dd"))
-    );
+    const activeDays = new Set([
+      ...outputs.map(o => format(parseISO(o.created_at), "yyyy-MM-dd")),
+      ...pomodoros.map(p => format(parseISO(p.completed_at), "yyyy-MM-dd")),
+    ]);
 
-    // Current streak
     let streak = 0;
     const today = startOfDay(new Date());
     let checkDate = today;
-
-    // Check if today has activity, if not start from yesterday
     if (!activeDays.has(format(checkDate, "yyyy-MM-dd"))) {
       checkDate = subDays(checkDate, 1);
     }
-
     while (activeDays.has(format(checkDate, "yyyy-MM-dd"))) {
       streak++;
       checkDate = subDays(checkDate, 1);
     }
 
-    // This week sessions
     const weekStart = subDays(today, 6);
-    const thisWeek = outputs.filter(o => {
-      const d = parseISO(o.created_at);
-      return d >= weekStart;
-    }).length;
+    const thisWeek = outputs.filter(o => parseISO(o.created_at) >= weekStart).length;
 
-    // Weekly data (last 7 days)
     const weeklyData = [];
+    const focusData = [];
     for (let i = 6; i >= 0; i--) {
       const day = subDays(today, i);
       const dayStr = format(day, "yyyy-MM-dd");
       const count = outputs.filter(o => format(parseISO(o.created_at), "yyyy-MM-dd") === dayStr).length;
-      weeklyData.push({
-        day: format(day, "EEE"),
-        date: format(day, "MMM d"),
-        sessions: count,
-        isToday: i === 0,
-      });
+      const focusMins = pomodoros
+        .filter(p => format(parseISO(p.completed_at), "yyyy-MM-dd") === dayStr)
+        .reduce((sum, p) => sum + p.duration_minutes, 0);
+      weeklyData.push({ day: format(day, "EEE"), date: format(day, "MMM d"), sessions: count, isToday: i === 0 });
+      focusData.push({ day: format(day, "EEE"), date: format(day, "MMM d"), minutes: focusMins, isToday: i === 0 });
     }
 
-    // Tool breakdown
     const toolCounts: Record<string, number> = {};
     outputs.forEach(o => {
       toolCounts[o.tool] = (toolCounts[o.tool] || 0) + 1;
@@ -108,9 +109,10 @@ const Progress = () => {
       .slice(0, 5);
 
     const completedTasks = reminders.filter(r => r.completed).length;
+    const totalFocusMinutes = pomodoros.reduce((sum, p) => sum + p.duration_minutes, 0);
 
-    return { streak, totalSessions: outputs.length, thisWeek, completedTasks, weeklyData, toolBreakdown };
-  }, [outputs, reminders]);
+    return { streak, totalSessions: outputs.length, thisWeek, completedTasks, weeklyData, toolBreakdown, totalFocusMinutes, focusData };
+  }, [outputs, reminders, pomodoros]);
 
   if (loading) {
     return (
@@ -153,6 +155,20 @@ const Progress = () => {
       suffix: "",
       color: "text-accent-foreground bg-accent",
     },
+    {
+      icon: Clock,
+      label: "Focus Time",
+      value: Math.round(stats.totalFocusMinutes / 60) || stats.totalFocusMinutes,
+      suffix: stats.totalFocusMinutes >= 60 ? "hours" : "min",
+      color: "text-primary bg-primary/10",
+    },
+    {
+      icon: Target,
+      label: "Pomodoros",
+      value: pomodoros.length,
+      suffix: "",
+      color: "text-destructive bg-destructive/10",
+    },
   ];
 
   return (
@@ -168,7 +184,7 @@ const Progress = () => {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         {statCards.map(({ icon: Icon, label, value, suffix, color }) => (
           <Card key={label}>
             <CardContent className="p-4 flex items-center gap-3">
@@ -242,6 +258,40 @@ const Progress = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Focus Time Chart */}
+      {stats.focusData.some((d: any) => d.minutes > 0) && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              Focus Time (minutes)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pb-4">
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={stats.focusData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="day" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={false} tickLine={false} width={24} />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (!active || !payload?.length) return null;
+                    const d = payload[0].payload;
+                    return (
+                      <div className="bg-popover text-popover-foreground border rounded-lg px-3 py-2 shadow-md text-xs">
+                        <p className="font-medium">{d.date}</p>
+                        <p>{d.minutes} min focused</p>
+                      </div>
+                    );
+                  }}
+                />
+                <Line type="monotone" dataKey="minutes" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: "hsl(var(--primary))", r: 3 }} activeDot={{ r: 5 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Tool Breakdown */}
       {stats.toolBreakdown.length > 0 && (

@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
-import { Lightbulb, CalendarDays, Layers, FileDown, Bell, Timer, GraduationCap, ArrowRight } from "lucide-react";
+import { Lightbulb, CalendarDays, Layers, FileDown, Bell, Timer, GraduationCap, ArrowRight, Brain } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const tools = [
   { to: "/study", icon: Lightbulb, title: "Quick Study", color: "bg-primary/10 text-primary" },
   { to: "/planner", icon: CalendarDays, title: "Revision Planner", color: "bg-warning/10 text-warning" },
   { to: "/flashcards", icon: Layers, title: "Flashcards", color: "bg-accent text-accent-foreground" },
+  { to: "/spaced-review", icon: Brain, title: "Spaced Review", color: "bg-success/10 text-success" },
   { to: "/pdf-export", icon: FileDown, title: "PDF Export", color: "bg-destructive/10 text-destructive" },
   { to: "/reminders", icon: Bell, title: "Reminders", color: "bg-destructive/10 text-destructive" },
   { to: "/pomodoro", icon: Timer, title: "Pomodoro", color: "bg-success/10 text-success" },
