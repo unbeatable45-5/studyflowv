@@ -61,6 +61,17 @@ const FlashcardGenerator = () => {
           .map((c: Flashcard, i: number) => `Card ${i + 1}:\nQ: ${c.front}\nA: ${c.back}`)
           .join("\n\n");
         saveOutput("study-helper", { topic, type: "flashcards" }, text);
+
+        // Save to spaced repetition system
+        if (user) {
+          const rows = data.flashcards.map((c: Flashcard) => ({
+            user_id: user.id,
+            topic: topic.trim(),
+            card_front: c.front,
+            card_back: c.back,
+          }));
+          await supabase.from("flashcard_reviews" as any).insert(rows);
+        }
       } else {
         toast({ title: "Error", description: "Failed to generate flashcards", variant: "destructive" });
       }
