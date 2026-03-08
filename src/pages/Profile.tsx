@@ -1,45 +1,114 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
-import { User, Loader2, Camera } from "lucide-react";
+import { User, Loader2, Camera, X, Plus } from "lucide-react";
+
+const SUBJECT_OPTIONS = [
+  "Mathematics", "Physics", "Chemistry", "Biology", "Computer Science",
+  "English", "History", "Geography", "Economics", "Psychology",
+  "Philosophy", "Art", "Music", "Law", "Business Studies",
+  "Sociology", "Political Science", "Literature", "Medicine", "Engineering",
+];
 
 const Profile = () => {
   const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [bio, setBio] = useState("");
+  const [studyGoal, setStudyGoal] = useState("");
+  const [preferredSubjects, setPreferredSubjects] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("display_name, avatar_url")
+      .select("display_name, avatar_url, bio, study_goal, preferred_subjects")
       .eq("user_id", user.id)
       .single()
       .then(({ data }) => {
         if (data) {
-          setDisplayName(data.display_name ?? "");
-          setAvatarUrl(data.avatar_url ?? "");
+          setDisplayName((data as any).display_name ?? "");
+          setAvatarUrl((data as any).avatar_url ?? "");
+          setBio((data as any).bio ?? "");
+          setStudyGoal((data as any).study_goal ?? "");
+          setPreferredSubjects((data as any).preferred_subjects ?? []);
         }
         setFetching(false);
       });
   }, [user]);
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Max 2MB", variant: "destructive" });
+      return;
+    }
+
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const path = `${user.id}/avatar.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) {
+      toast({ title: "Upload failed", description: uploadError.message, variant: "destructive" });
+      setUploading(false);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+    const newUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+    setAvatarUrl(newUrl);
+
+    await supabase
+      .from("profiles")
+      .update({ avatar_url: newUrl } as any)
+      .eq("user_id", user.id);
+
+    setUploading(false);
+    toast({ title: "Avatar updated!" });
+  };
+
+  const toggleSubject = (subject: string) => {
+    setPreferredSubjects(prev =>
+      prev.includes(subject)
+        ? prev.filter(s => s !== subject)
+        : prev.length < 8 ? [...prev, subject] : prev
+    );
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
     setLoading(true);
+
     const { error } = await supabase
       .from("profiles")
-      .update({ display_name: displayName, avatar_url: avatarUrl })
+      .update({
+        display_name: displayName,
+        avatar_url: avatarUrl,
+        bio,
+        study_goal: studyGoal,
+        preferred_subjects: preferredSubjects,
+      } as any)
       .eq("user_id", user.id);
+
     setLoading(false);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -69,22 +138,45 @@ const Profile = () => {
           </div>
           <h1 className="text-xl font-display font-bold">Profile Settings</h1>
         </div>
-        <p className="text-sm text-muted-foreground">Update your display name and avatar.</p>
+        <p className="text-sm text-muted-foreground">Personalize your account and study preferences.</p>
       </div>
 
       <Card>
         <CardContent className="pt-6">
-          <form onSubmit={handleSave} className="space-y-5">
-            {/* Avatar preview */}
+          <form onSubmit={handleSave} className="space-y-6">
+            {/* Avatar */}
             <div className="flex flex-col items-center gap-3">
-              <Avatar className="h-20 w-20 border-2 border-border">
-                <AvatarImage src={avatarUrl} alt={displayName} />
-                <AvatarFallback className="text-lg font-display bg-primary/10 text-primary">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative group">
+                <Avatar className="h-24 w-24 border-2 border-border">
+                  <AvatarImage src={avatarUrl} alt={displayName} />
+                  <AvatarFallback className="text-xl font-display bg-primary/10 text-primary">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  {uploading ? (
+                    <Loader2 className="h-6 w-6 text-white animate-spin" />
+                  ) : (
+                    <Camera className="h-6 w-6 text-white" />
+                  )}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">Click to upload a photo (max 2MB)</p>
             </div>
 
+            {/* Display name */}
             <div className="space-y-1.5">
               <Label htmlFor="displayName">Display name</Label>
               <Input
@@ -95,15 +187,50 @@ const Profile = () => {
               />
             </div>
 
+            {/* Bio */}
             <div className="space-y-1.5">
-              <Label htmlFor="avatarUrl">Avatar URL</Label>
-              <Input
-                id="avatarUrl"
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                placeholder="https://example.com/avatar.jpg"
+              <Label htmlFor="bio">Bio</Label>
+              <Textarea
+                id="bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Tell us about yourself..."
+                rows={3}
+                maxLength={300}
               />
-              <p className="text-xs text-muted-foreground">Paste a link to your profile picture</p>
+              <p className="text-xs text-muted-foreground text-right">{bio.length}/300</p>
+            </div>
+
+            {/* Study Goal */}
+            <div className="space-y-1.5">
+              <Label htmlFor="studyGoal">Study goal</Label>
+              <Input
+                id="studyGoal"
+                value={studyGoal}
+                onChange={(e) => setStudyGoal(e.target.value)}
+                placeholder="e.g. Pass all A-Levels with A grades"
+              />
+            </div>
+
+            {/* Preferred Subjects */}
+            <div className="space-y-2">
+              <Label>Preferred subjects <span className="text-muted-foreground font-normal">(up to 8)</span></Label>
+              <div className="flex flex-wrap gap-2">
+                {SUBJECT_OPTIONS.map(subject => {
+                  const selected = preferredSubjects.includes(subject);
+                  return (
+                    <Badge
+                      key={subject}
+                      variant={selected ? "default" : "outline"}
+                      className="cursor-pointer transition-colors select-none"
+                      onClick={() => toggleSubject(subject)}
+                    >
+                      {selected && <X className="h-3 w-3 mr-0.5" />}
+                      {subject}
+                    </Badge>
+                  );
+                })}
+              </div>
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
