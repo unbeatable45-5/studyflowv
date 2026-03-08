@@ -1,14 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Lightbulb, FileText, CalendarDays, Layers, FileUp } from "lucide-react";
+import { Home, Lightbulb, FileText, CalendarDays, Layers, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/", icon: Home, label: "Home" },
   { to: "/study", icon: Lightbulb, label: "Study" },
   { to: "/notes", icon: FileText, label: "Notes" },
-  { to: "/planner", icon: CalendarDays, label: "Planner" },
   { to: "/flashcards", icon: Layers, label: "Cards" },
-  { to: "/pdf-summarizer", icon: FileUp, label: "PDF" },
+  { to: "/history", icon: History, label: "History" },
 ];
 
 const BottomNav = () => {
