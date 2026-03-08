@@ -70,6 +70,7 @@ const App = () => (
               <Route path="/study-mode" element={<StudyMode />} />
               <Route path="/reminders" element={<Reminders />} />
               <Route path="/progress" element={<Progress />} />
+              <Route path="/pomodoro" element={<Pomodoro />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
             <Route path="*" element={<NotFound />} />

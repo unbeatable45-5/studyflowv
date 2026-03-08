@@ -87,6 +87,14 @@ const tools = [
     color: "bg-destructive/10 text-destructive",
     tool: "reminders",
   },
+  {
+    to: "/pomodoro",
+    icon: Timer,
+    title: "Pomodoro Timer",
+    description: "Stay focused with timed study & break sessions",
+    color: "bg-destructive/10 text-destructive",
+    tool: "pomodoro",
+  },
 ];
 
 const toolMeta: Record<string, { icon: typeof Lightbulb; color: string; label: string; to: string }> = {
