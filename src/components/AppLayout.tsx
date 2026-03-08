@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
+import { Link } from "react-router-dom";
 import BottomNav from "./BottomNav";
-import { BookOpen, Moon, Sun, LogOut } from "lucide-react";
+import { BookOpen, Moon, Sun, LogOut, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
