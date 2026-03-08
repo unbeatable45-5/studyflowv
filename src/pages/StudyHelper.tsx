@@ -30,7 +30,7 @@ const StudyHelper = () => {
       },
       onDone: () => {
         setLoading(false);
-        localStorage.setItem("lastStudy", JSON.stringify({ topic, output: fullText, date: new Date().toISOString() }));
+        saveOutput("study-helper", { topic }, fullText);
       },
       onError: (err) => {
         setLoading(false);
