@@ -18,6 +18,7 @@ import CustomPdfBuilder from "./pages/CustomPdfBuilder";
 import StudyOrganizer from "./pages/StudyOrganizer";
 import StudyMode from "./pages/StudyMode";
 import Reminders from "./pages/Reminders";
+import Progress from "./pages/Progress";
 import Tutorial from "./pages/Tutorial";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -67,6 +68,7 @@ const App = () => (
               <Route path="/organizer" element={<StudyOrganizer />} />
               <Route path="/study-mode" element={<StudyMode />} />
               <Route path="/reminders" element={<Reminders />} />
+              <Route path="/progress" element={<Progress />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
             <Route path="*" element={<NotFound />} />
