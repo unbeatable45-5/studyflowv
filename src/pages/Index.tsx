@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp, FilePlus, FolderOpen, BookOpen, Bell, Timer } from "lucide-react";
+import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers, FileDown, FileUp, FilePlus, FolderOpen, BookOpen, Bell, Timer, Download, Smartphone } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRecentOutputs } from "@/lib/saved-outputs";
 import { formatDistanceToNow } from "date-fns";
+import { usePwaInstall } from "@/hooks/use-pwa-install";
 
 const tools = [
   {
@@ -112,6 +114,7 @@ interface SavedOutput {
 }
 
 const Index = () => {
+  const { canInstall, isInstalled, install } = usePwaInstall();
   const [recents, setRecents] = useState<SavedOutput[]>([]);
   const [loadingRecents, setLoadingRecents] = useState(true);
 
@@ -133,6 +136,24 @@ const Index = () => {
           Pick a tool to start studying smarter.
         </p>
       </div>
+
+      {/* Install App Banner */}
+      {canInstall && (
+        <Card className="border-primary/30 bg-primary/5 overflow-hidden">
+          <CardContent className="p-4 flex items-center gap-4">
+            <div className="rounded-xl p-3 bg-primary/10 text-primary">
+              <Smartphone className="h-6 w-6" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-display font-semibold text-foreground">Install Student Hub</h3>
+              <p className="text-sm text-muted-foreground">Add to your home screen for a native app experience</p>
+            </div>
+            <Button size="sm" onClick={install} className="gap-1.5 shrink-0">
+              <Download className="h-4 w-4" /> Install
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Tool Cards */}
       <div className="space-y-3">
