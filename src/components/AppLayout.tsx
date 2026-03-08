@@ -1,12 +1,14 @@
 import { Outlet } from "react-router-dom";
 import { Link } from "react-router-dom";
 import BottomNav from "./BottomNav";
-import { BookOpen, Moon, Sun, LogOut, UserCircle, Search } from "lucide-react";
+import { BookOpen, Moon, Sun, LogOut, UserCircle, Search, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePremium } from "@/contexts/PremiumContext";
 import NotificationBell from "./NotificationBell";
 import GlobalSearch from "./GlobalSearch";
+import UpgradeDialog from "./UpgradeDialog";
 import { useReminderNotifications } from "@/hooks/use-reminder-notifications";
 import { toast } from "@/hooks/use-toast";
 
