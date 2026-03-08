@@ -1,0 +1,10 @@
+project_id = "eyugxzdotdsqlcuqcgkc"
+
+[functions.study-helper]
+verify_jwt = false
+
+[functions.note-organizer]
+verify_jwt = false
+
+[functions.revision-planner]
+verify_jwt = false
