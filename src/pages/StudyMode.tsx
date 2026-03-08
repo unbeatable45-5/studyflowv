@@ -201,6 +201,9 @@ const StudyMode = () => {
               <Sparkles className="h-4 w-4 mr-2" />
               {loading ? "Generating..." : "Generate Study Session"}
             </Button>
+            {loading && !hasOutput && (
+              <AIThinking message="Generating study session" />
+            )}
           </CardContent>
         )}
       </Card>
