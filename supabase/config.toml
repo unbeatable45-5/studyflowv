@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.revision-planner]
 verify_jwt = false
+
+[functions.flashcard-generator]
+verify_jwt = false

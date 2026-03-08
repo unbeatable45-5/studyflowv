@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock } from "lucide-react";
+import { Lightbulb, FileText, CalendarDays, GraduationCap, ArrowRight, Clock, Layers } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRecentOutputs } from "@/lib/saved-outputs";
@@ -30,6 +30,14 @@ const tools = [
     description: "Create a personalized daily/weekly study schedule",
     color: "bg-warning/10 text-warning",
     tool: "revision-planner",
+  },
+  {
+    to: "/flashcards",
+    icon: Layers,
+    title: "Flashcard Generator",
+    description: "Create interactive flashcards on any topic",
+    color: "bg-purple-500/10 text-purple-500",
+    tool: "flashcard-generator",
   },
 ];
 
