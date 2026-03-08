@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Timer, Play, Pause, RotateCcw, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const PRESETS = [
   { label: "5 min", seconds: 5 * 60 },
