@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,27 +19,103 @@ interface GroupFeedProps {
 }
 
 const GroupFeed = ({ groupId }: GroupFeedProps) => {
+  const { user } = useAuth();
   const [content, setContent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOutput, setSelectedOutput] = useState<any>(null);
+  const initialLoadRef = useRef(true);
 
   useEffect(() => {
     loadFeed();
-  }, [groupId]);
+
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel(`group-feed-${groupId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "shared_content",
+          filter: `group_id=eq.${groupId}`,
+        },
+        async (payload) => {
+          // Fetch the full content with relations
+          const { data: newContent } = await supabase
+            .from("shared_content")
+            .select(`
+              *,
+              saved_outputs(*)
+            `)
+            .eq("id", payload.new.id)
+            .single();
+
+          if (newContent && newContent.shared_by !== user?.id) {
+            // Fetch sharer's profile separately
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("display_name")
+              .eq("user_id", newContent.shared_by)
+              .single();
+
+            const sharer = profile?.display_name || "Someone";
+            const toolName = newContent.saved_outputs?.tool?.replace(/-/g, " ") || "content";
+            
+            toast({
+              title: "New content shared",
+              description: `${sharer} shared ${toolName}`,
+            });
+
+            // Add profile to the content object for display
+            const contentWithProfile = {
+              ...newContent,
+              profiles: profile,
+            };
+            setContent((prev) => [contentWithProfile, ...prev]);
+          } else if (newContent) {
+            setContent((prev) => [newContent, ...prev]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [groupId, user]);
 
   const loadFeed = async () => {
-    const { data } = await supabase
+    // Fetch shared content
+    const { data: sharedData } = await supabase
       .from("shared_content")
-      .select(`
-        *,
-        saved_outputs(*),
-        profiles:shared_by(display_name)
-      `)
+      .select("*")
       .eq("group_id", groupId)
       .order("shared_at", { ascending: false });
 
-    if (data) setContent(data);
+    if (sharedData && sharedData.length > 0) {
+      // Fetch related outputs and profiles
+      const outputIds = sharedData.map((s) => s.output_id);
+      const sharerIds = sharedData.map((s) => s.shared_by);
+
+      const [{ data: outputs }, { data: profiles }] = await Promise.all([
+        supabase.from("saved_outputs").select("*").in("id", outputIds),
+        supabase.from("profiles").select("user_id, display_name").in("user_id", sharerIds),
+      ]);
+
+      // Combine the data
+      const combined = sharedData.map((shared) => ({
+        ...shared,
+        saved_outputs: outputs?.find((o) => o.id === shared.output_id),
+        profiles: profiles?.find((p) => p.user_id === shared.shared_by),
+      }));
+
+      setContent(combined);
+    } else {
+      setContent([]);
+    }
+
     setLoading(false);
+    initialLoadRef.current = false;
   };
 
   if (loading) {

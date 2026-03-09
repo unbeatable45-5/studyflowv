@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { generatePdf } from "@/lib/pdf-generator";
 import { toast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
+import ShareToGroupDialog from "@/components/groups/ShareToGroupDialog";
 import {
   History as HistoryIcon,
   Lightbulb,
@@ -19,6 +20,7 @@ import {
   Copy,
   ChevronDown,
   ChevronUp,
+  Share2,
 } from "lucide-react";
 import { copyToClipboard } from "@/lib/streaming";
 
@@ -53,6 +55,8 @@ const HistoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [selectedOutputId, setSelectedOutputId] = useState<string>("");
   const navigate = useNavigate();
 
   const fetchItems = async () => {
@@ -97,6 +101,11 @@ const HistoryPage = () => {
   const handleCopy = async (text: string) => {
     const ok = await copyToClipboard(text);
     if (ok) toast({ title: "Copied to clipboard!" });
+  };
+
+  const handleShareToGroup = (outputId: string) => {
+    setSelectedOutputId(outputId);
+    setShareDialogOpen(true);
   };
 
   const getLabel = (item: SavedOutput): string => {
@@ -219,6 +228,14 @@ const HistoryPage = () => {
                         <Button
                           size="sm"
                           variant="outline"
+                          className="gap-1.5 text-xs"
+                          onClick={() => handleShareToGroup(item.id)}
+                        >
+                          <Share2 className="h-3.5 w-3.5" /> Share
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
                           className="gap-1.5 text-xs text-destructive hover:text-destructive"
                           onClick={() => handleDelete(item.id)}
                         >
@@ -233,6 +250,13 @@ const HistoryPage = () => {
           })}
         </div>
       )}
+
+      <ShareToGroupDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        outputId={selectedOutputId}
+        onSuccess={() => toast({ title: "Shared to group!" })}
+      />
     </div>
   );
 };
