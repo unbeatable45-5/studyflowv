@@ -86,7 +86,7 @@ const AppLayout = () => {
               <Outlet />
             </PageTransition>
           </AnimatePresence>
-
+        </main>
         <BottomNav />
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
         <UpgradeDialog />
