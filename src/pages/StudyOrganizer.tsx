@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { generatePdf } from "@/lib/pdf-generator";
+import { usePremium } from "@/contexts/PremiumContext";
 import { copyToClipboard } from "@/lib/streaming";
 import { toast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";

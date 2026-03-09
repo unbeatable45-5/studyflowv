@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { generatePdf } from "@/lib/pdf-generator";
+import { usePremium } from "@/contexts/PremiumContext";
 import { saveOutput } from "@/lib/saved-outputs";
 import { toast } from "@/hooks/use-toast";
 import { FileDown, FileText, Lightbulb, Loader2 } from "lucide-react";

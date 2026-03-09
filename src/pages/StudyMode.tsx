@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { streamAI } from "@/lib/streaming";
+import { usePremium } from "@/contexts/PremiumContext";
 import { saveOutput } from "@/lib/saved-outputs";
 import { generatePdf } from "@/lib/pdf-generator";
 import ReactMarkdown from "react-markdown";
