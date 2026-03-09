@@ -104,11 +104,13 @@ export function generatePdf(opts: PdfOptions): void {
   const contentWidth = pageWidth - margin * 2;
   let y = 38;
   let pageNum = 1;
+  const showWatermark = !opts.isPremium;
 
   drawHeader(doc, opts, pageWidth);
 
   const checkPageBreak = (needed: number) => {
     if (y + needed > pageHeight - 16) {
+      if (showWatermark) drawWatermark(doc, pageWidth, pageHeight);
       drawFooter(doc, pageWidth, pageHeight, pageNum);
       doc.addPage();
       pageNum++;
