@@ -34,7 +34,7 @@ const Index = () => {
   }
 
   return (
-    <div className="px-4 py-8 max-w-lg mx-auto space-y-7">
+    <div className="px-3 sm:px-4 py-6 sm:py-8 max-w-lg mx-auto space-y-5 sm:space-y-7">
       <FadeIn><GreetingSection /></FadeIn>
 
       <FadeIn delay={0.05}><StreakWidget /></FadeIn>
@@ -42,16 +42,16 @@ const Index = () => {
       {canInstall && (
         <FadeIn delay={0.1}>
           <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-accent/30 overflow-hidden shadow-premium">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="rounded-2xl p-3 bg-primary/10 text-primary">
-                <Smartphone className="h-5 w-5" />
+            <CardContent className="p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+              <div className="rounded-2xl p-2.5 sm:p-3 bg-primary/10 text-primary shrink-0">
+                <Smartphone className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-display font-semibold text-foreground text-sm">Install StudyFlow</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">Add to home screen for native experience</p>
+                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">Add to home screen for native experience</p>
               </div>
-              <Button size="sm" onClick={install} className="gap-1.5 shrink-0 rounded-xl">
-                <Download className="h-4 w-4" /> Install
+              <Button size="sm" onClick={install} className="gap-1.5 shrink-0 rounded-xl text-xs sm:text-sm">
+                <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Install
               </Button>
             </CardContent>
           </Card>
