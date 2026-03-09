@@ -265,45 +265,41 @@ const Subscription = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <StaggerContainer>
-                    {features.map((feature, i) => (
-                      <StaggerItem key={feature.name}>
-                        <tr className={cn(
-                          "border-b border-border/30 last:border-0 transition-colors hover:bg-muted/30",
-                          i % 2 === 0 && "bg-muted/10"
-                        )}>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <feature.icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                              <span className="text-foreground">{feature.name}</span>
-                            </div>
-                          </td>
-                          <td className="text-center px-4 py-3">
-                            {typeof feature.free === "boolean" ? (
-                              feature.free ? (
-                                <Check className="h-4 w-4 text-success mx-auto" />
-                              ) : (
-                                <X className="h-4 w-4 text-muted-foreground/40 mx-auto" />
-                              )
-                            ) : (
-                              <span className="text-xs text-muted-foreground font-medium">{feature.free}</span>
-                            )}
-                          </td>
-                          <td className="text-center px-4 py-3">
-                            {typeof feature.pro === "boolean" ? (
-                              feature.pro ? (
-                                <Check className="h-4 w-4 text-warning mx-auto" />
-                              ) : (
-                                <X className="h-4 w-4 text-muted-foreground/40 mx-auto" />
-                              )
-                            ) : (
-                              <span className="text-xs text-warning font-semibold">{feature.pro}</span>
-                            )}
-                          </td>
-                        </tr>
-                      </StaggerItem>
-                    ))}
-                  </StaggerContainer>
+                  {features.map((feature, i) => (
+                    <tr key={feature.name} className={cn(
+                      "border-b border-border/30 last:border-0 transition-colors hover:bg-muted/30",
+                      i % 2 === 0 && "bg-muted/10"
+                    )}>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <feature.icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                          <span className="text-foreground">{feature.name}</span>
+                        </div>
+                      </td>
+                      <td className="text-center px-4 py-3">
+                        {typeof feature.free === "boolean" ? (
+                          feature.free ? (
+                            <Check className="h-4 w-4 text-success mx-auto" />
+                          ) : (
+                            <X className="h-4 w-4 text-muted-foreground/40 mx-auto" />
+                          )
+                        ) : (
+                          <span className="text-xs text-muted-foreground font-medium">{feature.free}</span>
+                        )}
+                      </td>
+                      <td className="text-center px-4 py-3">
+                        {typeof feature.pro === "boolean" ? (
+                          feature.pro ? (
+                            <Check className="h-4 w-4 text-warning mx-auto" />
+                          ) : (
+                            <X className="h-4 w-4 text-muted-foreground/40 mx-auto" />
+                          )
+                        ) : (
+                          <span className="text-xs text-warning font-semibold">{feature.pro}</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
