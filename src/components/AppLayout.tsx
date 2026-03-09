@@ -1,8 +1,8 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import BottomNav from "./BottomNav";
 import { AppSidebar } from "./AppSidebar";
-import { BookOpen, Moon, Sun, LogOut, UserCircle, Search, Crown, Menu } from "lucide-react";
+import { BookOpen, Moon, Sun, LogOut, UserCircle, Search, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,11 +15,14 @@ import { usePaystackVerify } from "@/hooks/use-paystack-verify";
 import { toast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
+import PageTransition from "./PageTransition";
+import { AnimatePresence } from "framer-motion";
 
 const AppLayout = () => {
   const { signOut } = useAuth();
   const { isPremium, promptUpgrade } = usePremium();
   const isMobile = useIsMobile();
+  const location = useLocation();
   useReminderNotifications();
   usePaystackVerify(() => window.location.reload());
   const [searchOpen, setSearchOpen] = useState(false);
@@ -78,9 +81,12 @@ const AppLayout = () => {
         </header>
 
         <main className="flex-1 pb-20 sm:pb-24 overflow-y-auto overscroll-contain">
-          <Outlet />
+          <AnimatePresence mode="wait">
+            <PageTransition key={location.pathname}>
+              <Outlet />
+            </PageTransition>
+          </AnimatePresence>
         </main>
-
         <BottomNav />
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
         <UpgradeDialog />
@@ -109,7 +115,11 @@ const AppLayout = () => {
 
           <main className="flex-1 overflow-y-auto">
             <div className="max-w-4xl mx-auto">
-              <Outlet />
+              <AnimatePresence mode="wait">
+                <PageTransition key={location.pathname}>
+                  <Outlet />
+                </PageTransition>
+              </AnimatePresence>
             </div>
           </main>
         </SidebarInset>
