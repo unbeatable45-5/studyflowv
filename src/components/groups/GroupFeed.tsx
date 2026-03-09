@@ -5,8 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { FileText, Calendar, Share2, Search, Lightbulb, CalendarDays, Layers, FileUp, X } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { FileText, Calendar, Share2, Search, Lightbulb, CalendarDays, Layers, FileUp, X, MessageCircle, Send, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import {
   Dialog,
@@ -33,8 +35,12 @@ const GroupFeed = ({ groupId }: GroupFeedProps) => {
   const [content, setContent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOutput, setSelectedOutput] = useState<any>(null);
+  const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [toolFilter, setToolFilter] = useState("all");
+  const [comments, setComments] = useState<any[]>([]);
+  const [commentText, setCommentText] = useState("");
+  const [postingComment, setPostingComment] = useState(false);
   const initialLoadRef = useRef(true);
 
   useEffect(() => {
@@ -96,6 +102,38 @@ const GroupFeed = ({ groupId }: GroupFeedProps) => {
     };
   }, [groupId, user]);
 
+  // Load comments when output is selected
+  useEffect(() => {
+    if (selectedContentId) {
+      loadComments(selectedContentId);
+
+      // Subscribe to new comments
+      const channel = supabase
+        .channel(`comments-${selectedContentId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "comments",
+            filter: `shared_content_id=eq.${selectedContentId}`,
+          },
+          (payload) => {
+            if (payload.eventType === "INSERT") {
+              loadComments(selectedContentId);
+            } else if (payload.eventType === "DELETE") {
+              setComments((prev) => prev.filter((c) => c.id !== payload.old.id));
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [selectedContentId]);
+
   const loadFeed = async () => {
     // Fetch shared content
     const { data: sharedData } = await supabase
@@ -128,6 +166,74 @@ const GroupFeed = ({ groupId }: GroupFeedProps) => {
 
     setLoading(false);
     initialLoadRef.current = false;
+  };
+
+  const loadComments = async (contentId: string) => {
+    const { data: commentsData } = await supabase
+      .from("comments")
+      .select("*")
+      .eq("shared_content_id", contentId)
+      .order("created_at", { ascending: true });
+
+    if (commentsData && commentsData.length > 0) {
+      const userIds = [...new Set(commentsData.map((c) => c.user_id))];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, display_name")
+        .in("user_id", userIds);
+
+      const commentsWithProfiles = commentsData.map((comment) => ({
+        ...comment,
+        profile: profiles?.find((p) => p.user_id === comment.user_id),
+      }));
+
+      setComments(commentsWithProfiles);
+    } else {
+      setComments([]);
+    }
+  };
+
+  const handlePostComment = async () => {
+    if (!commentText.trim() || !selectedContentId || !user) return;
+    setPostingComment(true);
+
+    const { error } = await supabase.from("comments").insert({
+      shared_content_id: selectedContentId,
+      user_id: user.id,
+      comment_text: commentText.trim(),
+    });
+
+    if (error) {
+      toast({ title: "Failed to post comment", variant: "destructive" });
+    } else {
+      setCommentText("");
+      toast({ title: "Comment posted!" });
+    }
+
+    setPostingComment(false);
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    const { error } = await supabase
+      .from("comments")
+      .delete()
+      .eq("id", commentId);
+
+    if (!error) {
+      toast({ title: "Comment deleted" });
+    }
+  };
+
+  const handleOpenContent = (item: any) => {
+    setSelectedOutput(item.saved_outputs);
+    setSelectedContentId(item.id);
+  };
+
+  const handleCloseDialog = () => {
+    setSelectedOutput(null);
+    setSelectedContentId(null);
+    setComments([]);
+    setCommentText("");
   };
 
   // Filter content based on search and tool filter
@@ -258,7 +364,7 @@ const GroupFeed = ({ groupId }: GroupFeedProps) => {
 
             return (
               <Card key={item.id} className="cursor-pointer hover:bg-accent/30 transition-colors">
-                <CardContent className="p-4" onClick={() => setSelectedOutput(output)}>
+                <CardContent className="p-4" onClick={() => handleOpenContent(item)}>
                   <div className="flex items-start gap-3">
                     <Avatar className="h-8 w-8 shrink-0">
                       <AvatarFallback className="text-xs">{initial}</AvatarFallback>
@@ -290,15 +396,16 @@ const GroupFeed = ({ groupId }: GroupFeedProps) => {
         </div>
       )}
 
-      <Dialog open={!!selectedOutput} onOpenChange={() => setSelectedOutput(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <Dialog open={!!selectedOutput} onOpenChange={handleCloseDialog}>
+        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
               {selectedOutput?.custom_title || "Shared Content"}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          
+          <div className="flex-1 overflow-y-auto space-y-4">
             {selectedOutput?.subject && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="h-4 w-4" />
@@ -309,6 +416,88 @@ const GroupFeed = ({ groupId }: GroupFeedProps) => {
               <pre className="whitespace-pre-wrap font-sans text-sm">
                 {selectedOutput?.output_text}
               </pre>
+            </div>
+
+            <Separator />
+
+            {/* Comments section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4 text-muted-foreground" />
+                <h3 className="font-semibold text-sm">
+                  Comments ({comments.length})
+                </h3>
+              </div>
+
+              {/* Comment list */}
+              <div className="space-y-3 max-h-60 overflow-y-auto">
+                {comments.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-4">
+                    No comments yet. Be the first to share your thoughts!
+                  </p>
+                ) : (
+                  comments.map((comment) => {
+                    const commenterName = comment.profile?.display_name || "Unknown";
+                    const initial = commenterName[0]?.toUpperCase() || "?";
+                    const isOwn = comment.user_id === user?.id;
+
+                    return (
+                      <div key={comment.id} className="flex gap-2 group">
+                        <Avatar className="h-7 w-7 shrink-0">
+                          <AvatarFallback className="text-xs">{initial}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-medium text-xs">{commenterName}</p>
+                            <span className="text-[10px] text-muted-foreground">
+                              {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                            </span>
+                            {isOwn && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => handleDeleteComment(comment.id)}
+                              >
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
+                            )}
+                          </div>
+                          <p className="text-sm text-foreground whitespace-pre-wrap">
+                            {comment.comment_text}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Add comment */}
+              <div className="flex gap-2">
+                <Textarea
+                  placeholder="Add a comment..."
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  className="min-h-[60px] text-sm"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                      handlePostComment();
+                    }
+                  }}
+                />
+                <Button
+                  onClick={handlePostComment}
+                  disabled={!commentText.trim() || postingComment}
+                  size="icon"
+                  className="shrink-0"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                Press Cmd/Ctrl + Enter to post
+              </p>
             </div>
           </div>
         </DialogContent>

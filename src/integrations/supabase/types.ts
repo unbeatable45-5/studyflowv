@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      comments: {
+        Row: {
+          comment_text: string
+          created_at: string
+          id: string
+          shared_content_id: string
+          user_id: string
+        }
+        Insert: {
+          comment_text: string
+          created_at?: string
+          id?: string
+          shared_content_id: string
+          user_id: string
+        }
+        Update: {
+          comment_text?: string
+          created_at?: string
+          id?: string
+          shared_content_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_shared_content_id_fkey"
+            columns: ["shared_content_id"]
+            isOneToOne: false
+            referencedRelation: "shared_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flashcard_reviews: {
         Row: {
           card_back: string
