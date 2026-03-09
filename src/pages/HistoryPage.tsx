@@ -258,6 +258,13 @@ const HistoryPage = () => {
           })}
         </div>
       )}
+
+      <ShareToGroupDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        outputId={selectedOutputId}
+        onSuccess={() => toast({ title: "Shared to group!" })}
+      />
     </div>
   );
 };
