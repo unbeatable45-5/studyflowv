@@ -28,6 +28,7 @@ import {
   Copy,
   ChevronDown,
   ChevronUp,
+  Share2,
 } from "lucide-react";
 import { copyToClipboard } from "@/lib/streaming";
 
