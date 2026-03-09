@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Lightbulb, CalendarDays, Layers, FileDown, Bell, Timer, GraduationCap, ArrowRight, Brain, Lock, Network, Clock as ClockIcon } from "lucide-react";
+import { Lightbulb, CalendarDays, Layers, FileDown, Bell, Timer, GraduationCap, ArrowRight, Brain, Lock, Network, Mic, Bot } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { usePremium, PremiumFeature } from "@/contexts/PremiumContext";
 import { MotionCard, MotionIcon, StaggerContainer, StaggerItem, MotionButton } from "@/components/ui/motion";
@@ -20,10 +20,12 @@ const tools: Tool[] = [
   { to: "/flashcards", icon: Layers, title: "Flashcards", color: "bg-accent text-accent-foreground" },
   { to: "/mind-map", icon: Network, title: "Mind Maps", color: "bg-primary/10 text-primary" },
   { to: "/spaced-review", icon: Brain, title: "Spaced Review", color: "bg-success/10 text-success", premiumFeature: "spaced_repetition" },
-  { to: "#", icon: GraduationCap, title: "Lecture Capture", color: "bg-muted text-muted-foreground", comingSoon: true },
   { to: "/pdf-export", icon: FileDown, title: "PDF Export", color: "bg-destructive/10 text-destructive" },
   { to: "/reminders", icon: Bell, title: "Reminders", color: "bg-destructive/10 text-destructive" },
   { to: "/pomodoro", icon: Timer, title: "Pomodoro", color: "bg-primary/10 text-primary" },
+  { to: "#", icon: GraduationCap, title: "Lecture Capture", color: "bg-muted text-muted-foreground", comingSoon: true },
+  { to: "#", icon: Bot, title: "AI Tutor", color: "bg-muted text-muted-foreground", comingSoon: true },
+  { to: "#", icon: Mic, title: "Voice Notes", color: "bg-muted text-muted-foreground", comingSoon: true },
 ];
 
 const ToolGrid = () => {
