@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, Lightbulb, FileText, Users, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 const navItems = [
   { to: "/", icon: Home, label: "Home" },
@@ -22,15 +23,22 @@ const BottomNav = () => {
             <Link
               key={to}
               to={to}
-              className={cn(
-                "flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl transition-all duration-300 min-w-[56px]",
-                active
-                  ? "text-primary bg-primary/10 shadow-sm"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              )}
+              className="relative flex flex-col items-center gap-1 px-4 py-1.5 min-w-[56px]"
             >
-              <Icon className={cn("h-5 w-5 transition-transform duration-300", active && "scale-110")} />
-              <span className={cn("text-[10px] font-semibold tracking-wide", active && "text-primary")}>{label}</span>
+              {active && (
+                <motion.div
+                  layoutId="nav-indicator"
+                  className="absolute inset-0 rounded-2xl bg-primary/10"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
+              <motion.div
+                whileTap={{ scale: 0.85 }}
+                className="relative z-10"
+              >
+                <Icon className={cn("h-5 w-5 transition-colors duration-200", active ? "text-primary" : "text-muted-foreground")} />
+              </motion.div>
+              <span className={cn("text-[10px] font-semibold tracking-wide relative z-10 transition-colors duration-200", active ? "text-primary" : "text-muted-foreground")}>{label}</span>
             </Link>
           );
         })}

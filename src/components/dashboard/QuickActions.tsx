@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { BookOpen, FileUp, FileText, FilePlus, Network } from "lucide-react";
+import { MotionCard, MotionIcon, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 
 const actions = [
   { to: "/study-mode", icon: BookOpen, label: "Start Study", color: "bg-primary/10 text-primary" },
@@ -12,18 +13,20 @@ const actions = [
 const QuickActions = () => (
   <div className="space-y-3">
     <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Quick Actions</h2>
-    <div className="grid grid-cols-5 gap-2.5">
+    <StaggerContainer className="grid grid-cols-5 gap-2.5">
       {actions.map(({ to, icon: Icon, label, color }) => (
-        <Link key={to} to={to} className="group">
-          <div className="flex flex-col items-center gap-2.5 p-3.5 rounded-2xl bg-card border border-border/50 hover:shadow-premium hover:border-primary/25 transition-all duration-300">
-            <div className={`rounded-2xl p-3 ${color} group-hover:scale-110 transition-transform duration-300`}>
-              <Icon className="h-5 w-5" />
-            </div>
-            <span className="text-[10px] font-semibold text-foreground text-center leading-tight">{label}</span>
-          </div>
-        </Link>
+        <StaggerItem key={to}>
+          <Link to={to}>
+            <MotionCard className="flex flex-col items-center gap-2.5 p-3.5 rounded-2xl bg-card border border-border/50 cursor-pointer">
+              <MotionIcon className={`rounded-2xl p-3 ${color}`}>
+                <Icon className="h-5 w-5" />
+              </MotionIcon>
+              <span className="text-[10px] font-semibold text-foreground text-center leading-tight">{label}</span>
+            </MotionCard>
+          </Link>
+        </StaggerItem>
       ))}
-    </div>
+    </StaggerContainer>
   </div>
 );
 
