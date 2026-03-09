@@ -120,6 +120,7 @@ const AppLayout = () => {
                   <Outlet />
                 </PageTransition>
               </AnimatePresence>
+            </div>
           </main>
         </SidebarInset>
       </div>
