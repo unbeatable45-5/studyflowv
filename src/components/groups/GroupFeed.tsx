@@ -19,13 +19,60 @@ interface GroupFeedProps {
 }
 
 const GroupFeed = ({ groupId }: GroupFeedProps) => {
+  const { user } = useAuth();
   const [content, setContent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOutput, setSelectedOutput] = useState<any>(null);
+  const initialLoadRef = useRef(true);
 
   useEffect(() => {
     loadFeed();
-  }, [groupId]);
+
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel(`group-feed-${groupId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "shared_content",
+          filter: `group_id=eq.${groupId}`,
+        },
+        async (payload) => {
+          // Fetch the full content with relations
+          const { data: newContent } = await supabase
+            .from("shared_content")
+            .select(`
+              *,
+              saved_outputs(*),
+              profiles:shared_by(display_name)
+            `)
+            .eq("id", payload.new.id)
+            .single();
+
+          if (newContent && newContent.shared_by !== user?.id) {
+            // Only show toast if not shared by current user
+            const sharer = newContent.profiles?.display_name || "Someone";
+            const toolName = newContent.saved_outputs?.tool?.replace(/-/g, " ") || "content";
+            
+            toast({
+              title: "New content shared",
+              description: `${sharer} shared ${toolName}`,
+            });
+          }
+
+          if (newContent) {
+            setContent((prev) => [newContent, ...prev]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [groupId, user]);
 
   const loadFeed = async () => {
     const { data } = await supabase
