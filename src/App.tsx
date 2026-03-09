@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { PremiumProvider } from "./contexts/PremiumContext";
 import AppLayout from "./components/AppLayout";
+import PageSkeleton from "./components/PageSkeleton";
 import Index from "./pages/Index";
 import Profile from "@/pages/Profile";
 import StudyHelper from "./pages/StudyHelper";
@@ -36,14 +37,14 @@ const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <PageSkeleton variant="dashboard" />;
   if (!user) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <PageSkeleton variant="default" />;
   if (user) return <Navigate to="/" replace />;
   return <>{children}</>;
 };
