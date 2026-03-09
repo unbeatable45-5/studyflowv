@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { streamAI } from "@/lib/streaming";
+import { usePremium } from "@/contexts/PremiumContext";
 import { saveOutput } from "@/lib/saved-outputs";
 import { generatePdf } from "@/lib/pdf-generator";
 import ReactMarkdown from "react-markdown";
@@ -52,6 +53,7 @@ function parseSections(text: string): Record<SectionKey, string> {
 }
 
 const StudyMode = () => {
+  const { isPremium } = usePremium();
   const [topic, setTopic] = useState("");
   const [notes, setNotes] = useState("");
   const [inputMode, setInputMode] = useState<"topic" | "notes" | "pdf">("topic");
@@ -121,7 +123,7 @@ const StudyMode = () => {
   const handleDownload = () => {
     if (!output) return;
     const label = inputMode === "topic" ? topic : pdfFileName || "Study Session";
-    generatePdf({ title: label, content: output, source: "custom" });
+    generatePdf({ title: label, content: output, source: "custom", isPremium });
   };
 
   const sections = parseSections(output);

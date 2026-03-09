@@ -8,6 +8,7 @@ import AIThinking from "@/components/AIThinking";
 import OutputActions from "@/components/OutputActions";
 import { streamAI } from "@/lib/streaming";
 import { saveOutput } from "@/lib/saved-outputs";
+import { usePremium } from "@/contexts/PremiumContext";
 import { generatePdf } from "@/lib/pdf-generator";
 import { FileUp, Loader2, FileDown, Upload } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -23,6 +24,7 @@ const summaryOptions = [
 ];
 
 const PdfSummarizer = () => {
+  const { isPremium } = usePremium();
   const [file, setFile] = useState<File | null>(null);
   const [extractedText, setExtractedText] = useState("");
   const [summaryLength, setSummaryLength] = useState("medium");
@@ -116,6 +118,7 @@ const PdfSummarizer = () => {
       title: title || "PDF Summary",
       content: output,
       source: "custom",
+      isPremium,
     });
     toast({ title: "PDF downloaded!" });
   };

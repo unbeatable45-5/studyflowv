@@ -6,6 +6,8 @@ interface PdfOptions {
   date?: string;
   content: string;
   source: "study-helper" | "note-organizer" | "custom";
+  /** If true, no watermark is added to the PDF */
+  isPremium?: boolean;
 }
 
 // Colors
@@ -54,6 +56,22 @@ function drawFooter(doc: jsPDF, pageWidth: number, pageHeight: number, pageNum: 
   doc.text("Student Hub", 14, pageHeight - 8);
 }
 
+function drawWatermark(doc: jsPDF, pageWidth: number, pageHeight: number) {
+  doc.saveGraphicsState();
+  doc.setGState(new (doc as any).GState({ opacity: 0.06 }));
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(54);
+  setColor(doc, GRAY);
+  // Diagonal watermark across the page
+  const centerX = pageWidth / 2;
+  const centerY = pageHeight / 2;
+  doc.text("StudyFlow Free", centerX, centerY, {
+    align: "center",
+    angle: 45,
+  });
+  doc.restoreGraphicsState();
+}
+
 function parseMarkdownLines(content: string): Array<{ type: "h2" | "h3" | "bullet" | "text" | "bold-text" | "empty"; text: string }> {
   const lines = content.split("\n");
   const parsed: Array<{ type: "h2" | "h3" | "bullet" | "text" | "bold-text" | "empty"; text: string }> = [];
@@ -86,11 +104,13 @@ export function generatePdf(opts: PdfOptions): void {
   const contentWidth = pageWidth - margin * 2;
   let y = 38;
   let pageNum = 1;
+  const showWatermark = !opts.isPremium;
 
   drawHeader(doc, opts, pageWidth);
 
   const checkPageBreak = (needed: number) => {
     if (y + needed > pageHeight - 16) {
+      if (showWatermark) drawWatermark(doc, pageWidth, pageHeight);
       drawFooter(doc, pageWidth, pageHeight, pageNum);
       doc.addPage();
       pageNum++;
@@ -167,6 +187,7 @@ export function generatePdf(opts: PdfOptions): void {
     }
   }
 
+  if (showWatermark) drawWatermark(doc, pageWidth, pageHeight);
   drawFooter(doc, pageWidth, pageHeight, pageNum);
 
   const fileName = (opts.title || "study-notes")

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { generatePdf } from "@/lib/pdf-generator";
+import { usePremium } from "@/contexts/PremiumContext";
 import { saveOutput } from "@/lib/saved-outputs";
 import { toast } from "@/hooks/use-toast";
 import { FileDown, FileText, Lightbulb, Loader2 } from "lucide-react";
@@ -17,6 +18,7 @@ type Source = "study-helper" | "note-organizer" | "custom";
 
 const PdfExport = () => {
   const [searchParams] = useSearchParams();
+  const { isPremium } = usePremium();
   const [title, setTitle] = useState("");
   const [course, setCourse] = useState("");
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -48,6 +50,7 @@ const PdfExport = () => {
         date: date || undefined,
         content: content.trim(),
         source,
+        isPremium,
       });
       // Save to history
       saveOutput("study-helper", {

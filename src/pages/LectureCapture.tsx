@@ -8,6 +8,7 @@ import AIThinking from "@/components/AIThinking";
 import OutputActions from "@/components/OutputActions";
 import { streamAI } from "@/lib/streaming";
 import { saveOutput } from "@/lib/saved-outputs";
+import { usePremium } from "@/contexts/PremiumContext";
 import { generatePdf } from "@/lib/pdf-generator";
 import {
   GraduationCap, Loader2, FileDown, Upload, FileUp,
@@ -29,6 +30,7 @@ const sectionMeta: Record<SectionKey, { icon: typeof BookOpen; label: string; th
 };
 
 const LectureCapture = () => {
+  const { isPremium } = usePremium();
   const [file, setFile] = useState<File | null>(null);
   const [extractedText, setExtractedText] = useState("");
   const [title, setTitle] = useState("");
@@ -149,7 +151,7 @@ const LectureCapture = () => {
   };
 
   const handleDownloadPdf = () => {
-    generatePdf({ title: title || "Lecture Notes", content: output, source: "custom" });
+    generatePdf({ title: title || "Lecture Notes", content: output, source: "custom", isPremium });
     toast({ title: "PDF downloaded!" });
   };
 

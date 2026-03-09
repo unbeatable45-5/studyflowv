@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { generatePdf } from "@/lib/pdf-generator";
+import { usePremium } from "@/contexts/PremiumContext";
 import { copyToClipboard } from "@/lib/streaming";
 import { toast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
@@ -122,6 +123,7 @@ interface SavedItem {
 }
 
 const StudyOrganizer = () => {
+  const { isPremium } = usePremium();
   const [items, setItems] = useState<SavedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -240,7 +242,7 @@ const StudyOrganizer = () => {
   };
 
   const handleDownloadPdf = (item: SavedItem) => {
-    generatePdf({ title: getTitle(item), content: item.output_text, source: "custom" });
+    generatePdf({ title: getTitle(item), content: item.output_text, source: "custom", isPremium });
     toast({ title: "PDF downloaded!" });
   };
 

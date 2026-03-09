@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { generatePdf } from "@/lib/pdf-generator";
+import { usePremium } from "@/contexts/PremiumContext";
 import { toast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -52,6 +53,7 @@ const HistoryPage = () => {
   const [items, setItems] = useState<SavedOutput[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const { isPremium } = usePremium();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -90,6 +92,7 @@ const HistoryPage = () => {
       title: label,
       content: item.output_text,
       source: "custom",
+      isPremium,
     });
     toast({ title: "PDF downloaded!" });
   };
