@@ -18,6 +18,7 @@ type Source = "study-helper" | "note-organizer" | "custom";
 
 const PdfExport = () => {
   const [searchParams] = useSearchParams();
+  const { isPremium } = usePremium();
   const [title, setTitle] = useState("");
   const [course, setCourse] = useState("");
   const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
