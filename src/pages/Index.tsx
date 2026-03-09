@@ -1,8 +1,15 @@
 import { useState, useEffect } from "react";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
-import { Download, Smartphone } from "lucide-react";
+import { Download, Smartphone, Share, MoreVertical, Plus, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import GreetingSection from "@/components/dashboard/GreetingSection";
 import QuickActions from "@/components/dashboard/QuickActions";
 import RecentActivity from "@/components/dashboard/RecentActivity";
@@ -16,7 +23,7 @@ import Onboarding from "@/components/Onboarding";
 import { FadeIn } from "@/components/ui/motion";
 
 const Index = () => {
-  const { canInstall, install } = usePwaInstall();
+  const { canInstall, install, platform, showIOSGuide, dismissGuide } = usePwaInstall();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
@@ -48,7 +55,11 @@ const Index = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-display font-semibold text-foreground text-sm">Install StudyFlow</h3>
-                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">Add to home screen for native experience</p>
+                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                  {platform === "ios-safari"
+                    ? "Add to Home Screen from Safari"
+                    : "Add to home screen for native experience"}
+                </p>
               </div>
               <Button size="sm" onClick={install} className="gap-1.5 shrink-0 rounded-xl text-xs sm:text-sm">
                 <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Install
@@ -57,6 +68,96 @@ const Index = () => {
           </Card>
         </FadeIn>
       )}
+
+      {/* iOS / manual install guide dialog */}
+      <Dialog open={showIOSGuide} onOpenChange={dismissGuide}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg">Install StudyFlow</DialogTitle>
+            <DialogDescription>
+              Follow these steps to add StudyFlow to your home screen:
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            {platform === "ios-safari" ? (
+              <>
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 rounded-xl p-2 shrink-0">
+                    <Share className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground">1. Tap the Share button</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Find the share icon (square with arrow) at the bottom of Safari
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 rounded-xl p-2 shrink-0">
+                    <Plus className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground">2. Add to Home Screen</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Scroll down and tap "Add to Home Screen"
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 rounded-xl p-2 shrink-0">
+                    <Download className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground">3. Tap "Add"</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Confirm by tapping Add in the top right
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 rounded-xl p-2 shrink-0">
+                    <MoreVertical className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground">1. Open browser menu</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Tap the three-dot menu (⋮) in your browser
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 rounded-xl p-2 shrink-0">
+                    <Plus className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground">2. Add to Home Screen</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Look for "Add to Home screen" or "Install app"
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-primary/10 rounded-xl p-2 shrink-0">
+                    <Download className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground">3. Confirm</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Tap "Add" or "Install" to confirm
+                    </p>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+          <Button onClick={dismissGuide} variant="outline" className="w-full">
+            Got it
+          </Button>
+        </DialogContent>
+      </Dialog>
 
       <FadeIn delay={0.1}><NotificationPrompt /></FadeIn>
       <FadeIn delay={0.15}><QuickActions /></FadeIn>
