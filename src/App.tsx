@@ -33,6 +33,7 @@ import NotFound from "./pages/NotFound";
 import Groups from "./pages/Groups";
 import GroupDetail from "./pages/GroupDetail";
 import JoinGroup from "./pages/JoinGroup";
+import MindMap from "./pages/MindMap";
 
 const queryClient = new QueryClient();
 
@@ -86,6 +87,7 @@ const App = () => (
                 <Route path="/subscription" element={<Subscription />} />
                 <Route path="/groups" element={<Groups />} />
                 <Route path="/groups/:groupId" element={<GroupDetail />} />
+                <Route path="/mind-map" element={<MindMap />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>

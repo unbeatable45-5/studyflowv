@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { BookOpen, FileUp, FileText, FilePlus, GraduationCap } from "lucide-react";
+import { BookOpen, FileUp, FileText, FilePlus, Network } from "lucide-react";
 
 const actions = [
   { to: "/study-mode", icon: BookOpen, label: "Start Study", color: "bg-primary/10 text-primary" },
   { to: "/pdf-summarizer", icon: FileUp, label: "Upload PDF", color: "bg-success/10 text-success" },
-  { to: "/notes", icon: FileText, label: "Summarize", color: "bg-warning/10 text-warning" },
+  { to: "/mind-map", icon: Network, label: "Mind Map", color: "bg-warning/10 text-warning" },
   { to: "/pdf-builder", icon: FilePlus, label: "Create PDF", color: "bg-destructive/10 text-destructive" },
-  { to: "/lecture-capture", icon: GraduationCap, label: "Lecture", color: "bg-accent text-accent-foreground" },
+  { to: "/notes", icon: FileText, label: "Notes", color: "bg-accent text-accent-foreground" },
 ];
 
 const QuickActions = () => (
