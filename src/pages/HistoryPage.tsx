@@ -53,6 +53,7 @@ const HistoryPage = () => {
   const [items, setItems] = useState<SavedOutput[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const { isPremium } = usePremium();
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const navigate = useNavigate();
 
