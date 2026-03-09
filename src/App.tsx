@@ -24,7 +24,6 @@ import Progress from "./pages/Progress";
 import Pomodoro from "./pages/Pomodoro";
 import Tutorial from "./pages/Tutorial";
 import SpacedReview from "./pages/SpacedReview";
-import LectureCapture from "./pages/LectureCapture";
 import Subscription from "./pages/Subscription";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -80,7 +79,6 @@ const App = () => (
                 <Route path="/pomodoro" element={<Pomodoro />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/spaced-review" element={<SpacedReview />} />
-                <Route path="/lecture-capture" element={<LectureCapture />} />
                 <Route path="/subscription" element={<Subscription />} />
                 <Route path="/mind-map" element={<MindMap />} />
               </Route>

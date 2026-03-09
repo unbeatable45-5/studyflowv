@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
-import { Lightbulb, CalendarDays, Layers, FileDown, Bell, Timer, GraduationCap, ArrowRight, Brain, Lock, Network } from "lucide-react";
+import { Lightbulb, CalendarDays, Layers, FileDown, Bell, Timer, GraduationCap, ArrowRight, Brain, Lock, Network, Clock as ClockIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { usePremium, PremiumFeature } from "@/contexts/PremiumContext";
 import { MotionCard, MotionIcon, StaggerContainer, StaggerItem, MotionButton } from "@/components/ui/motion";
+import { Badge } from "@/components/ui/badge";
 
 interface Tool {
   to: string;
@@ -10,6 +11,7 @@ interface Tool {
   title: string;
   color: string;
   premiumFeature?: PremiumFeature;
+  comingSoon?: boolean;
 }
 
 const tools: Tool[] = [
@@ -18,7 +20,7 @@ const tools: Tool[] = [
   { to: "/flashcards", icon: Layers, title: "Flashcards", color: "bg-accent text-accent-foreground" },
   { to: "/mind-map", icon: Network, title: "Mind Maps", color: "bg-primary/10 text-primary" },
   { to: "/spaced-review", icon: Brain, title: "Spaced Review", color: "bg-success/10 text-success", premiumFeature: "spaced_repetition" },
-  { to: "/lecture-capture", icon: GraduationCap, title: "Lecture Capture", color: "bg-success/10 text-success" },
+  { to: "#", icon: GraduationCap, title: "Lecture Capture", color: "bg-muted text-muted-foreground", comingSoon: true },
   { to: "/pdf-export", icon: FileDown, title: "PDF Export", color: "bg-destructive/10 text-destructive" },
   { to: "/reminders", icon: Bell, title: "Reminders", color: "bg-destructive/10 text-destructive" },
   { to: "/pomodoro", icon: Timer, title: "Pomodoro", color: "bg-primary/10 text-primary" },
@@ -31,8 +33,27 @@ const ToolGrid = () => {
     <div className="space-y-3">
       <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">More Tools</h2>
       <StaggerContainer className="grid grid-cols-4 gap-3" delay={0.1}>
-        {tools.map(({ to, icon: Icon, title, color, premiumFeature }) => {
+        {tools.map(({ to, icon: Icon, title, color, premiumFeature, comingSoon }) => {
           const locked = premiumFeature && !canAccess(premiumFeature);
+          
+          // Coming Soon items
+          if (comingSoon) {
+            return (
+              <StaggerItem key={title}>
+                <div className="text-left w-full cursor-not-allowed">
+                  <MotionCard className="relative flex flex-col items-center gap-2 p-3 rounded-2xl bg-card border border-border/50 opacity-60">
+                    <Badge variant="outline" className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0 bg-muted border-muted-foreground/30">
+                      Soon
+                    </Badge>
+                    <MotionIcon className={`rounded-2xl p-2.5 ${color}`}>
+                      <Icon className="h-5 w-5" />
+                    </MotionIcon>
+                    <span className="text-[10px] font-semibold text-muted-foreground text-center leading-tight">{title}</span>
+                  </MotionCard>
+                </div>
+              </StaggerItem>
+            );
+          }
           
           if (locked) {
             return (
