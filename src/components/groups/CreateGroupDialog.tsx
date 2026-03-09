@@ -48,19 +48,6 @@ const CreateGroupDialog = ({ open, onOpenChange, onSuccess }: CreateGroupDialogP
       return;
     }
 
-    // Add creator as owner member
-    const { error: memberError } = await supabase.from("group_memberships").insert({
-      group_id: group.id,
-      user_id: user.id,
-      role: "owner",
-    });
-
-    if (memberError) {
-      toast({ title: "Failed to join group", variant: "destructive" });
-      setLoading(false);
-      return;
-    }
-
     toast({ title: "Group created!", description: `${name} is ready` });
     setName("");
     setDescription("");
