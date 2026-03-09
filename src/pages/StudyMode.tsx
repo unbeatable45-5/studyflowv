@@ -53,6 +53,7 @@ function parseSections(text: string): Record<SectionKey, string> {
 }
 
 const StudyMode = () => {
+  const { isPremium } = usePremium();
   const [topic, setTopic] = useState("");
   const [notes, setNotes] = useState("");
   const [inputMode, setInputMode] = useState<"topic" | "notes" | "pdf">("topic");
