@@ -87,6 +87,7 @@ const App = () => (
                 <Route path="/subscription" element={<Subscription />} />
                 <Route path="/groups" element={<Groups />} />
                 <Route path="/groups/:groupId" element={<GroupDetail />} />
+                <Route path="/mind-map" element={<MindMap />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
