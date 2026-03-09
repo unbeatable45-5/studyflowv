@@ -14,8 +14,8 @@ const BottomNav = () => {
   const { pathname } = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t">
-      <div className="flex items-center justify-around max-w-lg mx-auto px-2 py-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 glass-strong border-t-0">
+      <div className="flex items-center justify-around max-w-lg mx-auto px-2 py-2.5">
         {navItems.map(({ to, icon: Icon, label }) => {
           const active = pathname === to;
           return (
@@ -23,14 +23,14 @@ const BottomNav = () => {
               key={to}
               to={to}
               className={cn(
-                "flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors min-w-[56px]",
+                "flex flex-col items-center gap-1 px-4 py-1.5 rounded-2xl transition-all duration-300 min-w-[56px]",
                 active
-                  ? "text-primary bg-accent"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-primary bg-primary/10 shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
               )}
             >
-              <Icon className="h-5 w-5" />
-              <span className="text-[11px] font-medium">{label}</span>
+              <Icon className={cn("h-5 w-5 transition-transform duration-300", active && "scale-110")} />
+              <span className={cn("text-[10px] font-semibold tracking-wide", active && "text-primary")}>{label}</span>
             </Link>
           );
         })}

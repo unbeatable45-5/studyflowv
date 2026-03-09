@@ -32,17 +32,17 @@ const NotificationPrompt = () => {
   };
 
   return (
-    <Card className="border-accent/30 bg-accent/5 overflow-hidden">
-      <CardContent className="p-4 flex items-center gap-3">
-        <div className="rounded-xl p-2.5 bg-accent text-accent-foreground">
+    <Card className="border-accent-foreground/15 bg-gradient-to-r from-accent/50 to-accent/20 overflow-hidden shadow-premium animate-scale-in">
+      <CardContent className="p-4 flex items-center gap-3.5">
+        <div className="rounded-2xl p-3 bg-primary/10 text-primary">
           <Bell className="h-5 w-5" />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-display font-semibold text-foreground text-sm">Enable Notifications</h3>
-          <p className="text-xs text-muted-foreground">Get alerts for reminders and study sessions</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Get alerts for reminders and study sessions</p>
         </div>
-        <Button size="sm" onClick={handleEnable} className="shrink-0">Enable</Button>
-        <Button size="icon" variant="ghost" onClick={handleDismiss} className="shrink-0 h-8 w-8">
+        <Button size="sm" onClick={handleEnable} className="shrink-0 rounded-xl">Enable</Button>
+        <Button size="icon" variant="ghost" onClick={handleDismiss} className="shrink-0 h-8 w-8 rounded-xl">
           <X className="h-4 w-4" />
         </Button>
       </CardContent>

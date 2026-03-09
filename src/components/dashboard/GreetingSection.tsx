@@ -11,7 +11,6 @@ const GreetingSection = () => {
   useEffect(() => {
     if (!user) return;
 
-    // Check if user signed up today
     const createdAt = new Date(user.created_at);
     const now = new Date();
     const diffHours = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
@@ -31,19 +30,19 @@ const GreetingSection = () => {
   const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       {isNewUser && (
-        <div className="flex items-center gap-2 bg-primary/10 rounded-lg px-3 py-2 mb-2">
+        <div className="flex items-center gap-2.5 bg-gradient-to-r from-primary/10 to-accent/40 rounded-2xl px-4 py-3 mb-3 animate-scale-in">
           <PartyPopper className="h-5 w-5 text-primary" />
           <p className="text-sm font-medium text-primary">
             Welcome to StudyFlow! Start by exploring the tools below.
           </p>
         </div>
       )}
-      <h1 className="text-2xl font-display font-bold text-foreground">
+      <h1 className="text-[1.65rem] font-display font-extrabold text-foreground leading-tight tracking-tight">
         {greeting}, {displayName}! 👋
       </h1>
-      <p className="text-muted-foreground flex items-center gap-1.5">
+      <p className="text-muted-foreground text-sm flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-warning" />
         Ready to study smarter today?
       </p>
