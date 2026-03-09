@@ -85,17 +85,35 @@ const GroupFeed = ({ groupId }: GroupFeedProps) => {
   }, [groupId, user]);
 
   const loadFeed = async () => {
-    const { data } = await supabase
+    // Fetch shared content
+    const { data: sharedData } = await supabase
       .from("shared_content")
-      .select(`
-        *,
-        saved_outputs(*),
-        profiles:shared_by(display_name)
-      `)
+      .select("*")
       .eq("group_id", groupId)
       .order("shared_at", { ascending: false });
 
-    if (data) setContent(data);
+    if (sharedData && sharedData.length > 0) {
+      // Fetch related outputs and profiles
+      const outputIds = sharedData.map((s) => s.output_id);
+      const sharerIds = sharedData.map((s) => s.shared_by);
+
+      const [{ data: outputs }, { data: profiles }] = await Promise.all([
+        supabase.from("saved_outputs").select("*").in("id", outputIds),
+        supabase.from("profiles").select("user_id, display_name").in("user_id", sharerIds),
+      ]);
+
+      // Combine the data
+      const combined = sharedData.map((shared) => ({
+        ...shared,
+        saved_outputs: outputs?.find((o) => o.id === shared.output_id),
+        profiles: profiles?.find((p) => p.user_id === shared.shared_by),
+      }));
+
+      setContent(combined);
+    } else {
+      setContent([]);
+    }
+
     setLoading(false);
     initialLoadRef.current = false;
   };
