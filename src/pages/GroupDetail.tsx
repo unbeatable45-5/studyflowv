@@ -8,6 +8,7 @@ import { ArrowLeft, UserPlus, Settings, LogOut } from "lucide-react";
 import GroupFeed from "@/components/groups/GroupFeed";
 import GroupMembers from "@/components/groups/GroupMembers";
 import InviteMemberDialog from "@/components/groups/InviteMemberDialog";
+import GroupChat from "@/components/groups/GroupChat";
 import { toast } from "@/hooks/use-toast";
 
 const GroupDetail = () => {
