@@ -111,6 +111,11 @@ const HistoryPage = () => {
     if (ok) toast({ title: "Copied to clipboard!" });
   };
 
+  const handleShareToGroup = (outputId: string) => {
+    setSelectedOutputId(outputId);
+    setShareDialogOpen(true);
+  };
+
   const getLabel = (item: SavedOutput): string => {
     const input = item.input_data as any;
     if (item.tool === "study-helper") return input?.topic || "Study Notes";
