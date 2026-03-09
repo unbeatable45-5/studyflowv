@@ -22,6 +22,7 @@ const AppLayout = () => {
   const { signOut } = useAuth();
   const { isPremium, promptUpgrade } = usePremium();
   const isMobile = useIsMobile();
+  const location = useLocation();
   useReminderNotifications();
   usePaystackVerify(() => window.location.reload());
   const [searchOpen, setSearchOpen] = useState(false);
