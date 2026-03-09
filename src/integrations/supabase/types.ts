@@ -56,6 +56,38 @@ export type Database = {
         }
         Relationships: []
       }
+      group_memberships: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_memberships_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pomodoro_sessions: {
         Row: {
           completed_at: string
@@ -182,6 +214,75 @@ export type Database = {
           subject?: string | null
           tool?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      shared_content: {
+        Row: {
+          group_id: string
+          id: string
+          output_id: string
+          shared_at: string
+          shared_by: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          output_id: string
+          shared_at?: string
+          shared_by: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          output_id?: string
+          shared_at?: string
+          shared_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_content_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_content_output_id_fkey"
+            columns: ["output_id"]
+            isOneToOne: false
+            referencedRelation: "saved_outputs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_groups: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          updated_at?: string
         }
         Relationships: []
       }

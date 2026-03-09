@@ -1,12 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Lightbulb, FileText, FolderOpen, TrendingUp } from "lucide-react";
+import { Home, Lightbulb, FileText, Users, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/", icon: Home, label: "Home" },
   { to: "/study", icon: Lightbulb, label: "Study" },
   { to: "/notes", icon: FileText, label: "Notes" },
-  { to: "/organizer", icon: FolderOpen, label: "Files" },
+  { to: "/groups", icon: Users, label: "Groups" },
   { to: "/progress", icon: TrendingUp, label: "Progress" },
 ];
 
