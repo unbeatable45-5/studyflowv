@@ -24,6 +24,7 @@ const summaryOptions = [
 ];
 
 const PdfSummarizer = () => {
+  const { isPremium } = usePremium();
   const [file, setFile] = useState<File | null>(null);
   const [extractedText, setExtractedText] = useState("");
   const [summaryLength, setSummaryLength] = useState("medium");
