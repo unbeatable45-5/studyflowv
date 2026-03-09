@@ -50,6 +50,7 @@ const PdfExport = () => {
         date: date || undefined,
         content: content.trim(),
         source,
+        isPremium,
       });
       // Save to history
       saveOutput("study-helper", {

@@ -242,7 +242,7 @@ const StudyOrganizer = () => {
   };
 
   const handleDownloadPdf = (item: SavedItem) => {
-    generatePdf({ title: getTitle(item), content: item.output_text, source: "custom" });
+    generatePdf({ title: getTitle(item), content: item.output_text, source: "custom", isPremium });
     toast({ title: "PDF downloaded!" });
   };
 

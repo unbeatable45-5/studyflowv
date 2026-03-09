@@ -118,6 +118,7 @@ const PdfSummarizer = () => {
       title: title || "PDF Summary",
       content: output,
       source: "custom",
+      isPremium,
     });
     toast({ title: "PDF downloaded!" });
   };
