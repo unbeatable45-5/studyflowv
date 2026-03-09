@@ -115,8 +115,11 @@ const AppLayout = () => {
 
           <main className="flex-1 overflow-y-auto">
             <div className="max-w-4xl mx-auto">
-              <Outlet />
-            </div>
+              <AnimatePresence mode="wait">
+                <PageTransition key={location.pathname}>
+                  <Outlet />
+                </PageTransition>
+              </AnimatePresence>
           </main>
         </SidebarInset>
       </div>
