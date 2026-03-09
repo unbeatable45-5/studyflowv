@@ -7,7 +7,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { generatePdf } from "@/lib/pdf-generator";
 import { toast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
-import ShareToGroupDialog from "@/components/groups/ShareToGroupDialog";
 import {
   History as HistoryIcon,
   Lightbulb,
@@ -20,7 +19,6 @@ import {
   Copy,
   ChevronDown,
   ChevronUp,
-  Share2,
 } from "lucide-react";
 import { copyToClipboard } from "@/lib/streaming";
 
