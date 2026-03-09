@@ -7,6 +7,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { generatePdf } from "@/lib/pdf-generator";
 import { toast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
+import ShareToGroupDialog from "@/components/groups/ShareToGroupDialog";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { generatePdf } from "@/lib/pdf-generator";
+import { toast } from "@/hooks/use-toast";
+import { formatDistanceToNow } from "date-fns";
 import {
   History as HistoryIcon,
   Lightbulb,
