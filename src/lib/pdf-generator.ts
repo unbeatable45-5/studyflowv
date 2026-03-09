@@ -187,6 +187,7 @@ export function generatePdf(opts: PdfOptions): void {
     }
   }
 
+  if (showWatermark) drawWatermark(doc, pageWidth, pageHeight);
   drawFooter(doc, pageWidth, pageHeight, pageNum);
 
   const fileName = (opts.title || "study-notes")
