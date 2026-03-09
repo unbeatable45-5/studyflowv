@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { FolderOpen, Calculator, Leaf, Atom, Code } from "lucide-react";
+import { MotionCard, MotionIcon, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 
 const subjects = [
   { label: "Math", icon: Calculator, color: "bg-primary/10 text-primary" },
@@ -17,18 +18,20 @@ const StudyLibrary = () => (
       </div>
       <Link to="/organizer" className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">Browse all</Link>
     </div>
-    <div className="grid grid-cols-4 gap-3">
+    <StaggerContainer className="grid grid-cols-4 gap-3" delay={0.15}>
       {subjects.map(({ label, icon: Icon, color }) => (
-        <Link key={label} to={`/organizer?subject=${encodeURIComponent(label)}`}>
-          <div className="flex flex-col items-center gap-2.5 p-3.5 rounded-2xl bg-card border border-border/50 hover:shadow-premium hover:border-primary/25 transition-all duration-300">
-            <div className={`rounded-xl p-2.5 ${color}`}>
-              <Icon className="h-5 w-5" />
-            </div>
-            <span className="text-xs font-semibold text-foreground">{label}</span>
-          </div>
-        </Link>
+        <StaggerItem key={label}>
+          <Link to={`/organizer?subject=${encodeURIComponent(label)}`}>
+            <MotionCard className="flex flex-col items-center gap-2.5 p-3.5 rounded-2xl bg-card border border-border/50 cursor-pointer">
+              <MotionIcon className={`rounded-xl p-2.5 ${color}`}>
+                <Icon className="h-5 w-5" />
+              </MotionIcon>
+              <span className="text-xs font-semibold text-foreground">{label}</span>
+            </MotionCard>
+          </Link>
+        </StaggerItem>
       ))}
-    </div>
+    </StaggerContainer>
   </div>
 );
 

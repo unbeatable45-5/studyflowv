@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Lightbulb, CalendarDays, Layers, FileDown, Bell, Timer, GraduationCap, ArrowRight, Brain, Lock, Network } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { usePremium, PremiumFeature } from "@/contexts/PremiumContext";
+import { MotionCard, MotionIcon, StaggerContainer, StaggerItem, MotionButton } from "@/components/ui/motion";
 
 interface Tool {
   to: string;
@@ -28,54 +29,60 @@ const ToolGrid = () => {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">More Tools</h2>
-      <div className="grid grid-cols-4 gap-3">
+      <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">More Tools</h2>
+      <StaggerContainer className="grid grid-cols-4 gap-3" delay={0.1}>
         {tools.map(({ to, icon: Icon, title, color, premiumFeature }) => {
           const locked = premiumFeature && !canAccess(premiumFeature);
           
           if (locked) {
             return (
-              <button key={to} onClick={promptUpgrade} className="text-left">
-                <div className="relative flex flex-col items-center gap-2 p-3 rounded-xl bg-card border border-border/60 hover:border-warning/30 transition-all duration-200 opacity-70">
-                  <div className="absolute top-1.5 right-1.5">
-                    <Lock className="h-3 w-3 text-warning" />
-                  </div>
-                  <div className={`rounded-xl p-2.5 ${color}`}>
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <span className="text-[10px] font-medium text-foreground text-center leading-tight">{title}</span>
-                </div>
-              </button>
+              <StaggerItem key={to}>
+                <button onClick={promptUpgrade} className="text-left w-full">
+                  <MotionCard className="relative flex flex-col items-center gap-2 p-3 rounded-2xl bg-card border border-border/50 opacity-70 cursor-pointer">
+                    <div className="absolute top-1.5 right-1.5">
+                      <Lock className="h-3 w-3 text-warning" />
+                    </div>
+                    <MotionIcon className={`rounded-2xl p-2.5 ${color}`}>
+                      <Icon className="h-5 w-5" />
+                    </MotionIcon>
+                    <span className="text-[10px] font-semibold text-foreground text-center leading-tight">{title}</span>
+                  </MotionCard>
+                </button>
+              </StaggerItem>
             );
           }
           
           return (
-            <Link key={to} to={to}>
-              <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-card border border-border/60 hover:shadow-md hover:border-primary/30 transition-all duration-200">
-                <div className={`rounded-xl p-2.5 ${color}`}>
-                  <Icon className="h-5 w-5" />
-                </div>
-                <span className="text-[10px] font-medium text-foreground text-center leading-tight">{title}</span>
-              </div>
-            </Link>
+            <StaggerItem key={to}>
+              <Link to={to}>
+                <MotionCard className="flex flex-col items-center gap-2 p-3 rounded-2xl bg-card border border-border/50 cursor-pointer">
+                  <MotionIcon className={`rounded-2xl p-2.5 ${color}`}>
+                    <Icon className="h-5 w-5" />
+                  </MotionIcon>
+                  <span className="text-[10px] font-semibold text-foreground text-center leading-tight">{title}</span>
+                </MotionCard>
+              </Link>
+            </StaggerItem>
           );
         })}
-      </div>
+      </StaggerContainer>
 
       {/* Tutorial Link */}
       <Link to="/tutorial">
-        <Card className="bg-accent border-accent hover:shadow-md transition-shadow cursor-pointer mt-3">
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="rounded-xl p-3 bg-primary/10 text-primary">
-              <GraduationCap className="h-5 w-5" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-display font-semibold text-accent-foreground text-sm">Getting Started</h3>
-              <p className="text-xs text-muted-foreground">Learn how to use StudyFlow</p>
-            </div>
-            <ArrowRight className="h-4 w-4 text-accent-foreground shrink-0" />
-          </CardContent>
-        </Card>
+        <MotionCard className="mt-3">
+          <Card className="bg-accent border-accent cursor-pointer">
+            <CardContent className="flex items-center gap-4 p-4">
+              <MotionIcon className="rounded-2xl p-3 bg-primary/10 text-primary">
+                <GraduationCap className="h-5 w-5" />
+              </MotionIcon>
+              <div className="flex-1">
+                <h3 className="font-display font-semibold text-accent-foreground text-sm">Getting Started</h3>
+                <p className="text-xs text-muted-foreground">Learn how to use StudyFlow</p>
+              </div>
+              <ArrowRight className="h-4 w-4 text-accent-foreground shrink-0" />
+            </CardContent>
+          </Card>
+        </MotionCard>
       </Link>
     </div>
   );

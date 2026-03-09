@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getRecentOutputs } from "@/lib/saved-outputs";
 import { formatDistanceToNow } from "date-fns";
+import { MotionCard, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 
 const toolMeta: Record<string, { icon: typeof Lightbulb; color: string; label: string; to: string }> = {
   "study-helper": { icon: Lightbulb, color: "text-primary", label: "Study Helper", to: "/study" },
@@ -50,15 +51,15 @@ const RecentActivity = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-muted-foreground" />
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Recent Activity</h2>
+          <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Recent Activity</h2>
         </div>
-        <Link to="/history" className="text-xs text-primary hover:underline">View all</Link>
+        <Link to="/history" className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors">View all</Link>
       </div>
 
       {loading ? (
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-14 w-full rounded-xl" />
+            <Skeleton key={i} className="h-14 w-full rounded-2xl" />
           ))}
         </div>
       ) : recents.length === 0 ? (
@@ -68,7 +69,7 @@ const RecentActivity = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-2">
+        <StaggerContainer className="space-y-2" delay={0.05}>
           {recents.map((item) => {
             const meta = toolMeta[item.tool];
             if (!meta) return null;
@@ -76,25 +77,29 @@ const RecentActivity = () => {
             const preview = item.output_text.slice(0, 60).replace(/\n/g, " ");
 
             return (
-              <Link key={item.id} to={meta.to}>
-                <Card className="hover:shadow-sm hover:border-primary/20 transition-all duration-200 cursor-pointer">
-                  <CardContent className="p-3 flex items-center gap-3">
-                    <div className={`rounded-lg p-2 bg-muted ${meta.color}`}>
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{getLabel(item)}</p>
-                      <p className="text-xs text-muted-foreground line-clamp-1">{preview}…</p>
-                    </div>
-                    <span className="text-[11px] text-muted-foreground shrink-0 whitespace-nowrap">
-                      {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
-                    </span>
-                  </CardContent>
-                </Card>
-              </Link>
+              <StaggerItem key={item.id}>
+                <Link to={meta.to}>
+                  <MotionCard className="cursor-pointer">
+                    <Card className="border-border/50">
+                      <CardContent className="p-3 flex items-center gap-3">
+                        <div className={`rounded-xl p-2 bg-muted ${meta.color}`}>
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{getLabel(item)}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-1">{preview}…</p>
+                        </div>
+                        <span className="text-[11px] text-muted-foreground shrink-0 whitespace-nowrap">
+                          {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
+                        </span>
+                      </CardContent>
+                    </Card>
+                  </MotionCard>
+                </Link>
+              </StaggerItem>
             );
           })}
-        </div>
+        </StaggerContainer>
       )}
     </div>
   );
