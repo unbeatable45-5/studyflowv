@@ -17,16 +17,19 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico"],
+      includeAssets: ["favicon.ico", "pwa-192x192.png", "pwa-512x512.png"],
       manifest: {
-        name: "Student Hub",
-        short_name: "StudentHub",
+        name: "StudyFlow - AI Study Companion",
+        short_name: "StudyFlow",
         description: "AI-powered study tools for students",
         theme_color: "#2563EB",
         background_color: "#F8FAFC",
         display: "standalone",
         orientation: "portrait",
+        scope: "/",
         start_url: "/",
+        id: "/",
+        categories: ["education", "productivity"],
         icons: [
           {
             src: "/pwa-192x192.png",
@@ -37,14 +40,21 @@ export default defineConfig(({ mode }) => ({
             src: "/pwa-512x512.png",
             sizes: "512x512",
             type: "image/png",
-            purpose: "any maskable",
+          },
+          {
+            src: "/pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
           },
         ],
       },
       workbox: {
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MB limit
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallbackDenylist: [/^\/~oauth/],
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+        clientsClaim: true,
+        skipWaiting: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

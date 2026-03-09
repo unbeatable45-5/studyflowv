@@ -2,30 +2,45 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <title>StudyFlow - Your AI Study Companion</title>
     <meta name="description" content="StudyFlow: AI-powered study tools including Quick Study Helper, Note Organizer, and Revision Planner. Study smarter, not harder.">
     <meta name="author" content="StudyFlow" />
+
+    <!-- PWA Meta -->
     <meta name="theme-color" content="#2563EB" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="StudyFlow" />
+    <meta name="application-name" content="StudyFlow" />
+    <meta name="msapplication-TileColor" content="#2563EB" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="format-detection" content="telephone=no" />
 
-    
-    
-    <meta property="og:type" content="website" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-
+    <!-- Apple Touch Icons (multiple sizes for older devices) -->
     <link rel="apple-touch-icon" href="/pwa-192x192.png" />
-    <meta property="og:title" content="StudyFlow - Your AI Study Companion">
-  <meta name="twitter:title" content="StudyFlow - Your AI Study Companion">
-  <meta property="og:description" content="StudyFlow: AI-powered study tools including Quick Study Helper, Note Organizer, and Revision Planner. Study smarter, not harder.">
-  <meta name="twitter:description" content="StudyFlow: AI-powered study tools including Quick Study Helper, Note Organizer, and Revision Planner. Study smarter, not harder.">
-  <link rel="icon" type="image/png" href="/pwa-192x192.png">
-  <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3e5dd3ba-211b-42fa-8cac-60fbfa98b10d/id-preview-afcfe8f5--618e2775-c110-4f8f-9209-d8660970caa3.lovable.app-1773018884231.png">
-  <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3e5dd3ba-211b-42fa-8cac-60fbfa98b10d/id-preview-afcfe8f5--618e2775-c110-4f8f-9209-d8660970caa3.lovable.app-1773018884231.png">
-</head>
+    <link rel="apple-touch-icon" sizes="152x152" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/pwa-192x192.png" />
+
+    <!-- Splash screens for iOS (older devices need these) -->
+    <meta name="apple-mobile-web-app-title" content="StudyFlow" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/pwa-192x192.png" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <!-- OG / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="StudyFlow - Your AI Study Companion" />
+    <meta property="og:description" content="StudyFlow: AI-powered study tools including Quick Study Helper, Note Organizer, and Revision Planner. Study smarter, not harder." />
+    <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3e5dd3ba-211b-42fa-8cac-60fbfa98b10d/id-preview-afcfe8f5--618e2775-c110-4f8f-9209-d8660970caa3.lovable.app-1773018884231.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="StudyFlow - Your AI Study Companion" />
+    <meta name="twitter:description" content="StudyFlow: AI-powered study tools including Quick Study Helper, Note Organizer, and Revision Planner. Study smarter, not harder." />
+    <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3e5dd3ba-211b-42fa-8cac-60fbfa98b10d/id-preview-afcfe8f5--618e2775-c110-4f8f-9209-d8660970caa3.lovable.app-1773018884231.png" />
+  </head>
 
   <body>
     <div id="root"></div>
