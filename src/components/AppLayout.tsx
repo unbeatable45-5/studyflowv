@@ -81,8 +81,11 @@ const AppLayout = () => {
         </header>
 
         <main className="flex-1 pb-20 sm:pb-24 overflow-y-auto overscroll-contain">
-          <Outlet />
-        </main>
+          <AnimatePresence mode="wait">
+            <PageTransition key={location.pathname}>
+              <Outlet />
+            </PageTransition>
+          </AnimatePresence>
 
         <BottomNav />
         <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
