@@ -30,6 +30,9 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
+import Groups from "./pages/Groups";
+import GroupDetail from "./pages/GroupDetail";
+import JoinGroup from "./pages/JoinGroup";
 
 const queryClient = new QueryClient();
 
