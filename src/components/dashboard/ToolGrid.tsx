@@ -33,8 +33,27 @@ const ToolGrid = () => {
     <div className="space-y-3">
       <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">More Tools</h2>
       <StaggerContainer className="grid grid-cols-4 gap-3" delay={0.1}>
-        {tools.map(({ to, icon: Icon, title, color, premiumFeature }) => {
+        {tools.map(({ to, icon: Icon, title, color, premiumFeature, comingSoon }) => {
           const locked = premiumFeature && !canAccess(premiumFeature);
+          
+          // Coming Soon items
+          if (comingSoon) {
+            return (
+              <StaggerItem key={title}>
+                <div className="text-left w-full cursor-not-allowed">
+                  <MotionCard className="relative flex flex-col items-center gap-2 p-3 rounded-2xl bg-card border border-border/50 opacity-60">
+                    <Badge variant="outline" className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[8px] px-1.5 py-0 bg-muted border-muted-foreground/30">
+                      Soon
+                    </Badge>
+                    <MotionIcon className={`rounded-2xl p-2.5 ${color}`}>
+                      <Icon className="h-5 w-5" />
+                    </MotionIcon>
+                    <span className="text-[10px] font-semibold text-muted-foreground text-center leading-tight">{title}</span>
+                  </MotionCard>
+                </div>
+              </StaggerItem>
+            );
+          }
           
           if (locked) {
             return (

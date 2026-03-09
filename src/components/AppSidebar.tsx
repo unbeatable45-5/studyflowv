@@ -9,7 +9,6 @@ import {
   FileUp,
   BookOpen,
   Brain,
-  Mic,
   History,
   Bell,
   Crown,
