@@ -220,14 +220,6 @@ const HistoryPage = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="gap-1.5 text-xs"
-                          onClick={() => handleShareToGroup(item.id)}
-                        >
-                          <Share2 className="h-3.5 w-3.5" /> Share
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
                           className="gap-1.5 text-xs text-destructive hover:text-destructive"
                           onClick={() => handleDelete(item.id)}
                         >
