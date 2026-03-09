@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { FileText, Calendar, Share2 } from "lucide-react";
+import { FileText, Calendar, Share2, Search, Lightbulb, CalendarDays, Layers, FileUp, X } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import {
   Dialog,
@@ -18,11 +19,22 @@ interface GroupFeedProps {
   groupId: string;
 }
 
+const toolFilters = [
+  { value: "all", label: "All", icon: null },
+  { value: "study-helper", label: "Study", icon: Lightbulb },
+  { value: "note-organizer", label: "Notes", icon: FileText },
+  { value: "revision-planner", label: "Plans", icon: CalendarDays },
+  { value: "flashcard-generator", label: "Cards", icon: Layers },
+  { value: "pdf-summarizer", label: "PDFs", icon: FileUp },
+];
+
 const GroupFeed = ({ groupId }: GroupFeedProps) => {
   const { user } = useAuth();
   const [content, setContent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOutput, setSelectedOutput] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [toolFilter, setToolFilter] = useState("all");
   const initialLoadRef = useRef(true);
 
   useEffect(() => {
@@ -118,6 +130,41 @@ const GroupFeed = ({ groupId }: GroupFeedProps) => {
     initialLoadRef.current = false;
   };
 
+  // Filter content based on search and tool filter
+  const filteredContent = useMemo(() => {
+    return content.filter((item) => {
+      const output = item.saved_outputs;
+      const sharer = item.profiles?.display_name || "";
+      
+      // Tool filter
+      if (toolFilter !== "all" && output?.tool !== toolFilter) {
+        return false;
+      }
+      
+      // Search filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const matchesText = output?.output_text?.toLowerCase().includes(query);
+        const matchesSubject = output?.subject?.toLowerCase().includes(query);
+        const matchesSharer = sharer.toLowerCase().includes(query);
+        const matchesTool = output?.tool?.replace(/-/g, " ").toLowerCase().includes(query);
+        
+        if (!matchesText && !matchesSubject && !matchesSharer && !matchesTool) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  }, [content, searchQuery, toolFilter]);
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setToolFilter("all");
+  };
+
+  const hasActiveFilters = searchQuery.trim() || toolFilter !== "all";
+
   if (loading) {
     return <div className="text-center text-sm text-muted-foreground">Loading feed...</div>;
   }
@@ -140,44 +187,108 @@ const GroupFeed = ({ groupId }: GroupFeedProps) => {
 
   return (
     <>
-      <div className="space-y-3">
-        {content.map((item) => {
-          const output = item.saved_outputs;
-          const sharer = item.profiles?.display_name || "Unknown";
-          const initial = sharer[0]?.toUpperCase() || "?";
-
-          return (
-            <Card key={item.id} className="cursor-pointer hover:bg-accent/30 transition-colors">
-              <CardContent className="p-4" onClick={() => setSelectedOutput(output)}>
-                <div className="flex items-start gap-3">
-                  <Avatar className="h-8 w-8 shrink-0">
-                    <AvatarFallback className="text-xs">{initial}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="font-medium text-sm">{sharer}</p>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(item.shared_at), { addSuffix: true })}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                      <FileText className="h-3 w-3" />
-                      <span className="capitalize">{output?.tool?.replace(/-/g, " ")}</span>
-                      {output?.subject && (
-                        <>
-                          <span>•</span>
-                          <span>{output.subject}</span>
-                        </>
-                      )}
-                    </div>
-                    <p className="text-sm line-clamp-2">{output?.output_text?.slice(0, 150)}...</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+      {/* Search and filters */}
+      <div className="space-y-3 mb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search content, subjects, or members..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 pr-9"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+        
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
+          {toolFilters.map((filter) => (
+            <Button
+              key={filter.value}
+              size="sm"
+              variant={toolFilter === filter.value ? "default" : "outline"}
+              className="shrink-0 text-xs gap-1.5 h-7 px-2.5"
+              onClick={() => setToolFilter(filter.value)}
+            >
+              {filter.icon && <filter.icon className="h-3 w-3" />}
+              {filter.label}
+            </Button>
+          ))}
+        </div>
       </div>
+
+      {/* Results info */}
+      {hasActiveFilters && (
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs text-muted-foreground">
+            {filteredContent.length} result{filteredContent.length !== 1 ? "s" : ""} found
+          </p>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="text-xs h-6 px-2"
+          >
+            Clear filters
+          </Button>
+        </div>
+      )}
+
+      {/* Feed content */}
+      {filteredContent.length === 0 ? (
+        <div className="text-center py-8 space-y-2">
+          <Search className="h-8 w-8 text-muted-foreground mx-auto" />
+          <p className="text-sm text-muted-foreground">No matching content found</p>
+          <Button variant="outline" size="sm" onClick={clearFilters}>
+            Clear filters
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filteredContent.map((item) => {
+            const output = item.saved_outputs;
+            const sharer = item.profiles?.display_name || "Unknown";
+            const initial = sharer[0]?.toUpperCase() || "?";
+
+            return (
+              <Card key={item.id} className="cursor-pointer hover:bg-accent/30 transition-colors">
+                <CardContent className="p-4" onClick={() => setSelectedOutput(output)}>
+                  <div className="flex items-start gap-3">
+                    <Avatar className="h-8 w-8 shrink-0">
+                      <AvatarFallback className="text-xs">{initial}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-medium text-sm">{sharer}</p>
+                        <span className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(item.shared_at), { addSuffix: true })}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                        <FileText className="h-3 w-3" />
+                        <span className="capitalize">{output?.tool?.replace(/-/g, " ")}</span>
+                        {output?.subject && (
+                          <>
+                            <span>•</span>
+                            <span>{output.subject}</span>
+                          </>
+                        )}
+                      </div>
+                      <p className="text-sm line-clamp-2">{output?.output_text?.slice(0, 150)}...</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       <Dialog open={!!selectedOutput} onOpenChange={() => setSelectedOutput(null)}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
