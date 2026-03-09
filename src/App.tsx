@@ -30,9 +30,6 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
-import Groups from "./pages/Groups";
-import GroupDetail from "./pages/GroupDetail";
-import JoinGroup from "./pages/JoinGroup";
 import MindMap from "./pages/MindMap";
 
 const queryClient = new QueryClient();
@@ -64,7 +61,6 @@ const App = () => (
               <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
               <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
               <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/join-group/:groupId" element={<ProtectedRoute><JoinGroup /></ProtectedRoute>} />
               <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                 <Route path="/" element={<Index />} />
                 <Route path="/study" element={<StudyHelper />} />
@@ -85,8 +81,6 @@ const App = () => (
                 <Route path="/spaced-review" element={<SpacedReview />} />
                 <Route path="/lecture-capture" element={<LectureCapture />} />
                 <Route path="/subscription" element={<Subscription />} />
-                <Route path="/groups" element={<Groups />} />
-                <Route path="/groups/:groupId" element={<GroupDetail />} />
                 <Route path="/mind-map" element={<MindMap />} />
               </Route>
               <Route path="*" element={<NotFound />} />
