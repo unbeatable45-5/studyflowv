@@ -87,6 +87,7 @@ const GroupFeed = ({ groupId }: GroupFeedProps) => {
 
     if (data) setContent(data);
     setLoading(false);
+    initialLoadRef.current = false;
   };
 
   if (loading) {
