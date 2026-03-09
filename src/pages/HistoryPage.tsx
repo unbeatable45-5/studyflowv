@@ -53,8 +53,6 @@ const HistoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  const [selectedOutputId, setSelectedOutputId] = useState<string>("");
   const navigate = useNavigate();
 
   const fetchItems = async () => {
