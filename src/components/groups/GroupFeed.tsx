@@ -45,24 +45,34 @@ const GroupFeed = ({ groupId }: GroupFeedProps) => {
             .from("shared_content")
             .select(`
               *,
-              saved_outputs(*),
-              profiles:shared_by(display_name)
+              saved_outputs(*)
             `)
             .eq("id", payload.new.id)
             .single();
 
           if (newContent && newContent.shared_by !== user?.id) {
-            // Only show toast if not shared by current user
-            const sharer = newContent.profiles?.display_name || "Someone";
+            // Fetch sharer's profile separately
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("display_name")
+              .eq("user_id", newContent.shared_by)
+              .single();
+
+            const sharer = profile?.display_name || "Someone";
             const toolName = newContent.saved_outputs?.tool?.replace(/-/g, " ") || "content";
             
             toast({
               title: "New content shared",
               description: `${sharer} shared ${toolName}`,
             });
-          }
 
-          if (newContent) {
+            // Add profile to the content object for display
+            const contentWithProfile = {
+              ...newContent,
+              profiles: profile,
+            };
+            setContent((prev) => [contentWithProfile, ...prev]);
+          } else if (newContent) {
             setContent((prev) => [newContent, ...prev]);
           }
         }
