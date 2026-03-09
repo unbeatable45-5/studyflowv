@@ -52,7 +52,6 @@ const toolItems = [
   { title: "Revision Planner", url: "/planner", icon: Calendar },
   { title: "PDF Summarizer", url: "/pdf-summarizer", icon: FileUp },
   { title: "Mind Map", url: "/mind-map", icon: Brain },
-  { title: "Lecture Capture", url: "/lecture-capture", icon: Mic },
   { title: "Pomodoro", url: "/pomodoro", icon: Clock },
   { title: "Spaced Review", url: "/spaced-review", icon: BookOpen },
 ];
