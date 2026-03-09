@@ -81,8 +81,6 @@ const App = () => (
                 <Route path="/spaced-review" element={<SpacedReview />} />
                 <Route path="/lecture-capture" element={<LectureCapture />} />
                 <Route path="/subscription" element={<Subscription />} />
-                <Route path="/groups" element={<Groups />} />
-                <Route path="/groups/:groupId" element={<GroupDetail />} />
                 <Route path="/mind-map" element={<MindMap />} />
               </Route>
               <Route path="*" element={<NotFound />} />
