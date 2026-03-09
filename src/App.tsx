@@ -33,6 +33,7 @@ import NotFound from "./pages/NotFound";
 import Groups from "./pages/Groups";
 import GroupDetail from "./pages/GroupDetail";
 import JoinGroup from "./pages/JoinGroup";
+import MindMap from "./pages/MindMap";
 
 const queryClient = new QueryClient();
 
