@@ -151,7 +151,7 @@ const LectureCapture = () => {
   };
 
   const handleDownloadPdf = () => {
-    generatePdf({ title: title || "Lecture Notes", content: output, source: "custom" });
+    generatePdf({ title: title || "Lecture Notes", content: output, source: "custom", isPremium });
     toast({ title: "PDF downloaded!" });
   };
 

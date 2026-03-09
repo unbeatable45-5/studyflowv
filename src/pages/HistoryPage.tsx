@@ -92,6 +92,7 @@ const HistoryPage = () => {
       title: label,
       content: item.output_text,
       source: "custom",
+      isPremium,
     });
     toast({ title: "PDF downloaded!" });
   };
