@@ -6,6 +6,8 @@ interface PdfOptions {
   date?: string;
   content: string;
   source: "study-helper" | "note-organizer" | "custom";
+  /** If true, no watermark is added to the PDF */
+  isPremium?: boolean;
 }
 
 // Colors
