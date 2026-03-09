@@ -111,11 +111,15 @@ const GroupDetail = () => {
         )}
       </div>
 
-      <Tabs defaultValue="feed" className="w-full">
-        <TabsList className="w-full grid grid-cols-2">
+      <Tabs defaultValue="chat" className="w-full">
+        <TabsList className="w-full grid grid-cols-3">
+          <TabsTrigger value="chat">Chat</TabsTrigger>
           <TabsTrigger value="feed">Feed</TabsTrigger>
           <TabsTrigger value="members">Members</TabsTrigger>
         </TabsList>
+        <TabsContent value="chat" className="mt-4">
+          <GroupChat groupId={groupId!} />
+        </TabsContent>
         <TabsContent value="feed" className="mt-4">
           <GroupFeed groupId={groupId!} />
         </TabsContent>
