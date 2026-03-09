@@ -30,6 +30,7 @@ const sectionMeta: Record<SectionKey, { icon: typeof BookOpen; label: string; th
 };
 
 const LectureCapture = () => {
+  const { isPremium } = usePremium();
   const [file, setFile] = useState<File | null>(null);
   const [extractedText, setExtractedText] = useState("");
   const [title, setTitle] = useState("");
