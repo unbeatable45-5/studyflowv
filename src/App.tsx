@@ -31,6 +31,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import MindMap from "./pages/MindMap";
+import AiTutor from "./pages/AiTutor";
 
 const queryClient = new QueryClient();
 
