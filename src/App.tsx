@@ -31,6 +31,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import MindMap from "./pages/MindMap";
+import AiTutor from "./pages/AiTutor";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => (
                 <Route path="/spaced-review" element={<SpacedReview />} />
                 <Route path="/subscription" element={<Subscription />} />
                 <Route path="/mind-map" element={<MindMap />} />
+                <Route path="/ai-tutor" element={<AiTutor />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
