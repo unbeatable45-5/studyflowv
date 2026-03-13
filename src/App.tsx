@@ -32,6 +32,7 @@ import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import MindMap from "./pages/MindMap";
 import AiTutor from "./pages/AiTutor";
+import PracticeExam from "./pages/PracticeExam";
 
 const queryClient = new QueryClient();
 
