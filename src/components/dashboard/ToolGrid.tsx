@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Lightbulb, CalendarDays, Layers, FileDown, Bell, Timer, GraduationCap, ArrowRight, Brain, Lock, Network, Mic, Bot } from "lucide-react";
+import { Lightbulb, CalendarDays, Layers, FileDown, Bell, Timer, GraduationCap, ArrowRight, Brain, Lock, Network, Mic, Bot, ClipboardList } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { usePremium, PremiumFeature } from "@/contexts/PremiumContext";
 import { MotionCard, MotionIcon, StaggerContainer, StaggerItem, MotionButton } from "@/components/ui/motion";
