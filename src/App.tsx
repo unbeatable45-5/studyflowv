@@ -84,6 +84,7 @@ const App = () => (
                 <Route path="/subscription" element={<Subscription />} />
                 <Route path="/mind-map" element={<MindMap />} />
                 <Route path="/ai-tutor" element={<AiTutor />} />
+                <Route path="/practice-exam" element={<PracticeExam />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
