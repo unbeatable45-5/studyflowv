@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Lightbulb, CalendarDays, Layers, FileDown, Bell, Timer, GraduationCap, ArrowRight, Brain, Lock, Network, Mic, Bot } from "lucide-react";
+import { Lightbulb, CalendarDays, Layers, FileDown, Bell, Timer, GraduationCap, ArrowRight, Brain, Lock, Network, Mic, Bot, ClipboardList } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { usePremium, PremiumFeature } from "@/contexts/PremiumContext";
 import { MotionCard, MotionIcon, StaggerContainer, StaggerItem, MotionButton } from "@/components/ui/motion";
@@ -25,6 +25,7 @@ const tools: Tool[] = [
   { to: "/pomodoro", icon: Timer, title: "Pomodoro", color: "bg-primary/10 text-primary" },
   { to: "#", icon: GraduationCap, title: "Lecture Capture", color: "bg-muted text-muted-foreground", comingSoon: true },
   { to: "/ai-tutor", icon: Bot, title: "AI Tutor", color: "bg-success/10 text-success" },
+  { to: "/practice-exam", icon: ClipboardList, title: "Practice Exam", color: "bg-warning/10 text-warning" },
   { to: "#", icon: Mic, title: "Voice Notes", color: "bg-muted text-muted-foreground", comingSoon: true },
 ];
 

@@ -32,6 +32,7 @@ import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import MindMap from "./pages/MindMap";
 import AiTutor from "./pages/AiTutor";
+import PracticeExam from "./pages/PracticeExam";
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,7 @@ const App = () => (
                 <Route path="/subscription" element={<Subscription />} />
                 <Route path="/mind-map" element={<MindMap />} />
                 <Route path="/ai-tutor" element={<AiTutor />} />
+                <Route path="/practice-exam" element={<PracticeExam />} />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Routes>
