@@ -24,7 +24,7 @@ const tools: Tool[] = [
   { to: "/reminders", icon: Bell, title: "Reminders", color: "bg-destructive/10 text-destructive" },
   { to: "/pomodoro", icon: Timer, title: "Pomodoro", color: "bg-primary/10 text-primary" },
   { to: "#", icon: GraduationCap, title: "Lecture Capture", color: "bg-muted text-muted-foreground", comingSoon: true },
-  { to: "#", icon: Bot, title: "AI Tutor", color: "bg-muted text-muted-foreground", comingSoon: true },
+  { to: "/ai-tutor", icon: Bot, title: "AI Tutor", color: "bg-success/10 text-success" },
   { to: "#", icon: Mic, title: "Voice Notes", color: "bg-muted text-muted-foreground", comingSoon: true },
 ];
 
