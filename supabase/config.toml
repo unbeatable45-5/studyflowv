@@ -24,7 +24,7 @@ verify_jwt = false
 [functions.daily-question]
 verify_jwt = false
 
-[functions.lecture-capture]
+[functions.ai-tutor]
 verify_jwt = false
 
 [functions.paystack-initialize]
