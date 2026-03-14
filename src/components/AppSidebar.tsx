@@ -16,7 +16,9 @@ import {
   UserCircle,
   Moon,
   Sun,
-  Search
+  Search,
+  ClipboardList,
+  Bot
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, Link } from "react-router-dom";
@@ -53,6 +55,8 @@ const toolItems = [
   { title: "Mind Map", url: "/mind-map", icon: Brain },
   { title: "Pomodoro", url: "/pomodoro", icon: Clock },
   { title: "Spaced Review", url: "/spaced-review", icon: BookOpen },
+  { title: "Practice Exam", url: "/practice-exam", icon: ClipboardList },
+  { title: "AI Tutor", url: "/ai-tutor", icon: Bot },
 ];
 
 const accountItems = [
