@@ -53,6 +53,8 @@ const toolItems = [
   { title: "Mind Map", url: "/mind-map", icon: Brain },
   { title: "Pomodoro", url: "/pomodoro", icon: Clock },
   { title: "Spaced Review", url: "/spaced-review", icon: BookOpen },
+  { title: "Practice Exam", url: "/practice-exam", icon: ClipboardList },
+  { title: "AI Tutor", url: "/ai-tutor", icon: Bot },
 ];
 
 const accountItems = [
