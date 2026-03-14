@@ -16,7 +16,9 @@ import {
   UserCircle,
   Moon,
   Sun,
-  Search
+  Search,
+  ClipboardList,
+  Bot
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, Link } from "react-router-dom";
