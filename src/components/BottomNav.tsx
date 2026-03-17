@@ -56,7 +56,7 @@ const BottomNav = () => {
           })}
           {/* More button */}
           <button
-            onClick={() => setMoreOpen(true)}
+            onClick={() => { if (navigator.vibrate) navigator.vibrate(10); setMoreOpen(true); }}
             className="relative flex flex-col items-center gap-0.5 sm:gap-1 px-2 sm:px-4 py-1.5 min-w-[48px] sm:min-w-[56px] touch-manipulation"
           >
             {isMoreActive && (
