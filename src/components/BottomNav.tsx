@@ -56,7 +56,7 @@ const BottomNav = () => {
           })}
           {/* More button */}
           <button
-            onClick={() => setMoreOpen(true)}
+            onClick={() => { if (navigator.vibrate) navigator.vibrate(10); setMoreOpen(true); }}
             className="relative flex flex-col items-center gap-0.5 sm:gap-1 px-2 sm:px-4 py-1.5 min-w-[48px] sm:min-w-[56px] touch-manipulation"
           >
             {isMoreActive && (
@@ -79,25 +79,49 @@ const BottomNav = () => {
           <SheetHeader className="pb-3">
             <SheetTitle className="text-base font-display">More Tools</SheetTitle>
           </SheetHeader>
-          <div className="grid grid-cols-3 gap-3">
-            {moreItems.map(({ to, icon: Icon, label }) => {
-              const active = pathname === to;
-              return (
-                <Link
-                  key={to}
-                  to={to}
-                  onClick={() => setMoreOpen(false)}
-                  className={cn(
-                    "flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-colors touch-manipulation",
-                    active ? "bg-primary/10" : "hover:bg-muted/50 active:bg-muted"
-                  )}
-                >
-                  <Icon className={cn("h-6 w-6", active ? "text-primary" : "text-muted-foreground")} />
-                  <span className={cn("text-[10px] font-semibold text-center leading-tight", active ? "text-primary" : "text-muted-foreground")}>{label}</span>
-                </Link>
-              );
-            })}
-          </div>
+          <AnimatePresence>
+            {moreOpen && (
+              <motion.div
+                className="grid grid-cols-3 gap-3"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: {},
+                  visible: { transition: { staggerChildren: 0.04, delayChildren: 0.1 } },
+                }}
+              >
+                {moreItems.map(({ to, icon: Icon, label }) => {
+                  const active = pathname === to;
+                  return (
+                    <motion.div
+                      key={to}
+                      variants={{
+                        hidden: { opacity: 0, y: 16, scale: 0.9 },
+                        visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 350, damping: 25 } },
+                      }}
+                    >
+                      <Link
+                        to={to}
+                        onClick={() => {
+                          if (navigator.vibrate) navigator.vibrate(8);
+                          setMoreOpen(false);
+                        }}
+                        className={cn(
+                          "flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-colors touch-manipulation",
+                          active ? "bg-primary/10" : "hover:bg-muted/50 active:bg-muted"
+                        )}
+                      >
+                        <motion.div whileTap={{ scale: 0.85 }}>
+                          <Icon className={cn("h-6 w-6", active ? "text-primary" : "text-muted-foreground")} />
+                        </motion.div>
+                        <span className={cn("text-[10px] font-semibold text-center leading-tight", active ? "text-primary" : "text-muted-foreground")}>{label}</span>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </SheetContent>
       </Sheet>
     </>
