@@ -1,9 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Lightbulb, TrendingUp, MoreHorizontal, FileText, Clock, Layers, Calendar, FileUp, Brain, BookOpen, ClipboardList, Bot, X } from "lucide-react";
+import { Home, Lightbulb, TrendingUp, MoreHorizontal, FileText, Clock, Layers, Calendar, FileUp, Brain, BookOpen, ClipboardList, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 
 const mainNavItems = [
   { to: "/", icon: Home, label: "Home" },
@@ -74,11 +74,11 @@ const BottomNav = () => {
         </div>
       </nav>
 
-      <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
-        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 pt-2 max-h-[70vh]">
-          <SheetHeader className="pb-3">
-            <SheetTitle className="text-base font-display">More Tools</SheetTitle>
-          </SheetHeader>
+      <Drawer open={moreOpen} onOpenChange={setMoreOpen}>
+        <DrawerContent className="px-4 pb-8 pt-2 max-h-[70vh]">
+          <DrawerHeader className="pb-3">
+            <DrawerTitle className="text-base font-display">More Tools</DrawerTitle>
+          </DrawerHeader>
           <AnimatePresence>
             {moreOpen && (
               <motion.div
@@ -122,8 +122,8 @@ const BottomNav = () => {
               </motion.div>
             )}
           </AnimatePresence>
-        </SheetContent>
-      </Sheet>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 };
