@@ -52,7 +52,12 @@ const BottomNav = () => {
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 )}
-                <motion.div whileTap={{ scale: 0.85 }} className="relative z-10">
+                <motion.div
+                  whileTap={{ scale: 0.85 }}
+                  animate={active ? { scale: [1, 1.25, 0.95, 1.05, 1], y: [0, -4, 1, -1, 0] } : { scale: 1, y: 0 }}
+                  transition={active ? { duration: 0.4, ease: "easeOut" } : { duration: 0.2 }}
+                  className="relative z-10"
+                >
                   <Icon className={cn("h-5 w-5 transition-colors duration-200", active ? "text-primary" : "text-muted-foreground")} />
                 </motion.div>
                 <span className={cn("text-[9px] sm:text-[10px] font-semibold tracking-wide relative z-10 transition-colors duration-200", active ? "text-primary" : "text-muted-foreground")}>{label}</span>
