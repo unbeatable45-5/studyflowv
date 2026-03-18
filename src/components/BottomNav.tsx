@@ -74,11 +74,11 @@ const BottomNav = () => {
         </div>
       </nav>
 
-      <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
-        <SheetContent side="bottom" className="rounded-t-3xl px-4 pb-8 pt-2 max-h-[70vh]">
-          <SheetHeader className="pb-3">
-            <SheetTitle className="text-base font-display">More Tools</SheetTitle>
-          </SheetHeader>
+      <Drawer open={moreOpen} onOpenChange={setMoreOpen}>
+        <DrawerContent className="px-4 pb-8 pt-2 max-h-[70vh]">
+          <DrawerHeader className="pb-3">
+            <DrawerTitle className="text-base font-display">More Tools</DrawerTitle>
+          </DrawerHeader>
           <AnimatePresence>
             {moreOpen && (
               <motion.div
@@ -122,8 +122,8 @@ const BottomNav = () => {
               </motion.div>
             )}
           </AnimatePresence>
-        </SheetContent>
-      </Sheet>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 };
