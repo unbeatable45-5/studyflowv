@@ -30,7 +30,7 @@ const BottomNav = () => {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 glass-strong border-t-0 pb-safe-area">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-xl border-t border-border/30 shadow-[0_-4px_24px_-6px_hsl(var(--primary)/0.08)] pb-safe-area">
         <div className="flex items-center justify-around max-w-lg mx-auto px-1 sm:px-2 py-2 safe-area-bottom">
           {mainNavItems.map(({ to, icon: Icon, label }) => {
             const active = pathname === to;
