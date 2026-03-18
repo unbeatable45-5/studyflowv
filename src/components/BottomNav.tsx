@@ -30,7 +30,12 @@ const BottomNav = () => {
 
   return (
     <>
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-xl border-t border-border/30 shadow-[0_-4px_24px_-6px_hsl(var(--primary)/0.08)] pb-safe-area">
+      <motion.nav
+        initial={{ y: 60, opacity: 0, scale: 0.95 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 28, delay: 0.3 }}
+        className="fixed bottom-0 left-0 right-0 z-50 bg-background/70 backdrop-blur-xl border-t border-border/30 shadow-[0_-4px_24px_-6px_hsl(var(--primary)/0.08)] pb-safe-area"
+      >
         <div className="flex items-center justify-around max-w-lg mx-auto px-1 sm:px-2 py-2 safe-area-bottom">
           {mainNavItems.map(({ to, icon: Icon, label }) => {
             const active = pathname === to;
@@ -72,7 +77,7 @@ const BottomNav = () => {
             <span className={cn("text-[9px] sm:text-[10px] font-semibold tracking-wide relative z-10 transition-colors duration-200", isMoreActive ? "text-primary" : "text-muted-foreground")}>More</span>
           </button>
         </div>
-      </nav>
+      </motion.nav>
 
       <Drawer open={moreOpen} onOpenChange={setMoreOpen}>
         <DrawerContent className="px-4 pb-8 pt-2 max-h-[70vh]">
