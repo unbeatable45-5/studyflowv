@@ -1,9 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Lightbulb, TrendingUp, MoreHorizontal, FileText, Clock, Layers, Calendar, FileUp, Brain, BookOpen, ClipboardList, Bot, X } from "lucide-react";
+import { Home, Lightbulb, TrendingUp, MoreHorizontal, FileText, Clock, Layers, Calendar, FileUp, Brain, BookOpen, ClipboardList, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 
 const mainNavItems = [
   { to: "/", icon: Home, label: "Home" },
