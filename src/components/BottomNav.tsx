@@ -77,7 +77,7 @@ const BottomNav = () => {
             <span className={cn("text-[9px] sm:text-[10px] font-semibold tracking-wide relative z-10 transition-colors duration-200", isMoreActive ? "text-primary" : "text-muted-foreground")}>More</span>
           </button>
         </div>
-      </nav>
+      </motion.nav>
 
       <Drawer open={moreOpen} onOpenChange={setMoreOpen}>
         <DrawerContent className="px-4 pb-8 pt-2 max-h-[70vh]">
