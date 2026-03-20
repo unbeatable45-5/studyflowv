@@ -12,6 +12,7 @@ import { usePremium } from "@/contexts/PremiumContext";
 import { generatePdf } from "@/lib/pdf-generator";
 import { FileUp, Loader2, FileDown, Upload } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import ReactMarkdown from "react-markdown";
 import * as pdfjsLib from "pdfjs-dist";
 
 // Set up PDF.js worker
@@ -237,8 +238,8 @@ const PdfSummarizer = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-sm max-w-none text-foreground whitespace-pre-wrap">
-              {output}
+            <div className="prose prose-sm max-w-none text-foreground">
+              <ReactMarkdown>{output}</ReactMarkdown>
             </div>
           </CardContent>
         </Card>
