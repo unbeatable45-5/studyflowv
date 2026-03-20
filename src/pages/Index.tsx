@@ -37,14 +37,14 @@ const Index = () => {
     setShowOnboarding(false);
   };
 
-  if (showOnboarding) {
-    return <Onboarding onComplete={completeOnboarding} />;
-  }
-
   const handleRefresh = useCallback(async () => {
     await new Promise((resolve) => setTimeout(resolve, 800));
     window.location.reload();
   }, []);
+
+  if (showOnboarding) {
+    return <Onboarding onComplete={completeOnboarding} />;
+  }
 
   return (
     <PullToRefresh onRefresh={handleRefresh} className="px-3 sm:px-4 py-6 sm:py-8 max-w-lg mx-auto space-y-5 sm:space-y-7">
