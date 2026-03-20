@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
+import PullToRefresh from "@/components/PullToRefresh";
 import { Download, Smartphone, Share, MoreVertical, Plus, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
