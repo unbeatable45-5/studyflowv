@@ -62,6 +62,18 @@ const BottomNav = () => {
                   <Icon className={cn("h-5 w-5 transition-colors duration-200", active ? "text-primary" : "text-muted-foreground")} />
                 </motion.div>
                 <span className={cn("text-[9px] sm:text-[10px] font-semibold tracking-wide relative z-10 transition-colors duration-200", active ? "text-primary" : "text-muted-foreground")}>{label}</span>
+                <AnimatePresence>
+                  {active && (
+                    <motion.div
+                      layoutId="nav-dot"
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-primary"
+                    />
+                  )}
+                </AnimatePresence>
               </Link>
             );
           })}
