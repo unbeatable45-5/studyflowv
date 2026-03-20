@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
+import PullToRefresh from "@/components/PullToRefresh";
 import { Download, Smartphone, Share, MoreVertical, Plus, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,12 +37,17 @@ const Index = () => {
     setShowOnboarding(false);
   };
 
+  const handleRefresh = useCallback(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    window.location.reload();
+  }, []);
+
   if (showOnboarding) {
     return <Onboarding onComplete={completeOnboarding} />;
   }
 
   return (
-    <div className="px-3 sm:px-4 py-6 sm:py-8 max-w-lg mx-auto space-y-5 sm:space-y-7">
+    <PullToRefresh onRefresh={handleRefresh} className="px-3 sm:px-4 py-6 sm:py-8 max-w-lg mx-auto space-y-5 sm:space-y-7">
       <FadeIn><GreetingSection /></FadeIn>
 
       <FadeIn delay={0.05}><StreakWidget /></FadeIn>
@@ -166,7 +172,7 @@ const Index = () => {
       <FadeIn delay={0.3}><StudyLibrary /></FadeIn>
       <FadeIn delay={0.35}><ToolGrid /></FadeIn>
       <FadeIn delay={0.4}><UpgradePrompt /></FadeIn>
-    </div>
+    </PullToRefresh>
   );
 };
 
