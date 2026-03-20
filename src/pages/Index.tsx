@@ -172,7 +172,7 @@ const Index = () => {
       <FadeIn delay={0.3}><StudyLibrary /></FadeIn>
       <FadeIn delay={0.35}><ToolGrid /></FadeIn>
       <FadeIn delay={0.4}><UpgradePrompt /></FadeIn>
-    </div>
+    </PullToRefresh>
   );
 };
 
