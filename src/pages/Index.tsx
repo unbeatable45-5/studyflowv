@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { usePwaInstall } from "@/hooks/use-pwa-install";
 import PullToRefresh from "@/components/PullToRefresh";
+import PageSkeleton from "@/components/PageSkeleton";
 import { Download, Smartphone, Share, MoreVertical, Plus, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ import { FadeIn } from "@/components/ui/motion";
 const Index = () => {
   const { canInstall, install, platform, showIOSGuide, dismissGuide } = usePwaInstall();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     const seen = localStorage.getItem("onboarding_completed");
@@ -38,12 +40,21 @@ const Index = () => {
   };
 
   const handleRefresh = useCallback(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    window.location.reload();
+    setIsRefreshing(true);
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    setIsRefreshing(false);
   }, []);
 
   if (showOnboarding) {
     return <Onboarding onComplete={completeOnboarding} />;
+  }
+
+  if (isRefreshing) {
+    return (
+      <div className="px-3 sm:px-4 py-6 sm:py-8 max-w-lg mx-auto">
+        <PageSkeleton variant="dashboard" />
+      </div>
+    );
   }
 
   return (

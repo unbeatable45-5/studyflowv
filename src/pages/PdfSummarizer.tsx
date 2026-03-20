@@ -238,8 +238,8 @@ const PdfSummarizer = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-sm max-w-none text-foreground whitespace-pre-wrap">
-              {output}
+            <div className="prose prose-sm max-w-none text-foreground">
+              <ReactMarkdown>{output}</ReactMarkdown>
             </div>
           </CardContent>
         </Card>
