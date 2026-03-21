@@ -138,7 +138,7 @@ const Profile = () => {
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <div className="bg-primary/10 rounded-lg p-2">
-            <User className="h-5 w-5 text-primary" />
+            <UserIcon className="h-5 w-5 text-primary" />
           </div>
           <h1 className="text-xl font-display font-bold">Profile Settings</h1>
         </div>
