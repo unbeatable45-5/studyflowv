@@ -248,6 +248,31 @@ const Profile = () => {
         </CardContent>
       </Card>
 
+      {/* Appearance */}
+      <Card>
+        <CardContent className="pt-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg p-2 bg-muted">
+              {dark ? <Moon className="h-4 w-4 text-primary" /> : <Sun className="h-4 w-4 text-warning" />}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">Dark mode</p>
+              <p className="text-xs text-muted-foreground">
+                {dark ? "Dark theme active" : "Light theme active"}
+              </p>
+            </div>
+          </div>
+          <Switch
+            checked={dark}
+            onCheckedChange={(checked) => {
+              setDark(checked);
+              document.documentElement.classList.toggle("dark", checked);
+              localStorage.setItem("theme", checked ? "dark" : "light");
+            }}
+          />
+        </CardContent>
+      </Card>
+
       {/* Subscription link */}
       <Link to="/subscription">
         <Card className="hover:bg-muted/80 transition-colors cursor-pointer">
