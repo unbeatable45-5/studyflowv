@@ -10,8 +10,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
-import { User, Loader2, Camera, X, Plus, Crown, ChevronRight } from "lucide-react";
+import { User as UserIcon, Loader2, Camera, X, Plus, Crown, ChevronRight, Moon, Sun } from "lucide-react";
 
 const SUBJECT_OPTIONS = [
   "Mathematics", "Physics", "Chemistry", "Biology", "Computer Science",
