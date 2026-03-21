@@ -33,6 +33,9 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [dark, setDark] = useState(() =>
+    document.documentElement.classList.contains("dark")
+  );
 
   useEffect(() => {
     if (!user) return;
