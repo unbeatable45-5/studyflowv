@@ -10,8 +10,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
-import { User, Loader2, Camera, X, Plus, Crown, ChevronRight } from "lucide-react";
+import { User as UserIcon, Loader2, Camera, X, Plus, Crown, ChevronRight, Moon, Sun } from "lucide-react";
 
 const SUBJECT_OPTIONS = [
   "Mathematics", "Physics", "Chemistry", "Biology", "Computer Science",
@@ -32,6 +33,9 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [dark, setDark] = useState(() =>
+    document.documentElement.classList.contains("dark")
+  );
 
   useEffect(() => {
     if (!user) return;
@@ -137,7 +141,7 @@ const Profile = () => {
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <div className="bg-primary/10 rounded-lg p-2">
-            <User className="h-5 w-5 text-primary" />
+            <UserIcon className="h-5 w-5 text-primary" />
           </div>
           <h1 className="text-xl font-display font-bold">Profile Settings</h1>
         </div>
@@ -241,6 +245,31 @@ const Profile = () => {
               Save changes
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* Appearance */}
+      <Card>
+        <CardContent className="pt-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg p-2 bg-muted">
+              {dark ? <Moon className="h-4 w-4 text-primary" /> : <Sun className="h-4 w-4 text-warning" />}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">Dark mode</p>
+              <p className="text-xs text-muted-foreground">
+                {dark ? "Dark theme active" : "Light theme active"}
+              </p>
+            </div>
+          </div>
+          <Switch
+            checked={dark}
+            onCheckedChange={(checked) => {
+              setDark(checked);
+              document.documentElement.classList.toggle("dark", checked);
+              localStorage.setItem("theme", checked ? "dark" : "light");
+            }}
+          />
         </CardContent>
       </Card>
 
