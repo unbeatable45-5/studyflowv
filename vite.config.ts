@@ -17,19 +17,23 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "pwa-192x192.png", "pwa-512x512.png"],
+      includeAssets: ["favicon.ico", "pwa-192x192.png", "pwa-512x512.png", "pwa-maskable-512.png"],
       manifest: {
         name: "StudyFlow - AI Study Companion",
         short_name: "StudyFlow",
-        description: "AI-powered study tools for students",
+        description: "AI-powered study tools for students. Flashcards, practice exams, AI tutor, revision planner and more.",
         theme_color: "#2563EB",
         background_color: "#F8FAFC",
         display: "standalone",
+        display_override: ["standalone", "minimal-ui"],
         orientation: "portrait",
         scope: "/",
         start_url: "/",
         id: "/",
+        lang: "en",
+        dir: "ltr",
         categories: ["education", "productivity"],
+        prefer_related_applications: false,
         icons: [
           {
             src: "/pwa-192x192.png",
@@ -42,11 +46,47 @@ export default defineConfig(({ mode }) => ({
             type: "image/png",
           },
           {
-            src: "/pwa-512x512.png",
+            src: "/pwa-maskable-512.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",
           },
+        ],
+        screenshots: [
+          {
+            src: "/pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            form_factor: "narrow",
+            label: "StudyFlow Dashboard"
+          },
+          {
+            src: "/pwa-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            form_factor: "wide",
+            label: "StudyFlow on Desktop"
+          }
+        ],
+        shortcuts: [
+          {
+            name: "Practice Exam",
+            short_name: "Exam",
+            url: "/practice-exam",
+            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
+          },
+          {
+            name: "AI Tutor",
+            short_name: "Tutor",
+            url: "/ai-tutor",
+            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
+          },
+          {
+            name: "Flashcards",
+            short_name: "Cards",
+            url: "/flashcards",
+            icons: [{ src: "/pwa-192x192.png", sizes: "192x192" }]
+          }
         ],
       },
       workbox: {

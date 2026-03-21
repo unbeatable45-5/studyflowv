@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Bell, BookOpen, Clock, Calendar, Brain, MessageSquare } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Bell, BookOpen, Clock, Calendar, Brain, MessageSquare, Moon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { requestNotificationPermission, getNotificationPermission } from "@/hooks/use-reminder-notifications";
 
@@ -13,6 +14,9 @@ interface NotifPref {
   streakReminder: boolean;
   spacedReview: boolean;
   appUpdates: boolean;
+  quietHoursEnabled: boolean;
+  quietHoursStart: string;
+  quietHoursEnd: string;
 }
 
 const STORAGE_KEY = "notif_preferences";
@@ -24,7 +28,16 @@ const defaultPrefs: NotifPref = {
   streakReminder: false,
   spacedReview: true,
   appUpdates: false,
+  quietHoursEnabled: false,
+  quietHoursStart: "22:00",
+  quietHoursEnd: "07:00",
 };
+
+const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
+  const h = i.toString().padStart(2, "0");
+  const label = i === 0 ? "12:00 AM" : i < 12 ? `${i}:00 AM` : i === 12 ? "12:00 PM" : `${i - 12}:00 PM`;
+  return { value: `${h}:00`, label };
+});
 
 const NotificationPreferences = () => {
   const [prefs, setPrefs] = useState<NotifPref>(() => {
@@ -38,7 +51,11 @@ const NotificationPreferences = () => {
   }, [prefs]);
 
   const togglePref = (key: keyof NotifPref) => {
-    setPrefs(prev => ({ ...prev, [key]: !prev[key] }));
+    setPrefs(prev => ({ ...prev, [key]: !prev[key] as any }));
+  };
+
+  const updatePref = (key: keyof NotifPref, value: any) => {
+    setPrefs(prev => ({ ...prev, [key]: value }));
   };
 
   const handleBrowserToggle = async (checked: boolean) => {
@@ -65,6 +82,9 @@ const NotificationPreferences = () => {
     { key: "appUpdates", label: "App updates & tips", desc: "New features and study tips", icon: Bell },
   ];
 
+  const startLabel = TIME_OPTIONS.find(t => t.value === prefs.quietHoursStart)?.label ?? prefs.quietHoursStart;
+  const endLabel = TIME_OPTIONS.find(t => t.value === prefs.quietHoursEnd)?.label ?? prefs.quietHoursEnd;
+
   return (
     <div className="space-y-4">
       <Card>
@@ -80,13 +100,66 @@ const NotificationPreferences = () => {
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">Push notifications</p>
-                <p className="text-xs text-muted-foreground">
-                  {browserEnabled ? "Enabled" : "Disabled"}
-                </p>
+                <p className="text-xs text-muted-foreground">{browserEnabled ? "Enabled" : "Disabled"}</p>
               </div>
             </div>
             <Switch checked={browserEnabled} onCheckedChange={handleBrowserToggle} />
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Quiet Hours */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Quiet Hours</CardTitle>
+          <CardDescription>Mute all notifications during specific hours.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg p-2 bg-accent">
+                <Moon className="h-4 w-4 text-accent-foreground" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">Enable quiet hours</p>
+                <p className="text-xs text-muted-foreground">
+                  {prefs.quietHoursEnabled ? `${startLabel} – ${endLabel}` : "No quiet hours set"}
+                </p>
+              </div>
+            </div>
+            <Switch checked={prefs.quietHoursEnabled} onCheckedChange={() => togglePref("quietHoursEnabled")} />
+          </div>
+
+          {prefs.quietHoursEnabled && (
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border/50">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">From</Label>
+                <Select value={prefs.quietHoursStart} onValueChange={(v) => updatePref("quietHoursStart", v)}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIME_OPTIONS.map(t => (
+                      <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">To</Label>
+                <Select value={prefs.quietHoursEnd} onValueChange={(v) => updatePref("quietHoursEnd", v)}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIME_OPTIONS.map(t => (
+                      <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -107,7 +180,7 @@ const NotificationPreferences = () => {
                   <p className="text-xs text-muted-foreground">{desc}</p>
                 </div>
               </div>
-              <Switch checked={prefs[key]} onCheckedChange={() => togglePref(key)} />
+              <Switch checked={prefs[key] as boolean} onCheckedChange={() => togglePref(key)} />
             </div>
           ))}
         </CardContent>
