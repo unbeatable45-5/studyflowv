@@ -196,18 +196,18 @@ const Progress = () => {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {statCards.map(({ icon: Icon, label, value, suffix, color }) => (
           <Card key={label}>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className={`rounded-xl p-2.5 ${color}`}>
-                <Icon className="h-5 w-5" />
+            <CardContent className="p-2.5 sm:p-4 flex flex-col items-center text-center gap-1.5 sm:flex-row sm:text-left sm:gap-3">
+              <div className={`rounded-lg sm:rounded-xl p-2 ${color} shrink-0`}>
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
-              <div>
-                <p className="text-2xl font-display font-bold text-foreground leading-none">
+              <div className="min-w-0">
+                <p className="text-lg sm:text-2xl font-display font-bold text-foreground leading-none">
                   {value}
                 </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 leading-tight">
                   {suffix ? `${suffix} · ` : ""}{label}
                 </p>
               </div>
