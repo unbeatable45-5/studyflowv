@@ -184,15 +184,15 @@ const Progress = () => {
   ];
 
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto space-y-5">
-      <div className="space-y-1">
+    <div className="px-3 sm:px-4 py-4 sm:py-6 max-w-lg mx-auto space-y-4 sm:space-y-5">
+      <div className="space-y-0.5 sm:space-y-1">
         <div className="flex items-center gap-2">
-          <div className="bg-warning/10 rounded-lg p-2">
-            <Trophy className="h-5 w-5 text-warning" />
+          <div className="bg-warning/10 rounded-lg p-1.5 sm:p-2">
+            <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
           </div>
-          <h1 className="text-xl font-display font-bold">Progress</h1>
+          <h1 className="text-lg sm:text-xl font-display font-bold">Progress</h1>
         </div>
-        <p className="text-sm text-muted-foreground">Track your study habits and keep the streak alive!</p>
+        <p className="text-xs sm:text-sm text-muted-foreground">Track your study habits and keep the streak alive!</p>
       </div>
 
       {/* Stat Cards */}
