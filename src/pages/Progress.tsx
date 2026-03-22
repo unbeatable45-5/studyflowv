@@ -184,30 +184,30 @@ const Progress = () => {
   ];
 
   return (
-    <div className="px-3 sm:px-4 py-4 sm:py-6 max-w-lg mx-auto space-y-4 sm:space-y-5">
+    <div className="px-3 sm:px-4 py-4 sm:py-6 max-w-lg mx-auto space-y-4 sm:space-y-5 overflow-x-hidden">
       <div className="space-y-0.5 sm:space-y-1">
         <div className="flex items-center gap-2">
-          <div className="bg-warning/10 rounded-lg p-1.5 sm:p-2">
+          <div className="bg-warning/10 rounded-lg p-1.5 sm:p-2 shrink-0">
             <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
           </div>
-          <h1 className="text-lg sm:text-xl font-display font-bold">Progress</h1>
+          <h1 className="text-base sm:text-xl font-display font-bold truncate">Progress</h1>
         </div>
-        <p className="text-xs sm:text-sm text-muted-foreground">Track your study habits and keep the streak alive!</p>
+        <p className="text-[11px] sm:text-sm text-muted-foreground">Track your study habits and keep the streak alive!</p>
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+      <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
         {statCards.map(({ icon: Icon, label, value, suffix, color }) => (
-          <Card key={label}>
-            <CardContent className="p-2.5 sm:p-4 flex flex-col items-center text-center gap-1.5 sm:flex-row sm:text-left sm:gap-3">
-              <div className={`rounded-lg sm:rounded-xl p-2 ${color} shrink-0`}>
-                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+          <Card key={label} className="overflow-hidden">
+            <CardContent className="p-2 sm:p-4 flex flex-col items-center text-center gap-1">
+              <div className={`rounded-lg p-1.5 sm:p-2 ${color} shrink-0`}>
+                <Icon className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
               </div>
-              <div className="min-w-0">
-                <p className="text-lg sm:text-2xl font-display font-bold text-foreground leading-none">
+              <div className="min-w-0 w-full">
+                <p className="text-base sm:text-2xl font-display font-bold text-foreground leading-none">
                   {value}
                 </p>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 leading-tight">
+                <p className="text-[9px] sm:text-xs text-muted-foreground mt-0.5 leading-tight truncate">
                   {suffix ? `${suffix} · ` : ""}{label}
                 </p>
               </div>

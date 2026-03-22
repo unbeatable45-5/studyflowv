@@ -15,13 +15,12 @@ import { toast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import * as pdfjsLib from "pdfjs-dist";
 
-// Set up PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
 const summaryOptions = [
-  { value: "short", label: "Short", desc: "5-8 key bullet points" },
-  { value: "medium", label: "Medium", desc: "10-15 detailed bullets" },
-  { value: "detailed", label: "Detailed", desc: "Comprehensive 15-25 bullets" },
+  { value: "short", label: "Short", desc: "5-8 bullets" },
+  { value: "medium", label: "Medium", desc: "10-15 bullets" },
+  { value: "detailed", label: "Detailed", desc: "15-25 bullets" },
 ];
 
 const PdfSummarizer = () => {
@@ -124,48 +123,53 @@ const PdfSummarizer = () => {
     toast({ title: "PDF downloaded!" });
   };
 
+  const handleUploadClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    fileInputRef.current?.click();
+  };
+
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto space-y-5">
+    <div className="px-3 sm:px-4 py-4 sm:py-6 max-w-lg mx-auto space-y-4 sm:space-y-5">
       {/* Header */}
-      <div className="space-y-1">
+      <div className="space-y-0.5 sm:space-y-1">
         <div className="flex items-center gap-2">
-          <div className="bg-primary/10 rounded-lg p-2">
-            <FileUp className="h-5 w-5 text-primary" />
+          <div className="bg-primary/10 rounded-lg p-1.5 sm:p-2 shrink-0">
+            <FileUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           </div>
-          <h1 className="text-xl font-display font-bold text-foreground">PDF Summarizer</h1>
+          <h1 className="text-base sm:text-xl font-display font-bold text-foreground">PDF Summarizer</h1>
         </div>
-        <p className="text-sm text-muted-foreground">Upload a PDF and get an AI-powered summary instantly.</p>
+        <p className="text-[11px] sm:text-sm text-muted-foreground">Upload a PDF and get an AI-powered summary.</p>
       </div>
 
       {/* Upload Area */}
-      <Card
-        className="border-dashed border-2 cursor-pointer hover:border-primary/50 transition-colors"
-        onClick={() => fileInputRef.current?.click()}
-      >
-        <CardContent className="flex flex-col items-center justify-center py-8 gap-3">
+      <Card className="border-dashed border-2 cursor-pointer hover:border-primary/50 transition-colors active:scale-[0.98]">
+        <CardContent
+          className="flex flex-col items-center justify-center py-6 sm:py-8 gap-2 sm:gap-3"
+          onClick={handleUploadClick}
+        >
           <input
             ref={fileInputRef}
             type="file"
-            accept=".pdf"
+            accept=".pdf,application/pdf"
             className="hidden"
             onChange={handleFileChange}
           />
           {extracting ? (
             <>
-              <Loader2 className="h-10 w-10 text-primary animate-spin" />
-              <p className="text-sm text-muted-foreground">Extracting text…</p>
+              <Loader2 className="h-8 w-8 sm:h-10 sm:w-10 text-primary animate-spin" />
+              <p className="text-xs sm:text-sm text-muted-foreground">Extracting text…</p>
             </>
           ) : file ? (
             <>
-              <FileUp className="h-10 w-10 text-primary" />
-              <p className="text-sm font-medium text-foreground">{file.name}</p>
-              <p className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(0)} KB · Tap to change</p>
+              <FileUp className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
+              <p className="text-xs sm:text-sm font-medium text-foreground text-center px-4 break-all line-clamp-2">{file.name}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">{(file.size / 1024).toFixed(0)} KB · Tap to change</p>
             </>
           ) : (
             <>
-              <Upload className="h-10 w-10 text-muted-foreground" />
-              <p className="text-sm font-medium text-foreground">Tap to upload a PDF</p>
-              <p className="text-xs text-muted-foreground">Max 20MB</p>
+              <Upload className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground" />
+              <p className="text-xs sm:text-sm font-medium text-foreground">Tap to upload a PDF</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Max 20MB</p>
             </>
           )}
         </CardContent>
@@ -174,31 +178,32 @@ const PdfSummarizer = () => {
       {/* Options */}
       {file && extractedText && (
         <Card className="animate-fade-in">
-          <CardContent className="p-4 space-y-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Title (optional)</Label>
+          <CardContent className="p-3 sm:p-4 space-y-3 sm:space-y-4">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label className="text-xs sm:text-sm font-medium">Title (optional)</Label>
               <Input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Summary title…"
+                className="text-sm h-9 sm:h-10"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Summary Length</Label>
-              <RadioGroup value={summaryLength} onValueChange={setSummaryLength} className="grid grid-cols-3 gap-2">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label className="text-xs sm:text-sm font-medium">Summary Length</Label>
+              <RadioGroup value={summaryLength} onValueChange={setSummaryLength} className="grid grid-cols-3 gap-1.5 sm:gap-2">
                 {summaryOptions.map((opt) => (
                   <label
                     key={opt.value}
-                    className={`flex flex-col items-center gap-1 rounded-lg border p-3 cursor-pointer transition-colors ${
+                    className={`flex flex-col items-center gap-0.5 sm:gap-1 rounded-lg border p-2 sm:p-3 cursor-pointer transition-colors ${
                       summaryLength === opt.value
                         ? "border-primary bg-accent"
                         : "border-border hover:border-primary/30"
                     }`}
                   >
                     <RadioGroupItem value={opt.value} className="sr-only" />
-                    <span className="text-sm font-medium text-foreground">{opt.label}</span>
-                    <span className="text-[10px] text-muted-foreground text-center leading-tight">{opt.desc}</span>
+                    <span className="text-xs sm:text-sm font-medium text-foreground">{opt.label}</span>
+                    <span className="text-[9px] sm:text-[10px] text-muted-foreground text-center leading-tight">{opt.desc}</span>
                   </label>
                 ))}
               </RadioGroup>
@@ -207,7 +212,7 @@ const PdfSummarizer = () => {
             <Button
               onClick={handleSummarize}
               disabled={loading}
-              className="w-full"
+              className="w-full h-10 sm:h-11 text-sm"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               {loading ? "Summarizing…" : "Summarize PDF"}
@@ -221,24 +226,24 @@ const PdfSummarizer = () => {
       {/* Output */}
       {output && (
         <Card className="animate-fade-in">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Summary</CardTitle>
-              <div className="flex items-center gap-1">
+          <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6">
+            <div className="flex items-center justify-between gap-2">
+              <CardTitle className="text-base sm:text-lg truncate">Summary</CardTitle>
+              <div className="flex items-center gap-1 shrink-0">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-1.5"
+                  className="gap-1 h-8 px-2 sm:px-3 text-xs"
                   onClick={handleDownloadPdf}
                 >
-                  <FileDown className="h-4 w-4" /> PDF
+                  <FileDown className="h-3.5 w-3.5" /> PDF
                 </Button>
                 <OutputActions text={output} title={title || "PDF Summary"} />
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="prose prose-sm max-w-none text-foreground">
+          <CardContent className="px-3 sm:px-6">
+            <div className="prose prose-sm max-w-none text-foreground dark:prose-invert prose-p:text-xs sm:prose-p:text-sm prose-headings:text-sm sm:prose-headings:text-base break-words overflow-hidden">
               <ReactMarkdown>{output}</ReactMarkdown>
             </div>
           </CardContent>
