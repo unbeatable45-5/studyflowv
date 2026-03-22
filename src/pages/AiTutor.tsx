@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { Bot, Send, Trash2, Sparkles } from "lucide-react";
+import { Bot, Send, Trash2, Sparkles, Brain, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import AIThinking from "@/components/AIThinking";
@@ -23,6 +22,7 @@ const AiTutor = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [deepThink, setDeepThink] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -41,9 +41,10 @@ const AiTutor = () => {
     setIsLoading(true);
 
     let assistantSoFar = "";
+    const endpoint = deepThink ? "ai-tutor-deep" : "ai-tutor";
 
     try {
-      const resp = await fetch(`${SUPABASE_URL}/functions/v1/ai-tutor`, {
+      const resp = await fetch(`${SUPABASE_URL}/functions/v1/${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +110,6 @@ const AiTutor = () => {
         }
       }
 
-      // Final flush
       if (textBuffer.trim()) {
         for (let raw of textBuffer.split("\n")) {
           if (!raw) continue;
@@ -157,11 +157,13 @@ const AiTutor = () => {
             <p className="text-xs text-muted-foreground">Your personal study assistant</p>
           </div>
         </div>
-        {messages.length > 0 && (
-          <Button variant="ghost" size="sm" onClick={clearChat} className="text-muted-foreground gap-1.5">
-            <Trash2 className="h-4 w-4" /> Clear
-          </Button>
-        )}
+        <div className="flex items-center gap-1.5">
+          {messages.length > 0 && (
+            <Button variant="ghost" size="sm" onClick={clearChat} className="text-muted-foreground gap-1.5">
+              <Trash2 className="h-4 w-4" /> Clear
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Chat area */}
@@ -219,7 +221,7 @@ const AiTutor = () => {
             <div className="rounded-xl p-1.5 bg-primary/10 text-primary h-fit mt-1 shrink-0">
               <Bot className="h-4 w-4" />
             </div>
-            <AIThinking />
+            <AIThinking message={deepThink ? "Deep thinking" : "Thinking"} />
           </div>
         )}
       </div>
@@ -227,12 +229,25 @@ const AiTutor = () => {
       {/* Input */}
       <div className="border-t border-border bg-background pt-3 pb-1 px-1">
         <div className="flex gap-2 items-end">
+          <button
+            onClick={() => setDeepThink(!deepThink)}
+            className={cn(
+              "shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium transition-all border",
+              deepThink
+                ? "bg-primary/15 text-primary border-primary/30"
+                : "bg-muted/50 text-muted-foreground border-transparent hover:bg-muted"
+            )}
+            title={deepThink ? "Deep Think ON – slower but more thorough" : "Deep Think OFF – quick answers"}
+          >
+            <Brain className={cn("h-4 w-4", deepThink && "animate-pulse")} />
+            <span className="hidden sm:inline">Deep Think</span>
+          </button>
           <Textarea
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask me anything..."
+            placeholder={deepThink ? "Ask for a deep, thorough answer..." : "Ask me anything..."}
             className="min-h-[44px] max-h-32 resize-none rounded-xl"
             rows={1}
           />
@@ -245,6 +260,12 @@ const AiTutor = () => {
             <Send className="h-4 w-4" />
           </Button>
         </div>
+        {deepThink && (
+          <p className="text-[10px] text-muted-foreground mt-1.5 ml-1 flex items-center gap-1">
+            <Zap className="h-3 w-3 text-warning" />
+            Deep Think uses advanced reasoning — responses may take longer but are more thorough
+          </p>
+        )}
       </div>
     </div>
   );

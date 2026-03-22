@@ -184,30 +184,30 @@ const Progress = () => {
   ];
 
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto space-y-5">
-      <div className="space-y-1">
+    <div className="px-3 sm:px-4 py-4 sm:py-6 max-w-lg mx-auto space-y-4 sm:space-y-5">
+      <div className="space-y-0.5 sm:space-y-1">
         <div className="flex items-center gap-2">
-          <div className="bg-warning/10 rounded-lg p-2">
-            <Trophy className="h-5 w-5 text-warning" />
+          <div className="bg-warning/10 rounded-lg p-1.5 sm:p-2">
+            <Trophy className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
           </div>
-          <h1 className="text-xl font-display font-bold">Progress</h1>
+          <h1 className="text-lg sm:text-xl font-display font-bold">Progress</h1>
         </div>
-        <p className="text-sm text-muted-foreground">Track your study habits and keep the streak alive!</p>
+        <p className="text-xs sm:text-sm text-muted-foreground">Track your study habits and keep the streak alive!</p>
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {statCards.map(({ icon: Icon, label, value, suffix, color }) => (
           <Card key={label}>
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className={`rounded-xl p-2.5 ${color}`}>
-                <Icon className="h-5 w-5" />
+            <CardContent className="p-2.5 sm:p-4 flex flex-col items-center text-center gap-1.5 sm:flex-row sm:text-left sm:gap-3">
+              <div className={`rounded-lg sm:rounded-xl p-2 ${color} shrink-0`}>
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
-              <div>
-                <p className="text-2xl font-display font-bold text-foreground leading-none">
+              <div className="min-w-0">
+                <p className="text-lg sm:text-2xl font-display font-bold text-foreground leading-none">
                   {value}
                 </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 leading-tight">
                   {suffix ? `${suffix} · ` : ""}{label}
                 </p>
               </div>
