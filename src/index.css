@@ -172,12 +172,45 @@
   .scroll-touch {
     -webkit-overflow-scrolling: touch;
   }
+
+  /* Hide scrollbar but keep scrollable */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* PWA safe area padding for mobile */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .pb-safe {
     padding-bottom: calc(env(safe-area-inset-bottom) + 4rem);
+  }
+}
+
+/* Global mobile overflow prevention */
+@media (max-width: 640px) {
+  .prose {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  
+  .prose pre {
+    overflow-x: auto;
+    max-width: calc(100vw - 3rem);
+  }
+  
+  .prose img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .prose table {
+    display: block;
+    overflow-x: auto;
+    max-width: calc(100vw - 3rem);
   }
 }
 
