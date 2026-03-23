@@ -16,7 +16,6 @@ Deno.serve(async (req) => {
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const paystackSecretKey = Deno.env.get("PAYSTACK_SECRET_KEY")!;
 
-    // Authenticate user
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -43,7 +42,24 @@ Deno.serve(async (req) => {
 
     const { plan } = await req.json();
 
-    // Initialize Paystack transaction
+    // Pricing: weekly ₦400, monthly ₦1,200 (in kobo)
+    let amountKobo: number;
+    let planLabel: string;
+    
+    switch (plan) {
+      case "weekly":
+        amountKobo = 400 * 100; // ₦400
+        planLabel = "weekly";
+        break;
+      case "monthly":
+        amountKobo = 1200 * 100; // ₦1,200
+        planLabel = "monthly";
+        break;
+      default:
+        amountKobo = 400 * 100; // Default to weekly
+        planLabel = "weekly";
+    }
+
     const response = await fetch(
       "https://api.paystack.co/transaction/initialize",
       {
@@ -54,11 +70,11 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           email: user.email,
-          amount: plan === "yearly" ? 7999 * 100 : 999 * 100, // Amount in kobo/cents
+          amount: amountKobo,
           currency: "NGN",
           metadata: {
             user_id: user.id,
-            plan: plan || "monthly",
+            plan: planLabel,
           },
           callback_url: req.headers.get("origin") || "https://studyflow.app",
         }),

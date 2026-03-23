@@ -87,7 +87,7 @@ const AppLayout = () => {
           </Button>
         </header>
 
-        <main className="flex-1 pb-20 overflow-y-auto overflow-x-hidden overscroll-contain">
+        <main className="flex-1 pb-24 overflow-y-auto overflow-x-hidden overscroll-contain scroll-touch" style={{ WebkitOverflowScrolling: 'touch', minHeight: 0 }}>
           <AnimatePresence mode="wait">
             <PageTransition key={location.pathname}>
               <Outlet />
