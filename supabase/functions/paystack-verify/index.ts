@@ -17,7 +17,6 @@ Deno.serve(async (req) => {
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Authenticate user
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -44,7 +43,6 @@ Deno.serve(async (req) => {
 
     const { reference } = await req.json();
 
-    // Verify transaction with Paystack
     const response = await fetch(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
@@ -57,9 +55,16 @@ Deno.serve(async (req) => {
     const data = await response.json();
 
     if (data.status && data.data.status === "success") {
-      const plan = data.data.metadata?.plan || "monthly";
+      const plan = data.data.metadata?.plan || "weekly";
       const periodEnd = new Date();
-      periodEnd.setMonth(periodEnd.getMonth() + (plan === "yearly" ? 12 : 1));
+      
+      // Set period end based on plan
+      if (plan === "monthly") {
+        periodEnd.setMonth(periodEnd.getMonth() + 1);
+      } else {
+        // weekly
+        periodEnd.setDate(periodEnd.getDate() + 7);
+      }
 
       const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
 

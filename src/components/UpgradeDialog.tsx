@@ -3,26 +3,27 @@ import { usePremium } from "@/contexts/PremiumContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Crown, Zap, Brain, FileText, Layers, BarChart3, Download, Users, Sparkles, Check, Loader2 } from "lucide-react";
+import { Crown, Zap, Brain, FileText, Layers, BarChart3, Download, Sparkles, Check, Loader2, ClipboardList, Bot, Flame } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const features = [
-  { icon: Zap, label: "Unlimited AI summaries" },
-  { icon: FileText, label: "Unlimited PDF uploads" },
+  { icon: Zap, label: "Unlimited Study Mode" },
+  { icon: ClipboardList, label: "Full Practice Exam (CBT)" },
+  { icon: Brain, label: "Deep Think AI (20/day)" },
+  { icon: Bot, label: "AI Tutor — full access" },
   { icon: Layers, label: "Advanced flashcards + SRS" },
-  { icon: Brain, label: "Smart weak-topic detection" },
-  { icon: BarChart3, label: "Detailed analytics dashboard" },
-  { icon: Download, label: "Bulk export & offline access" },
-  { icon: Sparkles, label: "Priority AI processing" },
-  { icon: Users, label: "Collaboration features" },
+  { icon: FileText, label: "Watermark-free PDF exports" },
+  { icon: BarChart3, label: "Detailed analytics" },
+  { icon: Sparkles, label: "Faster AI processing" },
 ];
 
 const UpgradeDialog = () => {
   const { showUpgradeDialog, setShowUpgradeDialog } = usePremium();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly">("monthly");
+  const [selectedPlan, setSelectedPlan] = useState<"weekly" | "monthly">("weekly");
 
   const handlePaystackCheckout = async () => {
     if (!user) {
@@ -39,7 +40,6 @@ const UpgradeDialog = () => {
       if (error) throw error;
 
       if (data?.authorization_url) {
-        // Store reference for verification on return
         localStorage.setItem("paystack_reference", data.reference);
         window.location.href = data.authorization_url;
       } else {
@@ -54,75 +54,85 @@ const UpgradeDialog = () => {
 
   return (
     <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
-      <DialogContent className="max-w-sm">
-        <DialogHeader className="text-center space-y-3">
+      <DialogContent className="max-w-sm mx-4">
+        <DialogHeader className="text-center space-y-2">
           <div className="mx-auto rounded-full p-3 bg-gradient-to-br from-warning/20 to-primary/20 w-fit">
-            <Crown className="h-7 w-7 text-warning" />
+            <Crown className="h-6 w-6 text-warning" />
           </div>
-          <DialogTitle className="font-display text-xl">Upgrade to StudyFlow Pro</DialogTitle>
-          <DialogDescription>Unlock the full power of AI-driven study tools</DialogDescription>
+          <DialogTitle className="font-display text-lg">Upgrade to StudyFlow Pro</DialogTitle>
+          <DialogDescription className="text-xs">Pass exams faster with AI-powered tools</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3 py-2">
+        {/* Early access badge */}
+        <div className="flex items-center justify-center gap-1.5 p-2 rounded-lg bg-warning/10 border border-warning/20">
+          <Flame className="h-3.5 w-3.5 text-warning" />
+          <span className="text-[11px] font-semibold text-foreground">🔥 Limited Early Access Price</span>
+        </div>
+
+        <div className="space-y-2 py-1 max-h-[200px] overflow-y-auto">
           {features.map(({ icon: Icon, label }) => (
-            <div key={label} className="flex items-center gap-3 text-sm">
-              <div className="rounded-lg p-1.5 bg-primary/10">
-                <Icon className="h-3.5 w-3.5 text-primary" />
+            <div key={label} className="flex items-center gap-2.5 text-sm">
+              <div className="rounded-lg p-1 bg-primary/10 shrink-0">
+                <Icon className="h-3 w-3 text-primary" />
               </div>
-              <span className="flex-1 text-foreground">{label}</span>
-              <Check className="h-4 w-4 text-success" />
+              <span className="flex-1 text-foreground text-xs">{label}</span>
+              <Check className="h-3.5 w-3.5 text-success shrink-0" />
             </div>
           ))}
         </div>
 
-        <div className="space-y-3 pt-2">
+        <div className="space-y-2.5 pt-1">
           {/* Plan toggle */}
-          <div className="flex gap-2 p-1 bg-muted rounded-lg">
+          <div className="grid grid-cols-2 gap-2">
             <button
-              onClick={() => setSelectedPlan("monthly")}
-              className={`flex-1 text-sm py-2 rounded-md font-medium transition-colors ${
-                selectedPlan === "monthly"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground"
-              }`}
+              onClick={() => setSelectedPlan("weekly")}
+              className={cn(
+                "relative p-3 rounded-xl border text-left transition-all",
+                selectedPlan === "weekly"
+                  ? "border-warning/50 bg-warning/5 ring-2 ring-warning/20"
+                  : "border-border hover:border-border/80 bg-background"
+              )}
             >
-              Monthly
+              {selectedPlan === "weekly" && (
+                <span className="absolute -top-2 left-3 text-[9px] bg-warning text-warning-foreground px-1.5 py-0.5 rounded-full font-bold">
+                  🔥 Popular
+                </span>
+              )}
+              <p className="text-base font-display font-bold text-foreground">₦400</p>
+              <p className="text-[10px] text-muted-foreground">/week</p>
             </button>
             <button
-              onClick={() => setSelectedPlan("yearly")}
-              className={`flex-1 text-sm py-2 rounded-md font-medium transition-colors ${
-                selectedPlan === "yearly"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground"
-              }`}
+              onClick={() => setSelectedPlan("monthly")}
+              className={cn(
+                "relative p-3 rounded-xl border text-left transition-all",
+                selectedPlan === "monthly"
+                  ? "border-primary/50 bg-primary/5 ring-2 ring-primary/20"
+                  : "border-border hover:border-border/80 bg-background"
+              )}
             >
-              Yearly <span className="text-xs text-success">Save 33%</span>
+              <span className="absolute -top-2 left-3 text-[9px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full font-bold">
+                Save ₦400
+              </span>
+              <p className="text-base font-display font-bold text-foreground">₦1,200</p>
+              <p className="text-[10px] text-muted-foreground">/month</p>
             </button>
           </div>
 
-          <div className="text-center">
-            <span className="text-3xl font-display font-bold text-foreground">
-              {selectedPlan === "monthly" ? "₦9,990" : "₦79,990"}
-            </span>
-            <span className="text-sm text-muted-foreground">
-              /{selectedPlan === "monthly" ? "month" : "year"}
-            </span>
+          {/* Value comparison */}
+          <div className="flex items-center justify-between text-[10px] px-1 text-muted-foreground">
+            <span>StudyFlow Pro: <strong className="text-warning">₦400/week</strong></span>
+            <span>Private Tutor: <strong className="line-through">₦5,000+/week</strong></span>
           </div>
 
           <Button
-            className="w-full gap-2 bg-gradient-to-r from-warning to-primary hover:opacity-90 text-white"
-            size="lg"
+            className="w-full gap-2 bg-gradient-to-r from-warning to-primary hover:opacity-90 text-white rounded-xl py-5 text-sm font-semibold"
             onClick={handlePaystackCheckout}
             disabled={loading}
           >
-            {loading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Crown className="h-4 w-4" />
-            )}
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Crown className="h-4 w-4" />}
             {loading ? "Processing..." : "Upgrade Now"}
           </Button>
-          <p className="text-[11px] text-center text-muted-foreground">
+          <p className="text-[10px] text-center text-muted-foreground">
             Cancel anytime · Secured by Paystack
           </p>
         </div>
