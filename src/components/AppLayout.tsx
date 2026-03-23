@@ -54,7 +54,7 @@ const AppLayout = () => {
   // Mobile layout with bottom navigation
   if (isMobile) {
     return (
-      <div className="min-h-[100dvh] bg-background flex flex-col overflow-x-hidden">
+      <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
         <header className="sticky top-0 z-40 glass-strong px-2.5 py-2.5 flex items-center gap-1.5 safe-area-top">
           <div className="bg-gradient-to-br from-primary to-primary/80 rounded-lg p-1.5 shadow-sm shrink-0">
             <BookOpen className="h-4 w-4 text-primary-foreground" />
