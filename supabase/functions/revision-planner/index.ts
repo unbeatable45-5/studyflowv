@@ -23,6 +23,8 @@ serve(async (req) => {
       `- ${c.name} (Exam: ${c.examDate})`
     ).join("\n");
 
+    const today = new Date().toISOString().split("T")[0];
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -34,30 +36,55 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a study planner for university students. Create a practical, actionable revision plan.
+            content: `You are a study planner for university/secondary school students. Today is ${today}.
 
-Rules:
-- Distribute study time across courses based on exam proximity
-- For courses with "Unknown" exam dates, allocate consistent review time and mark with ⚠️ placeholder
-- Include daily reminders like "Review [Course] today"
-- Format as a weekly table/schedule
-- Include tips for breaks and active recall
-- Keep it realistic and achievable
-- Use markdown formatting with tables
+Create a SPECIFIC, ACTIONABLE day-by-day revision plan. NO generic advice.
 
-Output format:
-## Weekly Study Plan
-[Table with Day | Time Block | Subject | Activity]
+RULES:
+- Prioritize courses by exam proximity (nearest exam = more early focus)
+- For "Unknown" exam dates, allocate consistent daily review
+- Each day MUST follow this cycle pattern:
+  **Day 1 (Learn):** Read chapter/topic summary, write key notes, highlight formulas
+  **Day 2 (Practice):** Do practice questions, create flashcards, active recall
+  **Day 3 (Test):** Take a timed quiz/CBT, review mistakes, revise weak areas
+  Then repeat the cycle for next topic.
 
-## Daily Reminders
-[List of reminders]
+- Include specific topic names, chapter references where possible
+- Allocate exact time blocks (e.g., "9:00-10:30 AM: Biology - Cell Division (Learn)")
+- Include short breaks every 90 minutes
+- Maximum ${hoursPerDay} hours of study per day
 
-## Tips
-[2-3 study tips]`,
+OUTPUT FORMAT (use markdown):
+
+## 📅 Week 1 Study Plan
+
+### Day 1 (Monday) — LEARN
+| Time | Course | Activity | Details |
+|------|--------|----------|---------|
+| 9:00-10:30 | Course Name | Learn | Read Chapter X, summarize key points |
+| 10:45-12:00 | Course Name | Learn | Study topic Y, write notes |
+
+### Day 2 (Tuesday) — PRACTICE
+| Time | Course | Activity | Details |
+|------|--------|----------|---------|
+| 9:00-10:30 | Course Name | Practice | Solve past questions Ch.X, create 10 flashcards |
+
+### Day 3 (Wednesday) — TEST
+| Time | Course | Activity | Details |
+|------|--------|----------|---------|
+| 9:00-10:30 | Course Name | Test | Timed CBT quiz (15 min), review wrong answers |
+
+(Continue for 7 days, then outline Week 2)
+
+## ⚡ Quick Tips
+(2-3 specific, actionable study tips)
+
+## 📊 Priority Order
+(Rank courses by urgency with exam dates)`,
           },
           {
             role: "user",
-            content: `Create a study plan for these courses with ${hoursPerDay} hours of study per day:\n\n${courseList}`,
+            content: `Create a detailed study plan for these courses with ${hoursPerDay} hours/day:\n\n${courseList}`,
           },
         ],
         stream: true,

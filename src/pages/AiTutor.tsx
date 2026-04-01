@@ -3,13 +3,16 @@ import { Bot, Send, Trash2, Sparkles, Brain, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-import ReactMarkdown from "react-markdown";
+import MarkdownWithMath from "@/components/MarkdownWithMath";
 import AIThinking from "@/components/AIThinking";
 import { cn } from "@/lib/utils";
+import { usePremium } from "@/contexts/PremiumContext";
+import { useUsageLimitCheck } from "@/components/UsageLimitToast";
 
-type Message = { role: "user" | "assistant"; content: string; deepThink?: boolean };
+type Message = { role: "user" | "assistant"; content: string; deepThink?: boolean; ts?: number };
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const CHAT_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
 
 const starterPrompts = [
   "Explain photosynthesis like I'm 10",
@@ -24,7 +27,8 @@ const AiTutor = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [deepThink, setDeepThink] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { promptUpgrade } = usePremium();
+  const { checkAndPrompt } = useUsageLimitCheck();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -32,9 +36,27 @@ const AiTutor = () => {
     }
   }, [messages]);
 
+  // Auto-expire chat messages older than 10 minutes
+  useEffect(() => {
+    if (messages.length === 0) return;
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setMessages(prev => {
+        const filtered = prev.filter(m => !m.ts || (now - m.ts) < CHAT_EXPIRY_MS);
+        return filtered.length !== prev.length ? filtered : prev;
+      });
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [messages.length]);
+
   const sendMessage = async (text: string) => {
     if (!text.trim() || isLoading) return;
-    const userMsg: Message = { role: "user", content: text.trim() };
+
+    // Check deep think limit
+    if (deepThink && !checkAndPrompt("deep_think", "Deep Think")) return;
+
+    const now = Date.now();
+    const userMsg: Message = { role: "user", content: text.trim(), ts: now };
     const allMessages = [...messages, userMsg];
     setMessages(allMessages);
     setInput("");
@@ -61,7 +83,8 @@ const AiTutor = () => {
           return;
         }
         if (resp.status === 402) {
-          toast({ title: "Usage limit reached", description: "Please try again later.", variant: "destructive" });
+          toast({ title: "Usage limit reached", description: "Upgrade to Pro for higher limits.", variant: "destructive" });
+          setTimeout(() => promptUpgrade(), 500);
           setIsLoading(false);
           return;
         }
@@ -82,7 +105,7 @@ const AiTutor = () => {
           if (last?.role === "assistant") {
             return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantSoFar } : m));
           }
-          return [...prev, { role: "assistant", content: assistantSoFar, deepThink: isDeep }];
+          return [...prev, { role: "assistant", content: assistantSoFar, deepThink: isDeep, ts: Date.now() }];
         });
       };
 
@@ -125,6 +148,13 @@ const AiTutor = () => {
             if (content) upsert(content);
           } catch { /* ignore */ }
         }
+      }
+
+      // Show upgrade prompt after deep think usage
+      if (isDeep) {
+        setTimeout(() => {
+          checkAndPrompt("deep_think", "Deep Think");
+        }, 1000);
       }
     } catch (e) {
       toast({ title: "Error", description: e instanceof Error ? e.message : "Something went wrong", variant: "destructive" });
@@ -213,9 +243,9 @@ const AiTutor = () => {
                   )}
                 >
                   {msg.role === "assistant" ? (
-                    <div className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-headings:my-1.5 prose-ul:my-1 prose-li:my-0.5 prose-p:text-xs sm:prose-p:text-sm prose-headings:text-sm sm:prose-headings:text-base break-words overflow-hidden">
-                      <ReactMarkdown>{msg.content}</ReactMarkdown>
-                    </div>
+                    <MarkdownWithMath className="prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-headings:my-1.5 prose-ul:my-1 prose-li:my-0.5 prose-p:text-xs sm:prose-p:text-sm prose-headings:text-sm sm:prose-headings:text-base break-words overflow-hidden">
+                      {msg.content}
+                    </MarkdownWithMath>
                   ) : (
                     <p className="whitespace-pre-wrap break-words">{msg.content}</p>
                   )}
@@ -251,7 +281,6 @@ const AiTutor = () => {
             <span className="hidden xs:inline">Deep</span>
           </button>
           <Textarea
-            ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
