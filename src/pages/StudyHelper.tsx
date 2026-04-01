@@ -5,9 +5,10 @@ import { saveOutput } from "@/lib/saved-outputs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AIThinking from "@/components/AIThinking";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import OutputActions from "@/components/OutputActions";
+import MarkdownWithMath from "@/components/MarkdownWithMath";
 import { streamAI } from "@/lib/streaming";
+import { useUsageLimitCheck } from "@/components/UsageLimitToast";
 import { Lightbulb, Loader2, FileDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -16,28 +17,21 @@ const StudyHelper = () => {
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { checkAndPrompt } = useUsageLimitCheck();
 
   const handleGenerate = async () => {
-    if (!topic.trim()) return;
+    if (!topic.trim() || loading) return;
+    if (!checkAndPrompt("summaries", "study summaries")) return;
+
     setLoading(true);
     setOutput("");
-
     let fullText = "";
     await streamAI({
       functionName: "study-helper",
       body: { topic: topic.trim() },
-      onDelta: (text) => {
-        fullText += text;
-        setOutput(fullText);
-      },
-      onDone: () => {
-        setLoading(false);
-        saveOutput("study-helper", { topic }, fullText);
-      },
-      onError: (err) => {
-        setLoading(false);
-        toast({ title: "Error", description: err, variant: "destructive" });
-      },
+      onDelta: (text) => { fullText += text; setOutput(fullText); },
+      onDone: () => { setLoading(false); saveOutput("study-helper", { topic }, fullText); },
+      onError: (err) => { setLoading(false); toast({ title: "Error", description: err, variant: "destructive" }); },
     });
   };
 
@@ -53,7 +47,6 @@ const StudyHelper = () => {
         <p className="text-sm text-muted-foreground">Enter a topic to get an explanation and practice questions.</p>
       </div>
 
-      {/* Input */}
       <div className="flex gap-2">
         <Input
           placeholder="e.g. Photosynthesis, Newton's Laws..."
@@ -70,7 +63,6 @@ const StudyHelper = () => {
 
       {loading && !output && <AIThinking message="Generating explanation" />}
 
-      {/* Output */}
       {output && (
         <Card className="animate-fade-in">
           <CardHeader className="pb-3">
@@ -90,9 +82,9 @@ const StudyHelper = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-sm max-w-none text-foreground whitespace-pre-wrap">
+            <MarkdownWithMath className="prose prose-sm max-w-none text-foreground dark:prose-invert break-words overflow-hidden">
               {output}
-            </div>
+            </MarkdownWithMath>
           </CardContent>
         </Card>
       )}
