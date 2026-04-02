@@ -343,10 +343,15 @@ const PracticeExam = () => {
 
       {showAnswers && (
         <Card className="border-primary/30">
-          <CardContent className="p-4 text-center space-y-1">
+          <CardContent className="p-4 text-center space-y-3">
             <p className="text-2xl font-bold text-foreground">{answeredCount}/{questions.length}</p>
             <p className="text-sm text-muted-foreground">Questions answered</p>
             <p className="text-xs text-muted-foreground">Time used: {formatTime(timerMinutes * 60 - timeLeft)}</p>
+            <TimeSavedIndicator wordCount={content.split(/\s+/).length} type="exam" />
+            <ShareResultButton 
+              text={`🎯 I scored ${answeredCount}/${questions.length} on my ${mode === "cbt" ? "CBT" : mode === "fill" ? "Fill-in" : "Theory"} practice exam!\n⏱️ Time: ${formatTime(timerMinutes * 60 - timeLeft)}\n\nTurn your notes into practice exams instantly with StudyFlow!`} 
+              title="My Practice Exam Result" 
+            />
           </CardContent>
         </Card>
       )}
