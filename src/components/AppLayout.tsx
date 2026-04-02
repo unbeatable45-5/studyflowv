@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import BottomNav from "./BottomNav";
 import { AppSidebar } from "./AppSidebar";
+import MiniTimer from "./MiniTimer";
 import { BookOpen, Moon, Sun, LogOut, UserCircle, Search, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
