@@ -114,6 +114,7 @@ const AppLayout = () => {
           <header className="h-14 flex items-center gap-3 border-b border-border/50 px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <SidebarTrigger className="h-8 w-8" />
             <div className="flex-1" />
+            <MiniTimer />
             <NotificationBell />
             {isPremium && (
               <span className="flex items-center gap-1 text-[10px] font-bold text-warning bg-warning/10 px-2.5 py-1 rounded-full border border-warning/20">
