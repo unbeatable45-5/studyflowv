@@ -2,6 +2,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import BottomNav from "./BottomNav";
 import { AppSidebar } from "./AppSidebar";
+import MiniTimer from "./MiniTimer";
 import { BookOpen, Moon, Sun, LogOut, UserCircle, Search, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -70,6 +71,7 @@ const AppLayout = () => {
               Pro
             </Button>
           )}
+          <MiniTimer />
           <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="shrink-0 rounded-lg hover:bg-muted h-7 w-7">
             <Search className="h-3.5 w-3.5" />
           </Button>
@@ -112,6 +114,7 @@ const AppLayout = () => {
           <header className="h-14 flex items-center gap-3 border-b border-border/50 px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <SidebarTrigger className="h-8 w-8" />
             <div className="flex-1" />
+            <MiniTimer />
             <NotificationBell />
             {isPremium && (
               <span className="flex items-center gap-1 text-[10px] font-bold text-warning bg-warning/10 px-2.5 py-1 rounded-full border border-warning/20">

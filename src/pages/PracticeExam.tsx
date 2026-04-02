@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ClipboardList, Upload, Sparkles, Clock, Hash, Play, Square, CheckCircle2, XCircle, Eye, RotateCcw } from "lucide-react";
+import { ClipboardList, Upload, Sparkles, Clock, Hash, Play, Square, CheckCircle2, XCircle, Eye, RotateCcw, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ShareResultButton from "@/components/ShareResultButton";
+import TimeSavedIndicator from "@/components/TimeSavedIndicator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -341,10 +343,15 @@ const PracticeExam = () => {
 
       {showAnswers && (
         <Card className="border-primary/30">
-          <CardContent className="p-4 text-center space-y-1">
+          <CardContent className="p-4 text-center space-y-3">
             <p className="text-2xl font-bold text-foreground">{answeredCount}/{questions.length}</p>
             <p className="text-sm text-muted-foreground">Questions answered</p>
             <p className="text-xs text-muted-foreground">Time used: {formatTime(timerMinutes * 60 - timeLeft)}</p>
+            <TimeSavedIndicator wordCount={content.split(/\s+/).length} type="exam" />
+            <ShareResultButton 
+              text={`🎯 I scored ${answeredCount}/${questions.length} on my ${mode === "cbt" ? "CBT" : mode === "fill" ? "Fill-in" : "Theory"} practice exam!\n⏱️ Time: ${formatTime(timerMinutes * 60 - timeLeft)}\n\nTurn your notes into practice exams instantly with StudyFlow!`} 
+              title="My Practice Exam Result" 
+            />
           </CardContent>
         </Card>
       )}
