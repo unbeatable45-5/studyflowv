@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.practice-exam]
 verify_jwt = false
+
+[functions.auto-cleanup]
+verify_jwt = false
