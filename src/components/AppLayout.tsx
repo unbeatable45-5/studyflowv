@@ -71,6 +71,7 @@ const AppLayout = () => {
               Pro
             </Button>
           )}
+          <MiniTimer />
           <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="shrink-0 rounded-lg hover:bg-muted h-7 w-7">
             <Search className="h-3.5 w-3.5" />
           </Button>
