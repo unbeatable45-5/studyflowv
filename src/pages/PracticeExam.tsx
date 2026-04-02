@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ClipboardList, Upload, Sparkles, Clock, Hash, Play, Square, CheckCircle2, XCircle, Eye, RotateCcw } from "lucide-react";
+import { ClipboardList, Upload, Sparkles, Clock, Hash, Play, Square, CheckCircle2, XCircle, Eye, RotateCcw, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import ShareResultButton from "@/components/ShareResultButton";
+import TimeSavedIndicator from "@/components/TimeSavedIndicator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

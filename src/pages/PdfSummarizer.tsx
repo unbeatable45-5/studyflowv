@@ -6,13 +6,15 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import AIThinking from "@/components/AIThinking";
 import OutputActions from "@/components/OutputActions";
+import ShareResultButton from "@/components/ShareResultButton";
+import TimeSavedIndicator from "@/components/TimeSavedIndicator";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
 import { streamAI } from "@/lib/streaming";
 import { saveOutput } from "@/lib/saved-outputs";
 import { usePremium } from "@/contexts/PremiumContext";
 import { useUsageLimitCheck } from "@/components/UsageLimitToast";
 import { generatePdf } from "@/lib/pdf-generator";
-import { FileUp, Loader2, FileDown, Upload } from "lucide-react";
+import { FileUp, Loader2, FileDown, Upload, ImageIcon, AlertTriangle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import * as pdfjsLib from "pdfjs-dist";
 
@@ -25,7 +27,7 @@ const summaryOptions = [
 ];
 
 const PdfSummarizer = () => {
-  const { isPremium } = usePremium();
+  const { isPremium, promptUpgrade } = usePremium();
   const { checkAndPrompt } = useUsageLimitCheck();
   const [file, setFile] = useState<File | null>(null);
   const [extractedText, setExtractedText] = useState("");
@@ -34,20 +36,30 @@ const PdfSummarizer = () => {
   const [loading, setLoading] = useState(false);
   const [extracting, setExtracting] = useState(false);
   const [title, setTitle] = useState("");
+  const [isImagePdf, setIsImagePdf] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Generating summary");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const extractTextFromPdf = async (pdfFile: File): Promise<string> => {
+  const extractTextFromPdf = async (pdfFile: File): Promise<{ text: string; isImage: boolean }> => {
     const arrayBuffer = await pdfFile.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const totalPages = pdf.numPages;
     const textParts: string[] = [];
+    let totalChars = 0;
+
     for (let i = 1; i <= totalPages; i++) {
       const page = await pdf.getPage(i);
       const content = await page.getTextContent();
       const pageText = content.items.map((item: any) => item.str).join(" ");
       textParts.push(pageText);
+      totalChars += pageText.replace(/\s/g, "").length;
     }
-    return textParts.join("\n\n");
+
+    // If average chars per page is very low, it's likely image-based
+    const avgCharsPerPage = totalChars / totalPages;
+    const isImage = avgCharsPerPage < 50;
+
+    return { text: textParts.join("\n\n"), isImage };
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,11 +76,32 @@ const PdfSummarizer = () => {
     setFile(selected);
     setOutput("");
     setExtracting(true);
+    setIsImagePdf(false);
     setTitle(selected.name.replace(/\.pdf$/i, ""));
     try {
-      const text = await extractTextFromPdf(selected);
-      if (!text.trim()) {
-        toast({ title: "No text found", description: "This PDF appears to contain only images or is empty.", variant: "destructive" });
+      const { text, isImage } = await extractTextFromPdf(selected);
+      setIsImagePdf(isImage);
+
+      if (isImage) {
+        if (!isPremium) {
+          toast({
+            title: "Image-based PDF detected",
+            description: "This PDF contains images/slides. Upgrade to Pro for Smart Slide Mode.",
+            variant: "destructive",
+          });
+          setFile(null);
+          setExtracting(false);
+          promptUpgrade();
+          return;
+        }
+        toast({
+          title: "📸 Smart Slide Mode",
+          description: "Image-based PDF detected. Using enhanced processing.",
+        });
+      }
+
+      if (!text.trim() && !isImage) {
+        toast({ title: "No text found", description: "This PDF appears to be empty.", variant: "destructive" });
         setFile(null);
         setExtracting(false);
         return;
@@ -89,6 +122,7 @@ const PdfSummarizer = () => {
 
     setLoading(true);
     setOutput("");
+    setLoadingMessage(isImagePdf ? "Analyzing slides..." : "Generating summary");
     let fullText = "";
     await streamAI({
       functionName: "pdf-summarizer",
@@ -108,6 +142,8 @@ const PdfSummarizer = () => {
     e.stopPropagation();
     fileInputRef.current?.click();
   };
+
+  const wordCount = output.split(/\s+/).length;
 
   return (
     <div className="px-3 sm:px-4 py-4 sm:py-6 max-w-lg mx-auto space-y-4 sm:space-y-5">
@@ -131,9 +167,16 @@ const PdfSummarizer = () => {
             </>
           ) : file ? (
             <>
-              <FileUp className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
+              {isImagePdf ? (
+                <ImageIcon className="h-8 w-8 sm:h-10 sm:w-10 text-warning" />
+              ) : (
+                <FileUp className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
+              )}
               <p className="text-xs sm:text-sm font-medium text-foreground text-center px-4 break-all line-clamp-2">{file.name}</p>
               <p className="text-[10px] sm:text-xs text-muted-foreground">{(file.size / 1024).toFixed(0)} KB · Tap to change</p>
+              {isImagePdf && (
+                <span className="text-[10px] font-semibold text-warning bg-warning/10 px-2 py-0.5 rounded-full">📸 Smart Slide Mode</span>
+              )}
             </>
           ) : (
             <>
@@ -172,14 +215,14 @@ const PdfSummarizer = () => {
         </Card>
       )}
 
-      {loading && !output && <AIThinking message="Generating summary" />}
+      {loading && !output && <AIThinking message={loadingMessage} />}
 
       {output && (
         <Card className="animate-fade-in">
           <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6">
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
               <CardTitle className="text-base sm:text-lg truncate">Summary</CardTitle>
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center gap-1 shrink-0 flex-wrap">
                 <Button variant="outline" size="sm" className="gap-1 h-8 px-2 sm:px-3 text-xs" onClick={handleDownloadPdf}>
                   <FileDown className="h-3.5 w-3.5" /> PDF
                 </Button>
@@ -187,10 +230,16 @@ const PdfSummarizer = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="px-3 sm:px-6">
+          <CardContent className="px-3 sm:px-6 space-y-3">
             <MarkdownWithMath className="prose prose-sm max-w-none text-foreground dark:prose-invert prose-p:text-xs sm:prose-p:text-sm prose-headings:text-sm sm:prose-headings:text-base break-words overflow-hidden">
               {output}
             </MarkdownWithMath>
+            {!loading && (
+              <>
+                <TimeSavedIndicator wordCount={wordCount} type="summary" />
+                <ShareResultButton text={output} title={title || "PDF Summary"} />
+              </>
+            )}
           </CardContent>
         </Card>
       )}
