@@ -87,7 +87,7 @@ const StudyHelper = () => {
             <MarkdownWithMath className="prose prose-sm max-w-none text-foreground dark:prose-invert break-words overflow-hidden">
               {output}
             </MarkdownWithMath>
-            <TimeSavedIndicator text={output} type="summary" />
+            <TimeSavedIndicator wordCount={output.split(/\s+/).length} type="summary" />
             <ShareResultButton text={output} title={`Study: ${topic}`} />
           </CardContent>
         </Card>
