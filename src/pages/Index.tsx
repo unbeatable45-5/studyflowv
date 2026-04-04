@@ -21,6 +21,7 @@ import StreakWidget from "@/components/dashboard/StreakWidget";
 import NotificationPrompt from "@/components/dashboard/NotificationPrompt";
 import UpgradePrompt from "@/components/dashboard/UpgradePrompt";
 import ReferralWidget from "@/components/dashboard/ReferralWidget";
+import UsageDashboard from "@/components/dashboard/UsageDashboard";
 import Onboarding from "@/components/Onboarding";
 import { FadeIn } from "@/components/ui/motion";
 
