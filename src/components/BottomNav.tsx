@@ -13,6 +13,7 @@ const mainNavItems = [
 ];
 
 const moreItems = [
+  { to: "/study", icon: Lightbulb, label: "Study Helper" },
   { to: "/practice-exam", icon: ClipboardList, label: "Practice Exam" },
   { to: "/ai-tutor", icon: Bot, label: "AI Tutor" },
   { to: "/notes", icon: FileText, label: "Notes" },

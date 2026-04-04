@@ -83,10 +83,12 @@ const StudyHelper = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <MarkdownWithMath className="prose prose-sm max-w-none text-foreground dark:prose-invert break-words overflow-hidden">
               {output}
             </MarkdownWithMath>
+            <TimeSavedIndicator text={output} type="summary" />
+            <ShareResultButton text={output} title={`Study: ${topic}`} />
           </CardContent>
         </Card>
       )}

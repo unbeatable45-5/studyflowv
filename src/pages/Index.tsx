@@ -177,11 +177,11 @@ const Index = () => {
       </Dialog>
 
       <FadeIn delay={0.1}><NotificationPrompt /></FadeIn>
-      <FadeIn delay={0.15}><QuickActions /></FadeIn>
+      <FadeIn delay={0.15}><MainActions /></FadeIn>
       <FadeIn delay={0.2}><DailyChallenge /></FadeIn>
       <FadeIn delay={0.25}><RecentActivity /></FadeIn>
       <FadeIn delay={0.3}><StudyLibrary /></FadeIn>
-      <FadeIn delay={0.35}><ToolGrid /></FadeIn>
+      <FadeIn delay={0.35}><ReferralWidget /></FadeIn>
       <FadeIn delay={0.4}><UpgradePrompt /></FadeIn>
     </PullToRefresh>
   );
