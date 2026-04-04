@@ -7,8 +7,9 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 
 const mainNavItems = [
   { to: "/", icon: Home, label: "Home" },
-  { to: "/study", icon: Lightbulb, label: "Study" },
+  { to: "/history", icon: Layers, label: "Library" },
   { to: "/progress", icon: TrendingUp, label: "Progress" },
+  { to: "/profile", icon: FileText, label: "Profile" },
 ];
 
 const moreItems = [
