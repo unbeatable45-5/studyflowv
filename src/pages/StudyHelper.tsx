@@ -9,6 +9,8 @@ import OutputActions from "@/components/OutputActions";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
 import { streamAI } from "@/lib/streaming";
 import { useUsageLimitCheck } from "@/components/UsageLimitToast";
+import ShareResultButton from "@/components/ShareResultButton";
+import TimeSavedIndicator from "@/components/TimeSavedIndicator";
 import { Lightbulb, Loader2, FileDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
