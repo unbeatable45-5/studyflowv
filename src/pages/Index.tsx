@@ -21,6 +21,7 @@ import StreakWidget from "@/components/dashboard/StreakWidget";
 import NotificationPrompt from "@/components/dashboard/NotificationPrompt";
 import UpgradePrompt from "@/components/dashboard/UpgradePrompt";
 import ReferralWidget from "@/components/dashboard/ReferralWidget";
+import UsageDashboard from "@/components/dashboard/UsageDashboard";
 import Onboarding from "@/components/Onboarding";
 import { FadeIn } from "@/components/ui/motion";
 
@@ -178,6 +179,7 @@ const Index = () => {
 
       <FadeIn delay={0.1}><NotificationPrompt /></FadeIn>
       <FadeIn delay={0.15}><MainActions /></FadeIn>
+      <FadeIn delay={0.18}><UsageDashboard /></FadeIn>
       <FadeIn delay={0.2}><DailyChallenge /></FadeIn>
       <FadeIn delay={0.25}><RecentActivity /></FadeIn>
       <FadeIn delay={0.3}><StudyLibrary /></FadeIn>
