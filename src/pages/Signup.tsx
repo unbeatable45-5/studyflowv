@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
@@ -7,31 +7,62 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
-import { BookOpen, Loader2, Mail } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { BookOpen, Loader2, Mail, Gift } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref) setReferralCode(ref);
+  }, [searchParams]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { full_name: name },
+        data: { full_name: name, referral_code: referralCode || undefined },
       },
     });
     setLoading(false);
     if (error) {
       toast({ title: "Signup failed", description: error.message, variant: "destructive" });
     } else {
+      // Try to redeem referral code
+      if (referralCode.trim() && data.user) {
+        try {
+          const { data: refData } = await supabase
+            .from("referrals" as any)
+            .select("*")
+            .eq("referral_code", referralCode.trim().toUpperCase())
+            .eq("status", "pending")
+            .limit(1);
+
+          const rows = (refData || []) as any[];
+          if (rows.length > 0 && rows[0].referrer_id !== data.user.id) {
+            await supabase
+              .from("referrals" as any)
+              .update({
+                referred_user_id: data.user.id,
+                status: "redeemed",
+                redeemed_at: new Date().toISOString(),
+              } as any)
+              .eq("id", rows[0].id);
+          }
+        } catch {
+          // Silently fail referral redemption
+        }
+      }
       toast({ title: "Check your email", description: "We sent you a confirmation link." });
     }
   };
@@ -81,6 +112,26 @@ const Signup = () => {
               <Label htmlFor="password">Password</Label>
               <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
             </div>
+
+            {/* Referral code */}
+            <div className="space-y-1.5">
+              <Label htmlFor="referral" className="flex items-center gap-1.5">
+                <Gift className="h-3.5 w-3.5 text-primary" />
+                Referral code (optional)
+              </Label>
+              <Input
+                id="referral"
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                placeholder="SF-XXXXXX"
+                className="font-mono tracking-wider"
+                maxLength={10}
+              />
+              {referralCode && (
+                <p className="text-[11px] text-primary">🎁 You & your friend both get 3 free Pro days!</p>
+              )}
+            </div>
+
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Mail className="h-4 w-4 mr-2" />}
               Create account
