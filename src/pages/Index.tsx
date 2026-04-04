@@ -13,14 +13,14 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import GreetingSection from "@/components/dashboard/GreetingSection";
-import QuickActions from "@/components/dashboard/QuickActions";
+import MainActions from "@/components/dashboard/MainActions";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import StudyLibrary from "@/components/dashboard/StudyLibrary";
 import DailyChallenge from "@/components/dashboard/DailyChallenge";
-import ToolGrid from "@/components/dashboard/ToolGrid";
 import StreakWidget from "@/components/dashboard/StreakWidget";
 import NotificationPrompt from "@/components/dashboard/NotificationPrompt";
 import UpgradePrompt from "@/components/dashboard/UpgradePrompt";
+import ReferralWidget from "@/components/dashboard/ReferralWidget";
 import Onboarding from "@/components/Onboarding";
 import { FadeIn } from "@/components/ui/motion";
 
