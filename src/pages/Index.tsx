@@ -179,6 +179,7 @@ const Index = () => {
 
       <FadeIn delay={0.1}><NotificationPrompt /></FadeIn>
       <FadeIn delay={0.15}><MainActions /></FadeIn>
+      <FadeIn delay={0.18}><UsageDashboard /></FadeIn>
       <FadeIn delay={0.2}><DailyChallenge /></FadeIn>
       <FadeIn delay={0.25}><RecentActivity /></FadeIn>
       <FadeIn delay={0.3}><StudyLibrary /></FadeIn>
