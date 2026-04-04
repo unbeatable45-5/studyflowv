@@ -13,14 +13,14 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import GreetingSection from "@/components/dashboard/GreetingSection";
-import QuickActions from "@/components/dashboard/QuickActions";
+import MainActions from "@/components/dashboard/MainActions";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import StudyLibrary from "@/components/dashboard/StudyLibrary";
 import DailyChallenge from "@/components/dashboard/DailyChallenge";
-import ToolGrid from "@/components/dashboard/ToolGrid";
 import StreakWidget from "@/components/dashboard/StreakWidget";
 import NotificationPrompt from "@/components/dashboard/NotificationPrompt";
 import UpgradePrompt from "@/components/dashboard/UpgradePrompt";
+import ReferralWidget from "@/components/dashboard/ReferralWidget";
 import Onboarding from "@/components/Onboarding";
 import { FadeIn } from "@/components/ui/motion";
 
@@ -177,11 +177,11 @@ const Index = () => {
       </Dialog>
 
       <FadeIn delay={0.1}><NotificationPrompt /></FadeIn>
-      <FadeIn delay={0.15}><QuickActions /></FadeIn>
+      <FadeIn delay={0.15}><MainActions /></FadeIn>
       <FadeIn delay={0.2}><DailyChallenge /></FadeIn>
       <FadeIn delay={0.25}><RecentActivity /></FadeIn>
       <FadeIn delay={0.3}><StudyLibrary /></FadeIn>
-      <FadeIn delay={0.35}><ToolGrid /></FadeIn>
+      <FadeIn delay={0.35}><ReferralWidget /></FadeIn>
       <FadeIn delay={0.4}><UpgradePrompt /></FadeIn>
     </PullToRefresh>
   );

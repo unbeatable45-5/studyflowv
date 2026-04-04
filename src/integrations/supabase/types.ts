@@ -251,6 +251,39 @@ export type Database = {
         }
         Relationships: []
       }
+      referrals: {
+        Row: {
+          bonus_days: number
+          created_at: string
+          id: string
+          redeemed_at: string | null
+          referral_code: string
+          referred_user_id: string | null
+          referrer_id: string
+          status: string
+        }
+        Insert: {
+          bonus_days?: number
+          created_at?: string
+          id?: string
+          redeemed_at?: string | null
+          referral_code: string
+          referred_user_id?: string | null
+          referrer_id: string
+          status?: string
+        }
+        Update: {
+          bonus_days?: number
+          created_at?: string
+          id?: string
+          redeemed_at?: string | null
+          referral_code?: string
+          referred_user_id?: string | null
+          referrer_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       reminders: {
         Row: {
           completed: boolean

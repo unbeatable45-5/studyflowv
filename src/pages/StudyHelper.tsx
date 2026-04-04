@@ -9,6 +9,8 @@ import OutputActions from "@/components/OutputActions";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
 import { streamAI } from "@/lib/streaming";
 import { useUsageLimitCheck } from "@/components/UsageLimitToast";
+import ShareResultButton from "@/components/ShareResultButton";
+import TimeSavedIndicator from "@/components/TimeSavedIndicator";
 import { Lightbulb, Loader2, FileDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -81,10 +83,12 @@ const StudyHelper = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <MarkdownWithMath className="prose prose-sm max-w-none text-foreground dark:prose-invert break-words overflow-hidden">
               {output}
             </MarkdownWithMath>
+            <TimeSavedIndicator wordCount={output.split(/\s+/).length} type="summary" />
+            <ShareResultButton text={output} title={`Study: ${topic}`} />
           </CardContent>
         </Card>
       )}
