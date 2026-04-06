@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,7 +14,7 @@ import { saveOutput } from "@/lib/saved-outputs";
 import { usePremium } from "@/contexts/PremiumContext";
 import { useUsageLimitCheck } from "@/components/UsageLimitToast";
 import { generatePdf } from "@/lib/pdf-generator";
-import { FileUp, Loader2, FileDown, Upload, ImageIcon, AlertTriangle } from "lucide-react";
+import { FileUp, Loader2, FileDown, Upload, ImageIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import * as pdfjsLib from "pdfjs-dist";
 
@@ -25,6 +25,19 @@ const summaryOptions = [
   { value: "medium", label: "Medium", desc: "10-15 bullets" },
   { value: "detailed", label: "Detailed", desc: "15-25 bullets" },
 ];
+
+/** Render a single PDF page to a base64 JPEG data URL */
+async function renderPageToImage(pdf: pdfjsLib.PDFDocumentProxy, pageNum: number): Promise<string> {
+  const page = await pdf.getPage(pageNum);
+  const scale = 1.5; // balance quality vs size
+  const viewport = page.getViewport({ scale });
+  const canvas = document.createElement("canvas");
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  const ctx = canvas.getContext("2d")!;
+  await page.render({ canvasContext: ctx, viewport }).promise;
+  return canvas.toDataURL("image/jpeg", 0.7);
+}
 
 const PdfSummarizer = () => {
   const { isPremium, promptUpgrade } = usePremium();
@@ -37,15 +50,19 @@ const PdfSummarizer = () => {
   const [extracting, setExtracting] = useState(false);
   const [title, setTitle] = useState("");
   const [isImagePdf, setIsImagePdf] = useState(false);
+  const [pageImages, setPageImages] = useState<string[]>([]);
   const [loadingMessage, setLoadingMessage] = useState("Generating summary");
+  const [extractProgress, setExtractProgress] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const extractTextFromPdf = async (pdfFile: File): Promise<{ text: string; isImage: boolean }> => {
+  const extractTextFromPdf = useCallback(async (pdfFile: File) => {
     const arrayBuffer = await pdfFile.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const totalPages = pdf.numPages;
     const textParts: string[] = [];
     let totalChars = 0;
+
+    setExtractProgress(`Reading ${totalPages} pages…`);
 
     for (let i = 1; i <= totalPages; i++) {
       const page = await pdf.getPage(i);
@@ -55,12 +72,23 @@ const PdfSummarizer = () => {
       totalChars += pageText.replace(/\s/g, "").length;
     }
 
-    // If average chars per page is very low, it's likely image-based
     const avgCharsPerPage = totalChars / totalPages;
     const isImage = avgCharsPerPage < 50;
 
-    return { text: textParts.join("\n\n"), isImage };
-  };
+    // For image-based PDFs, render pages to images for vision AI
+    let images: string[] = [];
+    if (isImage) {
+      setExtractProgress("Rendering slides for Smart Slide Mode…");
+      const maxPages = Math.min(totalPages, 20);
+      for (let i = 1; i <= maxPages; i++) {
+        setExtractProgress(`Rendering slide ${i}/${maxPages}…`);
+        const dataUrl = await renderPageToImage(pdf, i);
+        images.push(dataUrl);
+      }
+    }
+
+    return { text: textParts.join("\n\n"), isImage, images };
+  }, []);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
@@ -77,9 +105,10 @@ const PdfSummarizer = () => {
     setOutput("");
     setExtracting(true);
     setIsImagePdf(false);
+    setPageImages([]);
     setTitle(selected.name.replace(/\.pdf$/i, ""));
     try {
-      const { text, isImage } = await extractTextFromPdf(selected);
+      const { text, isImage, images } = await extractTextFromPdf(selected);
       setIsImagePdf(isImage);
 
       if (isImage) {
@@ -94,9 +123,10 @@ const PdfSummarizer = () => {
           promptUpgrade();
           return;
         }
+        setPageImages(images);
         toast({
           title: "📸 Smart Slide Mode",
-          description: "Image-based PDF detected. Using enhanced processing.",
+          description: `${images.length} slides rendered for AI vision analysis.`,
         });
       }
 
@@ -107,28 +137,35 @@ const PdfSummarizer = () => {
         return;
       }
       setExtractedText(text);
-      toast({ title: "PDF loaded", description: `Extracted text from ${selected.name}` });
+      toast({ title: "PDF loaded", description: `Extracted from ${selected.name}` });
     } catch {
       toast({ title: "Error", description: "Failed to read PDF. The file may be corrupted.", variant: "destructive" });
       setFile(null);
     } finally {
       setExtracting(false);
+      setExtractProgress("");
     }
   };
 
   const handleSummarize = async () => {
-    if (!extractedText.trim() || loading) return;
+    if (loading) return;
+    if (!extractedText.trim() && pageImages.length === 0) return;
     if (!checkAndPrompt("pdfs", "PDF summaries")) return;
 
     setLoading(true);
     setOutput("");
-    setLoadingMessage(isImagePdf ? "Analyzing slides..." : "Generating summary");
+    setLoadingMessage(isImagePdf ? "Analyzing slides with AI vision…" : "Generating summary");
     let fullText = "";
+
+    const body: Record<string, unknown> = { summaryLength };
+    if (extractedText.trim()) body.text = extractedText;
+    if (isImagePdf && pageImages.length > 0) body.images = pageImages;
+
     await streamAI({
       functionName: "pdf-summarizer",
-      body: { text: extractedText, summaryLength },
+      body,
       onDelta: (text) => { fullText += text; setOutput(fullText); },
-      onDone: () => { setLoading(false); saveOutput("pdf-summarizer", { fileName: file?.name, summaryLength }, fullText); },
+      onDone: () => { setLoading(false); saveOutput("pdf-summarizer", { fileName: file?.name, summaryLength, isImagePdf }, fullText); },
       onError: (err) => { setLoading(false); toast({ title: "Error", description: err, variant: "destructive" }); },
     });
   };
@@ -163,7 +200,7 @@ const PdfSummarizer = () => {
           {extracting ? (
             <>
               <Loader2 className="h-8 w-8 sm:h-10 sm:w-10 text-primary animate-spin" />
-              <p className="text-xs sm:text-sm text-muted-foreground">Extracting text…</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">{extractProgress || "Extracting text…"}</p>
             </>
           ) : file ? (
             <>
@@ -175,26 +212,41 @@ const PdfSummarizer = () => {
               <p className="text-xs sm:text-sm font-medium text-foreground text-center px-4 break-all line-clamp-2">{file.name}</p>
               <p className="text-[10px] sm:text-xs text-muted-foreground">{(file.size / 1024).toFixed(0)} KB · Tap to change</p>
               {isImagePdf && (
-                <span className="text-[10px] font-semibold text-warning bg-warning/10 px-2 py-0.5 rounded-full">📸 Smart Slide Mode</span>
+                <span className="text-[10px] font-semibold text-warning bg-warning/10 px-2 py-0.5 rounded-full">
+                  📸 Smart Slide Mode · {pageImages.length} slides
+                </span>
               )}
             </>
           ) : (
             <>
               <Upload className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground" />
               <p className="text-xs sm:text-sm font-medium text-foreground">Tap to upload a PDF</p>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">Max 20MB</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Max 20MB · Text or image-based</p>
             </>
           )}
         </CardContent>
       </Card>
 
-      {file && extractedText && (
+      {file && (extractedText || pageImages.length > 0) && (
         <Card className="animate-fade-in">
           <CardContent className="p-3 sm:p-4 space-y-3 sm:space-y-4">
             <div className="space-y-1.5 sm:space-y-2">
               <Label className="text-xs sm:text-sm font-medium">Title (optional)</Label>
               <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Summary title…" className="text-sm h-9 sm:h-10" />
             </div>
+
+            {isImagePdf && (
+              <div className="bg-warning/5 border border-warning/20 rounded-lg p-2.5 flex items-start gap-2">
+                <ImageIcon className="h-4 w-4 text-warning shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <p className="text-xs font-medium text-foreground">Smart Slide Mode Active</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {pageImages.length} slides will be analyzed using AI vision for accurate extraction of text, diagrams, and charts.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-1.5 sm:space-y-2">
               <Label className="text-xs sm:text-sm font-medium">Summary Length</Label>
               <RadioGroup value={summaryLength} onValueChange={setSummaryLength} className="grid grid-cols-3 gap-1.5 sm:gap-2">
@@ -209,7 +261,7 @@ const PdfSummarizer = () => {
             </div>
             <Button onClick={handleSummarize} disabled={loading} className="w-full h-10 sm:h-11 text-sm">
               {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              {loading ? "Summarizing…" : "Summarize PDF"}
+              {loading ? "Summarizing…" : isImagePdf ? "Analyze Slides" : "Summarize PDF"}
             </Button>
           </CardContent>
         </Card>
@@ -221,7 +273,9 @@ const PdfSummarizer = () => {
         <Card className="animate-fade-in">
           <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6">
             <div className="flex items-center justify-between gap-2 flex-wrap">
-              <CardTitle className="text-base sm:text-lg truncate">Summary</CardTitle>
+              <CardTitle className="text-base sm:text-lg truncate">
+                {isImagePdf ? "📸 Slide Analysis" : "Summary"}
+              </CardTitle>
               <div className="flex items-center gap-1 shrink-0 flex-wrap">
                 <Button variant="outline" size="sm" className="gap-1 h-8 px-2 sm:px-3 text-xs" onClick={handleDownloadPdf}>
                   <FileDown className="h-3.5 w-3.5" /> PDF

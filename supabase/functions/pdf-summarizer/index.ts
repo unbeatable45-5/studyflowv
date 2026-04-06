@@ -9,9 +9,12 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { text, summaryLength } = await req.json();
-    if (!text || !text.trim()) {
-      return new Response(JSON.stringify({ error: "No text provided" }), {
+    const { text, summaryLength, images } = await req.json();
+    const hasText = text && text.trim();
+    const hasImages = images && Array.isArray(images) && images.length > 0;
+
+    if (!hasText && !hasImages) {
+      return new Response(JSON.stringify({ error: "No text or images provided" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -27,8 +30,35 @@ serve(async (req) => {
     };
 
     const guide = lengthGuide[summaryLength] || lengthGuide.medium;
+    const isSlideMode = hasImages;
 
-    const systemPrompt = `You are an expert academic summarizer. A student has uploaded a PDF document. Your job is to summarize the extracted text clearly and professionally.
+    const systemPrompt = isSlideMode
+      ? `You are an expert academic summarizer analyzing presentation slides/scanned document pages. The student has uploaded image-based PDF pages.
+
+Instructions:
+- ${guide}
+- Carefully read all text visible in the slide images
+- Identify diagrams, charts, and visual elements and describe their meaning
+- Structure the output as follows:
+
+## Key Points
+- Bullet points of the most important information from all slides
+
+## Important Concepts
+- List and briefly explain critical concepts, terms, or ideas shown in the slides
+
+## Visual Elements
+- Describe any important diagrams, charts, or visual aids and what they convey
+
+## Summary
+A short cohesive paragraph that ties the key points together.
+
+Rules:
+- Use clear, student-friendly language
+- If slides have distinct sections/topics, organize accordingly
+- Never mention that you are an AI
+- Format using markdown`
+      : `You are an expert academic summarizer. A student has uploaded a PDF document. Your job is to summarize the extracted text clearly and professionally.
 
 Instructions:
 - ${guide}
@@ -50,6 +80,26 @@ Rules:
 - Never mention that you are an AI or that this is a prompt
 - Format using markdown`;
 
+    // Build messages based on mode
+    const userContent: any[] = [];
+
+    if (isSlideMode) {
+      userContent.push({ type: "text", text: `Please analyze and summarize these ${images.length} slide/page images from a PDF document:` });
+      // Limit to 20 pages max to control costs
+      const pageImages = images.slice(0, 20);
+      for (const img of pageImages) {
+        userContent.push({
+          type: "image_url",
+          image_url: { url: img },
+        });
+      }
+      if (hasText) {
+        userContent.push({ type: "text", text: `\n\nAdditional extracted text for context:\n${text.slice(0, 20000)}` });
+      }
+    } else {
+      userContent.push({ type: "text", text: `Please summarize the following document text:\n\n${text.slice(0, 80000)}` });
+    }
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -57,10 +107,10 @@ Rules:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: isSlideMode ? "google/gemini-2.5-flash" : "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: `Please summarize the following document text:\n\n${text.slice(0, 80000)}` },
+          { role: "user", content: userContent },
         ],
         stream: true,
       }),
