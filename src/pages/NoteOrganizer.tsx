@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import AIThinking from "@/components/AIThinking";
 import OutputActions from "@/components/OutputActions";
+import MarkdownWithMath from "@/components/MarkdownWithMath";
+import ShareResultButton from "@/components/ShareResultButton";
+import TimeSavedIndicator from "@/components/TimeSavedIndicator";
 import { streamAI } from "@/lib/streaming";
 import { FileText, Loader2, FileDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -85,10 +88,16 @@ const NoteOrganizer = () => {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="prose prose-sm max-w-none text-foreground whitespace-pre-wrap">
+          <CardContent className="space-y-4">
+            <MarkdownWithMath className="prose prose-sm max-w-none text-foreground dark:prose-invert break-words overflow-hidden">
               {output}
-            </div>
+            </MarkdownWithMath>
+            {!loading && (
+              <>
+                <TimeSavedIndicator wordCount={output.split(/\s+/).length} type="summary" />
+                <ShareResultButton text={output} title="Organized Notes" />
+              </>
+            )}
           </CardContent>
         </Card>
       )}

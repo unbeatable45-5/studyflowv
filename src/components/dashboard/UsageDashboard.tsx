@@ -1,45 +1,73 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useState, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { usePremium } from "@/contexts/PremiumContext";
-import { BarChart3, Zap } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { BarChart3, Zap, AlertTriangle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface UsageItem {
   label: string;
   used: number;
   limit: number;
-  color: string;
 }
 
 const UsageDashboard = () => {
   const { isPremium } = usePremium();
+  const { user } = useAuth();
+  const [usage, setUsage] = useState({ pdfs: 0, deep_think: 0, summaries: 0, exams: 0, mind_maps: 0 });
+
+  const fetchUsage = useCallback(async () => {
+    if (!user) return;
+    const today = new Date().toISOString().split("T")[0];
+    const { data } = await supabase
+      .from("saved_outputs")
+      .select("tool")
+      .eq("user_id", user.id)
+      .gte("created_at", `${today}T00:00:00`);
+
+    const outputs = data ?? [];
+    setUsage({
+      pdfs: outputs.filter((o) => o.tool === "pdf-summarizer").length,
+      deep_think: outputs.filter((o) => o.tool === "ai-tutor-deep").length,
+      summaries: outputs.filter((o) => ["study-helper", "note-organizer", "pdf-summarizer"].includes(o.tool)).length,
+      exams: outputs.filter((o) => o.tool === "practice-exam").length,
+      mind_maps: outputs.filter((o) => o.tool === "mind-map").length,
+    });
+  }, [user]);
+
+  useEffect(() => {
+    fetchUsage();
+
+    // Subscribe to realtime changes on saved_outputs
+    if (!user) return;
+    const channel = supabase
+      .channel("usage-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "saved_outputs", filter: `user_id=eq.${user.id}` },
+        () => fetchUsage()
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [user, fetchUsage]);
 
   const items: UsageItem[] = useMemo(() => {
-    const getUsed = (key: string) => {
-      const today = new Date().toDateString();
-      const stored = localStorage.getItem(`usage_${key}`);
-      if (!stored) return 0;
-      try {
-        const parsed = JSON.parse(stored);
-        if (parsed.date === today) return parsed.count;
-        return 0;
-      } catch { return 0; }
-    };
-
     if (isPremium) {
       return [
-        { label: "PDF Summaries", used: getUsed("pdfs"), limit: 50, color: "bg-primary" },
-        { label: "Deep Think", used: getUsed("deep_think"), limit: 20, color: "bg-warning" },
-        { label: "Practice Exams", used: getUsed("exams"), limit: 999, color: "bg-success" },
+        { label: "PDF Summaries", used: usage.pdfs, limit: 50 },
+        { label: "Deep Think", used: usage.deep_think, limit: 20 },
+        { label: "Practice Exams", used: usage.exams, limit: 999 },
       ];
     }
-
     return [
-      { label: "PDF Summaries", used: getUsed("pdfs"), limit: 3, color: "bg-primary" },
-      { label: "Deep Think", used: getUsed("deep_think"), limit: 2, color: "bg-warning" },
-      { label: "Mind Maps", used: getUsed("mind_maps"), limit: 1, color: "bg-destructive" },
+      { label: "PDF Summaries", used: usage.pdfs, limit: 3 },
+      { label: "Deep Think", used: usage.deep_think, limit: 2 },
+      { label: "Mind Maps", used: usage.mind_maps, limit: 1 },
     ];
-  }, [isPremium]);
+  }, [isPremium, usage]);
 
   return (
     <Card className="overflow-hidden">
@@ -62,15 +90,29 @@ const UsageDashboard = () => {
           {items.map((item) => {
             const pct = Math.min((item.used / item.limit) * 100, 100);
             const isMax = item.used >= item.limit;
+            const isNearLimit = !isMax && pct >= 70;
             return (
               <div key={item.label} className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">{item.label}</span>
-                  <span className={`font-semibold ${isMax ? "text-destructive" : "text-foreground"}`}>
+                  <span className={cn("text-muted-foreground", isNearLimit && "text-warning font-medium")}>
+                    {item.label}
+                    {isNearLimit && <AlertTriangle className="h-3 w-3 inline ml-1 text-warning" />}
+                  </span>
+                  <span className={cn(
+                    "font-semibold transition-all",
+                    isMax ? "text-destructive" : isNearLimit ? "text-warning animate-pulse" : "text-foreground"
+                  )}>
                     {item.used}/{item.limit === 999 ? "∞" : item.limit}
                   </span>
                 </div>
-                <Progress value={pct} className="h-1.5" />
+                <Progress
+                  value={pct}
+                  className={cn(
+                    "h-1.5 transition-all",
+                    isMax && "[&>div]:bg-destructive",
+                    isNearLimit && !isMax && "[&>div]:bg-warning"
+                  )}
+                />
               </div>
             );
           })}
