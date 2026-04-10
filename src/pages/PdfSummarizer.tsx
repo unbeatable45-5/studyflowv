@@ -249,6 +249,10 @@ const PdfSummarizer = () => {
               </div>
             )}
 
+            {isImagePdf && pageImages.length > 0 && (
+              <SlidePreviewCarousel images={pageImages} />
+            )}
+
             <div className="space-y-1.5 sm:space-y-2">
               <Label className="text-xs sm:text-sm font-medium">Summary Length</Label>
               <RadioGroup value={summaryLength} onValueChange={setSummaryLength} className="grid grid-cols-3 gap-1.5 sm:gap-2">
