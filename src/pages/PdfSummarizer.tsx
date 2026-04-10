@@ -292,6 +292,12 @@ const PdfSummarizer = () => {
             {!loading && (
               <>
                 <TimeSavedIndicator wordCount={wordCount} type="summary" />
+                <PdfStudyActions
+                  extractedText={extractedText}
+                  summaryOutput={output}
+                  fileName={file?.name}
+                  isImagePdf={isImagePdf}
+                />
                 <ShareResultButton text={output} title={title || "PDF Summary"} />
               </>
             )}
