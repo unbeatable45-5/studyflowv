@@ -10,6 +10,7 @@ import ShareResultButton from "@/components/ShareResultButton";
 import TimeSavedIndicator from "@/components/TimeSavedIndicator";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
 import { streamAI } from "@/lib/streaming";
+import { getCachedSummary, setCachedSummary } from "@/lib/pdf-cache";
 import { saveOutput } from "@/lib/saved-outputs";
 import { usePremium } from "@/contexts/PremiumContext";
 import { useUsageLimitCheck } from "@/components/UsageLimitToast";
@@ -156,6 +157,19 @@ const PdfSummarizer = () => {
 
     setLoading(true);
     setOutput("");
+
+    // Check cache first (skip for image PDFs since images aren't hashed)
+    if (!isImagePdf && extractedText.trim()) {
+      const cached = await getCachedSummary(extractedText, summaryLength, isImagePdf);
+      if (cached) {
+        setOutput(cached);
+        setLoading(false);
+        toast({ title: "⚡ Loaded from cache", description: "Showing previously generated summary." });
+        saveOutput("pdf-summarizer", { fileName: file?.name, summaryLength, isImagePdf, cached: true }, cached);
+        return;
+      }
+    }
+
     setLoadingMessage(isImagePdf ? "Analyzing slides with AI vision…" : "Generating summary");
     let fullText = "";
 
@@ -167,7 +181,13 @@ const PdfSummarizer = () => {
       functionName: "pdf-summarizer",
       body,
       onDelta: (text) => { fullText += text; setOutput(fullText); },
-      onDone: () => { setLoading(false); saveOutput("pdf-summarizer", { fileName: file?.name, summaryLength, isImagePdf }, fullText); },
+      onDone: async () => {
+        setLoading(false);
+        saveOutput("pdf-summarizer", { fileName: file?.name, summaryLength, isImagePdf }, fullText);
+        if (!isImagePdf && extractedText.trim()) {
+          await setCachedSummary(extractedText, summaryLength, isImagePdf, fullText);
+        }
+      },
       onError: (err) => { setLoading(false); toast({ title: "Error", description: err, variant: "destructive" }); },
     });
   };
