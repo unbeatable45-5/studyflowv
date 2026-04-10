@@ -17,21 +17,20 @@ serve(async (req) => {
       });
     }
 
+    // Try OpenRouter first, fall back to Lovable AI Gateway
+    const OPENROUTER_API_KEY = Deno.env.get("OPENROUTER_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [
-          {
-            role: "system",
-            content: `You are StudyFlow Deep Think AI Tutor — an advanced, thorough study assistant that provides exceptionally detailed and well-reasoned answers.
+    const useOpenRouter = !!OPENROUTER_API_KEY;
+    const apiUrl = useOpenRouter
+      ? "https://openrouter.ai/api/v1/chat/completions"
+      : "https://ai.gateway.lovable.dev/v1/chat/completions";
+    const apiKey = useOpenRouter ? OPENROUTER_API_KEY : LOVABLE_API_KEY;
+    const model = useOpenRouter ? "deepseek/deepseek-r1" : "google/gemini-2.5-pro";
+
+    if (!apiKey) throw new Error("No API key configured for Deep Think");
+
+    const systemPrompt = `You are StudyFlow Deep Think AI Tutor — an advanced, thorough study assistant that provides exceptionally detailed and well-reasoned answers.
 
 Your approach:
 - Think step-by-step through complex problems
@@ -53,15 +52,36 @@ Guidelines:
 - Be thorough but organized — use clear section headers
 - Show all working and reasoning steps
 - If a topic has nuances or common misconceptions, address them
-- Always be accurate — if unsure, say so honestly`,
-          },
-          ...messages,
-        ],
-        stream: true,
-        reasoning: {
-          effort: "high",
-        },
-      }),
+- Always be accurate — if unsure, say so honestly`;
+
+    const body: Record<string, unknown> = {
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...messages,
+      ],
+      stream: true,
+    };
+
+    // Add reasoning for Lovable AI Gateway models that support it
+    if (!useOpenRouter) {
+      body.reasoning = { effort: "high" };
+    }
+
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    };
+
+    if (useOpenRouter) {
+      headers["HTTP-Referer"] = "https://studyflowv.lovable.app";
+      headers["X-Title"] = "StudyFlow";
+    }
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {

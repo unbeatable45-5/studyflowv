@@ -16,6 +16,7 @@ import { useUsageLimitCheck } from "@/components/UsageLimitToast";
 import { generatePdf } from "@/lib/pdf-generator";
 import { FileUp, Loader2, FileDown, Upload, ImageIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import PdfStudyActions from "@/components/pdf/PdfStudyActions";
 import * as pdfjsLib from "pdfjs-dist";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -291,6 +292,12 @@ const PdfSummarizer = () => {
             {!loading && (
               <>
                 <TimeSavedIndicator wordCount={wordCount} type="summary" />
+                <PdfStudyActions
+                  extractedText={extractedText}
+                  summaryOutput={output}
+                  fileName={file?.name}
+                  isImagePdf={isImagePdf}
+                />
                 <ShareResultButton text={output} title={title || "PDF Summary"} />
               </>
             )}
