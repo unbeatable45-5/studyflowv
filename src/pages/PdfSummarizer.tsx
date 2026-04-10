@@ -17,6 +17,7 @@ import { generatePdf } from "@/lib/pdf-generator";
 import { FileUp, Loader2, FileDown, Upload, ImageIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import PdfStudyActions from "@/components/pdf/PdfStudyActions";
+import SlidePreviewCarousel from "@/components/pdf/SlidePreviewCarousel";
 import * as pdfjsLib from "pdfjs-dist";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
