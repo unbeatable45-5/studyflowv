@@ -35,8 +35,8 @@ const GreetingSection = () => {
         <div className="flex items-center gap-2.5 bg-gradient-to-r from-primary/10 to-accent/40 rounded-2xl px-4 py-3 mb-3 animate-scale-in">
           <PartyPopper className="h-5 w-5 text-primary" />
           <p className="text-sm font-medium text-primary">
-            Welcome to StudyFlow! Start by exploring the tools below.
-          </p>
+          Welcome to StudyFlow! Turn your notes into exam questions below.
+        </p>
         </div>
       )}
       <h1 className="text-[1.65rem] font-display font-extrabold text-foreground leading-tight tracking-tight">
@@ -44,7 +44,7 @@ const GreetingSection = () => {
       </h1>
       <p className="text-muted-foreground text-sm flex items-center gap-2">
         <Sparkles className="h-4 w-4 text-warning" />
-        Ready to study smarter today?
+        What do you want to prepare for today?
       </p>
     </div>
   );
