@@ -177,7 +177,15 @@ const PdfSummarizer = () => {
 
     const body: Record<string, unknown> = { summaryLength };
     if (extractedText.trim()) body.text = extractedText;
-    if (isImagePdf && pageImages.length > 0) body.images = pageImages;
+    if (isImagePdf && pageImages.length > 0) {
+      const filteredImages = pageImages.filter((_, i) => !excludedSlides.has(i));
+      if (filteredImages.length === 0) {
+        toast({ title: "No slides selected", description: "Please include at least one slide.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+      body.images = filteredImages;
+    }
 
     await streamAI({
       functionName: "pdf-summarizer",
