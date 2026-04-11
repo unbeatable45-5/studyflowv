@@ -56,6 +56,7 @@ const PdfSummarizer = () => {
   const [pageImages, setPageImages] = useState<string[]>([]);
   const [loadingMessage, setLoadingMessage] = useState("Generating summary");
   const [extractProgress, setExtractProgress] = useState("");
+  const [excludedSlides, setExcludedSlides] = useState<Set<number>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const extractTextFromPdf = useCallback(async (pdfFile: File) => {
