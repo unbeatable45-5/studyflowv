@@ -15,7 +15,7 @@ import { saveOutput } from "@/lib/saved-outputs";
 import { usePremium } from "@/contexts/PremiumContext";
 import { useUsageLimitCheck } from "@/components/UsageLimitToast";
 import { generatePdf } from "@/lib/pdf-generator";
-import { FileUp, Loader2, FileDown, Upload, ImageIcon } from "lucide-react";
+import { FileUp, Loader2, FileDown, Upload, ImageIcon, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import PdfStudyActions from "@/components/pdf/PdfStudyActions";
 import SlidePreviewCarousel from "@/components/pdf/SlidePreviewCarousel";
