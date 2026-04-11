@@ -13,6 +13,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import GreetingSection from "@/components/dashboard/GreetingSection";
+import MainActions from "@/components/dashboard/MainActions";
 import QuickActions from "@/components/dashboard/QuickActions";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import StudyLibrary from "@/components/dashboard/StudyLibrary";
