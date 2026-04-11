@@ -280,7 +280,7 @@ const PdfSummarizer = () => {
             )}
 
             {isImagePdf && pageImages.length > 0 && (
-              <SlidePreviewCarousel images={pageImages} />
+              <SlidePreviewCarousel images={pageImages} excludedSlides={excludedSlides} onExcludedChange={setExcludedSlides} />
             )}
 
             <div className="space-y-1.5 sm:space-y-2">
