@@ -110,6 +110,7 @@ const PdfSummarizer = () => {
     setExtracting(true);
     setIsImagePdf(false);
     setPageImages([]);
+    setExcludedSlides(new Set());
     setTitle(selected.name.replace(/\.pdf$/i, ""));
     try {
       const { text, isImage, images } = await extractTextFromPdf(selected);
