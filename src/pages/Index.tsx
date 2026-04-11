@@ -13,7 +13,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import GreetingSection from "@/components/dashboard/GreetingSection";
-import MainActions from "@/components/dashboard/MainActions";
+import QuickActions from "@/components/dashboard/QuickActions";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import StudyLibrary from "@/components/dashboard/StudyLibrary";
 import DailyChallenge from "@/components/dashboard/DailyChallenge";
@@ -179,6 +179,7 @@ const Index = () => {
 
       <FadeIn delay={0.1}><NotificationPrompt /></FadeIn>
       <FadeIn delay={0.15}><MainActions /></FadeIn>
+      <FadeIn delay={0.17}><QuickActions /></FadeIn>
       <FadeIn delay={0.18}><UsageDashboard /></FadeIn>
       <FadeIn delay={0.2}><DailyChallenge /></FadeIn>
       <FadeIn delay={0.25}><RecentActivity /></FadeIn>
