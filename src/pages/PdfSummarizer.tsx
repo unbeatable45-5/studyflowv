@@ -56,6 +56,7 @@ const PdfSummarizer = () => {
   const [pageImages, setPageImages] = useState<string[]>([]);
   const [loadingMessage, setLoadingMessage] = useState("Generating summary");
   const [extractProgress, setExtractProgress] = useState("");
+  const [excludedSlides, setExcludedSlides] = useState<Set<number>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const extractTextFromPdf = useCallback(async (pdfFile: File) => {
@@ -109,6 +110,7 @@ const PdfSummarizer = () => {
     setExtracting(true);
     setIsImagePdf(false);
     setPageImages([]);
+    setExcludedSlides(new Set());
     setTitle(selected.name.replace(/\.pdf$/i, ""));
     try {
       const { text, isImage, images } = await extractTextFromPdf(selected);
@@ -175,7 +177,15 @@ const PdfSummarizer = () => {
 
     const body: Record<string, unknown> = { summaryLength };
     if (extractedText.trim()) body.text = extractedText;
-    if (isImagePdf && pageImages.length > 0) body.images = pageImages;
+    if (isImagePdf && pageImages.length > 0) {
+      const filteredImages = pageImages.filter((_, i) => !excludedSlides.has(i));
+      if (filteredImages.length === 0) {
+        toast({ title: "No slides selected", description: "Please include at least one slide.", variant: "destructive" });
+        setLoading(false);
+        return;
+      }
+      body.images = filteredImages;
+    }
 
     await streamAI({
       functionName: "pdf-summarizer",
@@ -270,7 +280,7 @@ const PdfSummarizer = () => {
             )}
 
             {isImagePdf && pageImages.length > 0 && (
-              <SlidePreviewCarousel images={pageImages} />
+              <SlidePreviewCarousel images={pageImages} excludedSlides={excludedSlides} onExcludedChange={setExcludedSlides} />
             )}
 
             <div className="space-y-1.5 sm:space-y-2">
