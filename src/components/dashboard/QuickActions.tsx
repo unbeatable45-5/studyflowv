@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import { BookOpen, FileUp, FileText, FilePlus, Network } from "lucide-react";
+import { BookOpen, FileText, FilePlus, Network, BrainCircuit } from "lucide-react";
 import { MotionCard, MotionIcon, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 
 const actions = [
-  { to: "/study-mode", icon: BookOpen, label: "Start Study", color: "bg-primary/10 text-primary" },
-  { to: "/pdf-summarizer", icon: FileUp, label: "Upload PDF", color: "bg-success/10 text-success" },
+  { to: "/study-mode", icon: BookOpen, label: "Study Topic", color: "bg-primary/10 text-primary" },
+  { to: "/flashcards", icon: BrainCircuit, label: "Flashcards", color: "bg-success/10 text-success" },
   { to: "/mind-map", icon: Network, label: "Mind Map", color: "bg-warning/10 text-warning" },
   { to: "/pdf-builder", icon: FilePlus, label: "Create PDF", color: "bg-destructive/10 text-destructive" },
   { to: "/notes", icon: FileText, label: "Notes", color: "bg-accent text-accent-foreground" },
@@ -12,7 +12,7 @@ const actions = [
 
 const QuickActions = () => (
   <div className="space-y-3">
-    <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Quick Actions</h2>
+    <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">More Tools</h2>
     <StaggerContainer className="grid grid-cols-5 gap-2.5">
       {actions.map(({ to, icon: Icon, label, color }) => (
         <StaggerItem key={to}>
