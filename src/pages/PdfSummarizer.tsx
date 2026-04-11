@@ -274,7 +274,21 @@ const PdfSummarizer = () => {
             )}
 
             <div className="space-y-1.5 sm:space-y-2">
-              <Label className="text-xs sm:text-sm font-medium">Summary Length</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs sm:text-sm font-medium">Summary Length</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-[10px] sm:text-xs text-muted-foreground hover:text-destructive gap-1"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    localStorage.removeItem("sf_pdf_cache");
+                    toast({ title: "Cache cleared", description: "Next summary will be freshly generated." });
+                  }}
+                >
+                  <Trash2 className="h-3 w-3" /> Clear cache
+                </Button>
+              </div>
               <RadioGroup value={summaryLength} onValueChange={setSummaryLength} className="grid grid-cols-3 gap-1.5 sm:gap-2">
                 {summaryOptions.map((opt) => (
                   <label key={opt.value} className={`flex flex-col items-center gap-0.5 sm:gap-1 rounded-lg border p-2 sm:p-3 cursor-pointer transition-colors ${summaryLength === opt.value ? "border-primary bg-accent" : "border-border hover:border-primary/30"}`}>
