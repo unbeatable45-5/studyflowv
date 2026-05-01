@@ -1,38 +1,33 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { BookOpen, FileUp, Library, Brain, ArrowRight, X } from "lucide-react";
+import { ClipboardList, FileUp, RotateCcw, ArrowRight, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 
 const slides = [
   {
-    icon: BookOpen,
-    title: "AI Study Tools",
-    description: "Generate summaries, flashcards, quizzes, and revision plans instantly with AI. Just enter a topic or upload your notes.",
+    icon: ClipboardList,
+    emoji: "🧠",
+    title: "Practice Like the Real Exam",
+    description: "Simulate real CBT exams with timer, scoring, and instant performance analysis. Practice beats reading.",
     color: "text-primary",
     bg: "from-primary/10 to-primary/20",
     iconBg: "bg-primary/15",
   },
   {
     icon: FileUp,
-    title: "Smart PDF Tools",
-    description: "Upload lecture slides or PDFs to get instant AI summaries. Export your study materials as polished PDFs anytime.",
+    emoji: "📄",
+    title: "Slides → Exam Questions",
+    description: "Upload your lecture slides or notes and instantly turn them into practice questions, summaries, and flashcards.",
     color: "text-success",
     bg: "from-success/10 to-success/20",
     iconBg: "bg-success/15",
   },
   {
-    icon: Brain,
-    title: "Practice Exams",
-    description: "Take AI-generated CBT exams on any topic. Get instant scores, performance analysis, and share your results.",
-    color: "text-destructive",
-    bg: "from-destructive/10 to-destructive/20",
-    iconBg: "bg-destructive/15",
-  },
-  {
-    icon: Library,
-    title: "Smart Study Library",
-    description: "All your study outputs are auto-saved and organized by subject. Track your streak, progress, and review anytime.",
+    icon: RotateCcw,
+    emoji: "⚡",
+    title: "Quick Revision That Sticks",
+    description: "Structured study plans, smart summaries, and quick quizzes — revise faster and remember longer.",
     color: "text-warning",
     bg: "from-warning/10 to-warning/20",
     iconBg: "bg-warning/15",
@@ -47,16 +42,10 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
   const [current, setCurrent] = useState(0);
 
   const next = () => {
-    if (current < slides.length - 1) {
-      setCurrent(current + 1);
-    } else {
-      onComplete();
-    }
+    if (current < slides.length - 1) setCurrent(current + 1);
+    else onComplete();
   };
-
-  const prev = () => {
-    if (current > 0) setCurrent(current - 1);
-  };
+  const prev = () => current > 0 && setCurrent(current - 1);
 
   const slide = slides[current];
   const Icon = slide.icon;
@@ -64,7 +53,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-between px-6 py-8 safe-area-top safe-area-bottom">
-      {/* Top bar */}
       <div className="w-full max-w-sm flex items-center justify-between">
         <Progress value={progress} className="flex-1 h-1.5 mr-4" />
         <button
@@ -75,7 +63,6 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
         </button>
       </div>
 
-      {/* Content */}
       <div className="max-w-sm w-full flex flex-col items-center text-center gap-6 flex-1 justify-center">
         <div className={cn("rounded-3xl p-8 bg-gradient-to-br transition-all duration-500", slide.bg)}>
           <div className={cn("rounded-2xl p-5", slide.iconBg, slide.color)}>
@@ -87,14 +74,14 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
             Step {current + 1} of {slides.length}
           </p>
-          <h2 className="text-2xl font-display font-bold text-foreground">{slide.title}</h2>
+          <h2 className="text-2xl font-display font-bold text-foreground">
+            {slide.emoji} {slide.title}
+          </h2>
           <p className="text-muted-foreground text-sm leading-relaxed max-w-xs mx-auto">{slide.description}</p>
         </div>
       </div>
 
-      {/* Bottom controls */}
       <div className="max-w-sm w-full space-y-3">
-        {/* Dots */}
         <div className="flex justify-center gap-2">
           {slides.map((_, i) => (
             <button
@@ -118,7 +105,7 @@ const Onboarding = ({ onComplete }: OnboardingProps) => {
             {current < slides.length - 1 ? (
               <>Continue <ArrowRight className="h-4 w-4" /></>
             ) : (
-              "Get Started 🚀"
+              "Start Practicing 🔥"
             )}
           </Button>
         </div>
