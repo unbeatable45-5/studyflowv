@@ -224,6 +224,12 @@ const PdfSummarizer = () => {
           <h1 className="text-base sm:text-xl font-display font-bold text-foreground">PDF Summarizer</h1>
         </div>
         <p className="text-[11px] sm:text-sm text-muted-foreground">Upload a PDF and get an AI-powered summary.</p>
+        <a
+          href="/pdf-viewer"
+          className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-medium text-primary hover:underline pt-1"
+        >
+          ✨ Open Smart Study Viewer →
+        </a>
       </div>
 
       <Card className="border-dashed border-2 cursor-pointer hover:border-primary/50 transition-colors active:scale-[0.98]">

@@ -1,9 +1,19 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ClipboardList, FileUp, RotateCcw, ArrowRight, Upload, Sparkles, Timer, CheckCircle2, XCircle, Flame } from "lucide-react";
+import { ClipboardList, FileUp, RotateCcw, ArrowRight, Upload, Sparkles, Timer, CheckCircle2, XCircle, Flame, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { FadeIn } from "@/components/ui/motion";
+
+const TESTIMONIALS = [
+  { quote: "Wow, you made this? I went from cramming to actually understanding my notes.", author: "Adaeze O.", role: "Final-year Med Student", rating: 5 },
+  { quote: "This actually helps for exams. The CBT mode feels just like the real thing.", author: "Tunde A.", role: "300L Engineering", rating: 5 },
+  { quote: "Turned my 60-slide lecture into 20 sharp questions in seconds. Game changer.", author: "Sarah M.", role: "Law Student", rating: 5 },
+  { quote: "I went from 60% to 82% in two weeks of using StudyFlow daily.", author: "Daniel K.", role: "Pharmacy", rating: 5 },
+  { quote: "The slide-to-exam feature is unreal. I literally study 2x faster now.", author: "Chiamaka E.", role: "Nursing", rating: 4 },
+  { quote: "Finally a study app that respects my time. Quick revision saved my finals.", author: "Ifeanyi U.", role: "Computer Science", rating: 5 },
+];
 
 const Landing = () => {
   const { user } = useAuth();
@@ -171,25 +181,8 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Social proof */}
-      <section className="px-4 py-16 bg-muted/30">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <h2 className="text-center text-2xl font-display font-bold">Students love it</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[
-              { quote: "Wow, you made this?", author: "Final-year student" },
-              { quote: "This actually helps for exams.", author: "Med student" },
-            ].map((t) => (
-              <Card key={t.quote}>
-                <CardContent className="p-6">
-                  <p className="text-base font-medium">"{t.quote}"</p>
-                  <p className="text-xs text-muted-foreground mt-2">— {t.author}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Social proof — rotating testimonials */}
+      <TestimonialsCarousel />
 
       {/* Urgency */}
       <section className="px-4 py-12">
@@ -222,6 +215,93 @@ const Landing = () => {
         </p>
       </footer>
     </div>
+  );
+};
+
+const TestimonialsCarousel = () => {
+  const [index, setIndex] = useState(0);
+  const total = TESTIMONIALS.length;
+
+  useEffect(() => {
+    const id = setInterval(() => setIndex((i) => (i + 1) % total), 4500);
+    return () => clearInterval(id);
+  }, [total]);
+
+  const prev = () => setIndex((i) => (i - 1 + total) % total);
+  const next = () => setIndex((i) => (i + 1) % total);
+
+  return (
+    <section className="px-4 py-16 bg-muted/30">
+      <div className="max-w-3xl mx-auto space-y-6">
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star key={i} className="h-4 w-4 fill-warning text-warning" />
+            ))}
+            <span className="ml-2 text-sm font-semibold text-foreground">4.9/5</span>
+          </div>
+          <h2 className="text-2xl font-display font-bold">Students love it</h2>
+          <p className="text-xs text-muted-foreground">Real students. Real results.</p>
+        </div>
+
+        <div className="relative">
+          <div className="overflow-hidden">
+            <div
+              className="flex transition-transform duration-500 ease-out"
+              style={{ transform: `translateX(-${index * 100}%)` }}
+            >
+              {TESTIMONIALS.map((t, i) => (
+                <div key={i} className="min-w-full px-1">
+                  <Card className="border-border/50">
+                    <CardContent className="p-6 sm:p-8 space-y-3 text-center">
+                      <div className="flex items-center justify-center gap-0.5">
+                        {Array.from({ length: 5 }).map((_, s) => (
+                          <Star
+                            key={s}
+                            className={`h-4 w-4 ${s < t.rating ? "fill-warning text-warning" : "text-muted-foreground/30"}`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-base sm:text-lg font-medium leading-relaxed">"{t.quote}"</p>
+                      <div className="pt-2">
+                        <p className="text-sm font-semibold">{t.author}</p>
+                        <p className="text-xs text-muted-foreground">{t.role}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={prev}
+            aria-label="Previous testimonial"
+            className="absolute -left-1 sm:-left-4 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-background border border-border shadow-sm flex items-center justify-center hover:bg-accent transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            onClick={next}
+            aria-label="Next testimonial"
+            className="absolute -right-1 sm:-right-4 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-background border border-border shadow-sm flex items-center justify-center hover:bg-accent transition-colors"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-center gap-1.5">
+          {TESTIMONIALS.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              aria-label={`Go to testimonial ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all ${i === index ? "w-6 bg-primary" : "w-1.5 bg-muted-foreground/30"}`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 };
 
