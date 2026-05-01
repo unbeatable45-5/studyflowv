@@ -218,4 +218,91 @@ const Landing = () => {
   );
 };
 
+const TestimonialsCarousel = () => {
+  const [index, setIndex] = useState(0);
+  const total = TESTIMONIALS.length;
+
+  useEffect(() => {
+    const id = setInterval(() => setIndex((i) => (i + 1) % total), 4500);
+    return () => clearInterval(id);
+  }, [total]);
+
+  const prev = () => setIndex((i) => (i - 1 + total) % total);
+  const next = () => setIndex((i) => (i + 1) % total);
+
+  return (
+    <section className="px-4 py-16 bg-muted/30">
+      <div className="max-w-3xl mx-auto space-y-6">
+        <div className="text-center space-y-2">
+          <div className="flex items-center justify-center gap-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star key={i} className="h-4 w-4 fill-warning text-warning" />
+            ))}
+            <span className="ml-2 text-sm font-semibold text-foreground">4.9/5</span>
+          </div>
+          <h2 className="text-2xl font-display font-bold">Students love it</h2>
+          <p className="text-xs text-muted-foreground">Real students. Real results.</p>
+        </div>
+
+        <div className="relative">
+          <div className="overflow-hidden">
+            <div
+              className="flex transition-transform duration-500 ease-out"
+              style={{ transform: `translateX(-${index * 100}%)` }}
+            >
+              {TESTIMONIALS.map((t, i) => (
+                <div key={i} className="min-w-full px-1">
+                  <Card className="border-border/50">
+                    <CardContent className="p-6 sm:p-8 space-y-3 text-center">
+                      <div className="flex items-center justify-center gap-0.5">
+                        {Array.from({ length: 5 }).map((_, s) => (
+                          <Star
+                            key={s}
+                            className={`h-4 w-4 ${s < t.rating ? "fill-warning text-warning" : "text-muted-foreground/30"}`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-base sm:text-lg font-medium leading-relaxed">"{t.quote}"</p>
+                      <div className="pt-2">
+                        <p className="text-sm font-semibold">{t.author}</p>
+                        <p className="text-xs text-muted-foreground">{t.role}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={prev}
+            aria-label="Previous testimonial"
+            className="absolute -left-1 sm:-left-4 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-background border border-border shadow-sm flex items-center justify-center hover:bg-accent transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            onClick={next}
+            aria-label="Next testimonial"
+            className="absolute -right-1 sm:-right-4 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-background border border-border shadow-sm flex items-center justify-center hover:bg-accent transition-colors"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-center gap-1.5">
+          {TESTIMONIALS.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              aria-label={`Go to testimonial ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all ${i === index ? "w-6 bg-primary" : "w-1.5 bg-muted-foreground/30"}`}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export default Landing;
