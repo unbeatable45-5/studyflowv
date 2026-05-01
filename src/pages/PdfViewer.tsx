@@ -320,13 +320,20 @@ const PdfViewer = () => {
                 key={n}
                 ref={(el) => { if (el) pageRefs.current.set(n, el); else pageRefs.current.delete(n); }}
                 data-page-num={n}
-                className="bg-background shadow-sm rounded-md overflow-hidden border border-border/50"
+                className="bg-background shadow-sm rounded-md overflow-hidden border border-border/50 max-w-full"
               >
-                <canvas />
-                {/* Hidden text layer for selection */}
-                <div className="sr-only-text p-2 text-[10px] leading-snug select-text text-foreground/60 max-w-[800px]">
-                  {pageTexts[i]}
-                </div>
+                <canvas className="block max-w-full" />
+                {/* Selectable text strip — highlight to ask AI */}
+                {pageTexts[i] && (
+                  <div className="px-3 py-2 border-t border-dashed border-border/60 bg-muted/40">
+                    <p className="text-[9px] uppercase tracking-wide text-muted-foreground mb-1">
+                      Page {n} text · highlight to ask AI
+                    </p>
+                    <p className="text-[11px] leading-relaxed select-text text-foreground/80 max-w-[800px] whitespace-pre-wrap">
+                      {pageTexts[i]}
+                    </p>
+                  </div>
+                )}
               </div>
             );
           })}
