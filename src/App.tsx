@@ -35,6 +35,7 @@ import MindMap from "./pages/MindMap";
 import AiTutor from "./pages/AiTutor";
 import PracticeExam from "./pages/PracticeExam";
 import Landing from "./pages/Landing";
+import PdfViewer from "./pages/PdfViewer";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ const App = () => (
                   <Route path="/flashcards" element={<FlashcardGenerator />} />
                   <Route path="/pdf-export" element={<PdfExport />} />
                   <Route path="/pdf-summarizer" element={<PdfSummarizer />} />
+                  <Route path="/pdf-viewer" element={<PdfViewer />} />
                   <Route path="/history" element={<HistoryPage />} />
                   <Route path="/pdf-builder" element={<CustomPdfBuilder />} />
                   <Route path="/organizer" element={<StudyOrganizer />} />
