@@ -282,7 +282,7 @@ const PdfViewer = () => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-4rem)] sm:h-[calc(100dvh-5rem)]">
+    <div className="flex flex-col h-[calc(100dvh-4rem)] sm:h-[calc(100dvh-5rem)] relative">
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-20">
         <div className="flex items-center gap-1 min-w-0">
