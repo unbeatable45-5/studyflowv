@@ -34,6 +34,7 @@ import NotFound from "./pages/NotFound";
 import MindMap from "./pages/MindMap";
 import AiTutor from "./pages/AiTutor";
 import PracticeExam from "./pages/PracticeExam";
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
           <PremiumProvider>
             <TimerProvider>
               <Routes>
+                <Route path="/landing" element={<Landing />} />
                 <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
                 <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
                 <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
