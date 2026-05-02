@@ -101,7 +101,16 @@ const PdfViewer = () => {
         texts.push(c.items.map((it: any) => it.str).join(" "));
       }
       setPageTexts(texts);
-      toast({ title: "PDF loaded", description: `${doc.numPages} pages ready` });
+      const totalChars = texts.reduce((sum, t) => sum + t.length, 0);
+      const isImageBased = totalChars < doc.numPages * 40;
+      if (isImageBased) {
+        toast({
+          title: "Image-based PDF detected",
+          description: "Text extraction is limited. Use Smart Slide Mode (Pro) on the Slides → Exam page for OCR.",
+        });
+      } else {
+        toast({ title: "PDF loaded", description: `${doc.numPages} pages ready` });
+      }
     } catch {
       toast({ title: "Error", description: "Failed to read PDF.", variant: "destructive" });
       setFile(null);
