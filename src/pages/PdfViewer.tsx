@@ -581,43 +581,90 @@ const PdfViewer = () => {
 
       {/* Related Videos drawer */}
       <Sheet open={videosOpen} onOpenChange={setVideosOpen}>
-        <SheetContent side="bottom" className="h-[70dvh] flex flex-col p-0">
+        <SheetContent side="bottom" className="h-[80dvh] flex flex-col p-0">
           <SheetHeader className="px-4 py-3 border-b border-border">
-            <SheetTitle className="text-base flex items-center gap-2">
-              <Youtube className="h-4 w-4 text-destructive" /> Related Videos
+            <SheetTitle className="text-base flex items-center justify-between gap-2">
+              <span className="flex items-center gap-2">
+                <Youtube className="h-4 w-4 text-destructive" /> Related Videos
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 px-2 text-[11px] gap-1"
+                onClick={saveVideosToLibrary}
+                disabled={!ytVideos.length}
+              >
+                <BookOpen className="h-3 w-3" /> Save to Library
+              </Button>
             </SheetTitle>
           </SheetHeader>
           <ScrollArea className="flex-1 px-4 py-3">
             <p className="text-[11px] text-muted-foreground mb-3">
-              Curated YouTube searches based on this page. Tap to watch.
+              YouTube videos for page {currentPage}{file ? ` of ${file.name}` : ""}.
             </p>
-            <div className="space-y-2">
-              {buildVideoQueries(pageTexts[currentPage - 1] ?? "").map((q) => (
-                <a
-                  key={q.label}
-                  href={`https://www.youtube.com/results?search_query=${encodeURIComponent(q.query)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
-                >
-                  <div className="h-12 w-16 rounded bg-destructive/10 flex items-center justify-center shrink-0">
-                    <Youtube className="h-5 w-5 text-destructive" />
+            {ytLoading && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading videos…
+              </div>
+            )}
+            {ytError && !ytLoading && (
+              <p className="text-xs text-destructive">{ytError}</p>
+            )}
+            <div className="space-y-3">
+              {ytVideos.map((v) => (
+                <div key={v.videoId} className="rounded-lg border border-border bg-card overflow-hidden">
+                  <a href={v.url} target="_blank" rel="noopener noreferrer" className="flex gap-3 p-3 hover:bg-muted/50 transition-colors">
+                    {v.thumbnail ? (
+                      <img src={v.thumbnail} alt="" className="h-16 w-24 object-cover rounded shrink-0" loading="lazy" />
+                    ) : (
+                      <div className="h-16 w-24 rounded bg-destructive/10 flex items-center justify-center shrink-0">
+                        <Youtube className="h-5 w-5 text-destructive" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground line-clamp-2">{v.title}</p>
+                      <p className="text-[11px] text-muted-foreground truncate mt-0.5">{v.channel}</p>
+                    </div>
+                    <ExternalLink className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-1" />
+                  </a>
+                  <div className="flex items-center gap-1 px-3 pb-2 flex-wrap">
+                    <Button
+                      size="sm" variant="ghost"
+                      className="h-7 px-2 text-[11px] gap-1"
+                      onClick={() => runVideoAction("summarize_video", v)}
+                    >
+                      {!isPremium && <Crown className="h-3 w-3 text-warning" />}
+                      <Sparkles className="h-3 w-3" /> Summarize
+                    </Button>
+                    <Button
+                      size="sm" variant="ghost"
+                      className="h-7 px-2 text-[11px] gap-1"
+                      onClick={() => runVideoAction("key_notes", v)}
+                    >
+                      {!isPremium && <Crown className="h-3 w-3 text-warning" />}
+                      <BookOpen className="h-3 w-3" /> Key notes
+                    </Button>
+                    <Button
+                      size="sm" variant="ghost"
+                      className="h-7 px-2 text-[11px] gap-1"
+                      onClick={() => runVideoAction("video_questions", v)}
+                    >
+                      {!isPremium && <Crown className="h-3 w-3 text-warning" />}
+                      <ListChecks className="h-3 w-3" /> Questions
+                    </Button>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{q.label}</p>
-                    <p className="text-[11px] text-muted-foreground truncate">{q.tag}</p>
-                  </div>
-                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                </a>
+                </div>
               ))}
-              {!pageTexts[currentPage - 1] && (
-                <p className="text-xs text-muted-foreground">No text detected on this page.</p>
+              {!ytLoading && !ytError && ytVideos.length === 0 && (
+                <p className="text-xs text-muted-foreground">No videos found.</p>
               )}
             </div>
             {!isPremium && (
-              <div className="mt-4 rounded-lg border border-dashed border-border p-3">
-                <p className="text-xs font-semibold mb-1">⭐ Pro: Summarize Video & Extract Notes</p>
-                <p className="text-[11px] text-muted-foreground">Upgrade to summarize videos, extract key notes, and generate questions from them.</p>
+              <div className="mt-4 rounded-lg border border-dashed border-warning/40 p-3 bg-warning/5">
+                <p className="text-xs font-semibold mb-1 flex items-center gap-1">
+                  <Crown className="h-3 w-3 text-warning" /> Pro: Summarize, key notes & questions from videos
+                </p>
+                <p className="text-[11px] text-muted-foreground">Upgrade to unlock AI actions on YouTube results.</p>
               </div>
             )}
           </ScrollArea>
