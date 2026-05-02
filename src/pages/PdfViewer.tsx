@@ -53,6 +53,7 @@ const PdfViewer = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [askInput, setAskInput] = useState("");
   const [askContext, setAskContext] = useState("");
+  const [videosOpen, setVideosOpen] = useState(false);
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
