@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ClipboardList, FileUp, RotateCcw } from "lucide-react";
+import { ClipboardList, FileUp, RotateCcw, BookOpen } from "lucide-react";
 import { MotionCard, MotionIcon, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 
 const actions = [
@@ -18,6 +18,14 @@ const actions = [
     description: "Turn notes into questions",
     color: "bg-success/10 text-success",
     emoji: "📄",
+  },
+  {
+    to: "/pdf-viewer",
+    icon: BookOpen,
+    label: "Open Study File",
+    description: "Read your slides with built-in AI help",
+    color: "bg-accent text-accent-foreground",
+    emoji: "📖",
   },
   {
     to: "/planner",
