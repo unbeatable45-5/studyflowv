@@ -48,6 +48,8 @@ serve(async (req) => {
       userText = `Explain the following content:\n\n${trimmed}`;
     } else if (action === "generate_questions") {
       userText = `Generate practice questions from this content:\n\n${trimmed}`;
+    } else if (action === "make_flashcards") {
+      userText = `Turn this content into flashcards:\n\n${trimmed}`;
     } else {
       userText = `Summarize this page/section:\n\n${trimmed}`;
     }
