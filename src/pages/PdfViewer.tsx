@@ -223,12 +223,30 @@ const PdfViewer = () => {
         toast({ title: "No content", description: "Could not read this section.", variant: "destructive" });
         return;
       }
+
+      const cacheKey = makeAiCacheKey({
+        scope: `pdf::${file?.name ?? "doc"}`,
+        action,
+        content,
+        question,
+      });
+      const cached = getCachedAi(cacheKey);
+      if (cached) {
+        setAiAction(action);
+        setAiOpen(true);
+        setAiOutput(cached);
+        setAiLoading(false);
+        setAiFromCache(true);
+        return;
+      }
+
       if (!checkAndPrompt("pdfs", "AI study actions")) return;
 
       setAiAction(action);
       setAiOpen(true);
       setAiOutput("");
       setAiLoading(true);
+      setAiFromCache(false);
 
       let full = "";
       streamAI({
@@ -237,6 +255,7 @@ const PdfViewer = () => {
         onDelta: (t) => { full += t; setAiOutput(full); },
         onDone: () => {
           setAiLoading(false);
+          setCachedAi(cacheKey, full);
           saveOutput("pdf-summarizer", { tool: "smart-viewer", action, fileName: file?.name }, full);
         },
         onError: (err) => {
