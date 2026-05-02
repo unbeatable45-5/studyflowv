@@ -297,6 +297,118 @@ const PdfViewer = () => {
     runAction("ask", ctx, askInput.trim());
   };
 
+  // ----- Video features -----
+  const buildPrimaryQuery = (text: string) => {
+    const words = text.replace(/\s+/g, " ").split(/[^A-Za-z]+/).filter((w) => w.length > 4);
+    return Array.from(new Set(words)).slice(0, 5).join(" ").trim() || text.slice(0, 80);
+  };
+
+  const loadVideos = useCallback(async () => {
+    const text = pageTexts[currentPage - 1] ?? "";
+    if (!text.trim()) {
+      setYtVideos([]);
+      setYtError("No text detected on this page.");
+      return;
+    }
+    const query = buildPrimaryQuery(text);
+    const cacheKey = `yt::${file?.name ?? "doc"}::${currentPage}::${query}`;
+    const cached = getCachedAi(cacheKey);
+    if (cached) {
+      try { setYtVideos(JSON.parse(cached)); setYtError(null); return; } catch { /* refetch */ }
+    }
+    setYtLoading(true);
+    setYtError(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("youtube-search", {
+        body: { query, maxResults: 6 },
+      });
+      if (error) throw error;
+      const videos: YTVideo[] = data?.videos ?? [];
+      setYtVideos(videos);
+      setCachedAi(cacheKey, JSON.stringify(videos));
+    } catch (e) {
+      setYtError(e instanceof Error ? e.message : "Failed to load videos");
+    } finally {
+      setYtLoading(false);
+    }
+  }, [pageTexts, currentPage, file?.name]);
+
+  useEffect(() => {
+    if (videosOpen) loadVideos();
+  }, [videosOpen, loadVideos]);
+
+  const runVideoAction = useCallback(
+    (action: VideoAction, video: YTVideo) => {
+      if (!isPremium) {
+        toast({ title: "Pro feature", description: "Upgrade to summarize videos and extract notes.", variant: "destructive" });
+        return;
+      }
+      const cacheKey = makeAiCacheKey({
+        scope: `yt::${video.videoId}`,
+        action,
+        content: `${video.title}\n${video.description}`,
+      });
+      const cached = getCachedAi(cacheKey);
+      if (cached) {
+        setAiAction(action);
+        setAiOpen(true);
+        setAiOutput(cached);
+        setAiLoading(false);
+        setAiFromCache(true);
+        return;
+      }
+
+      setAiAction(action);
+      setAiOpen(true);
+      setAiOutput("");
+      setAiLoading(true);
+      setAiFromCache(false);
+
+      let full = "";
+      streamAI({
+        functionName: "video-smart-action",
+        body: { action, video },
+        onDelta: (t) => { full += t; setAiOutput(full); },
+        onDone: () => {
+          setAiLoading(false);
+          setCachedAi(cacheKey, full);
+          saveOutput("pdf-summarizer", { tool: "video", action, videoId: video.videoId, title: video.title, url: video.url }, full);
+        },
+        onError: (err) => {
+          setAiLoading(false);
+          toast({ title: "Error", description: err, variant: "destructive" });
+        },
+      });
+    },
+    [isPremium]
+  );
+
+  const saveVideosToLibrary = async () => {
+    if (!ytVideos.length) {
+      toast({ title: "Nothing to save", description: "Load some videos first.", variant: "destructive" });
+      return;
+    }
+    const text = pageTexts[currentPage - 1] ?? "";
+    const topic = buildPrimaryQuery(text).slice(0, 80);
+    const md = [
+      `# Related videos for ${file?.name ?? "document"} — page ${currentPage}`,
+      ``,
+      `**Topic:** ${topic || "—"}`,
+      ``,
+      ...ytVideos.map((v) => `- [${v.title}](${v.url}) — ${v.channel}`),
+    ].join("\n");
+    try {
+      await saveOutput(
+        "pdf-summarizer",
+        { tool: "related-videos", topic, page: currentPage, fileName: file?.name, videos: ytVideos },
+        md,
+      );
+      toast({ title: "Saved to Library", description: `${ytVideos.length} videos saved as a study entry.` });
+    } catch {
+      toast({ title: "Error", description: "Could not save to Library.", variant: "destructive" });
+    }
+  };
+
   // No PDF: upload screen
   if (!file || !pdf) {
     return (
