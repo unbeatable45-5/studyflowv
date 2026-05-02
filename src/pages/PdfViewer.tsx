@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
 import {
   Upload, Loader2, ZoomIn, ZoomOut, ChevronLeft, ChevronRight,
-  FileUp, Sparkles, MessageSquareQuote, BookOpen, ListChecks, X, Send,
+  FileUp, Sparkles, MessageSquareQuote, BookOpen, ListChecks, X, Send, Layers, Youtube, ExternalLink,
 } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
@@ -19,14 +19,32 @@ import { saveOutput } from "@/lib/saved-outputs";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
-type SmartAction = "summarize_page" | "generate_questions" | "explain" | "ask";
+type SmartAction = "summarize_page" | "generate_questions" | "explain" | "ask" | "make_flashcards";
 
 const ACTION_LABELS: Record<SmartAction, string> = {
   summarize_page: "Summarize Page",
   generate_questions: "Generate Questions",
   explain: "Explain This",
   ask: "Ask AI",
+  make_flashcards: "Turn Into Flashcards",
 };
+
+function buildVideoQueries(text: string): { label: string; query: string; tag: string }[] {
+  const cleaned = text.replace(/\s+/g, " ").trim();
+  if (!cleaned) return [];
+  // Take first ~80 chars as topic seed
+  const seed = cleaned.slice(0, 100);
+  // Pick top capitalised/keyword-y words for label
+  const words = cleaned.split(/[^A-Za-z]+/).filter((w) => w.length > 4);
+  const top = Array.from(new Set(words)).slice(0, 4).join(" ") || seed.slice(0, 40);
+  return [
+    { label: `${top} — explained`, query: `${top} explained tutorial`, tag: "Explains this concept" },
+    { label: `${top} — exam walkthrough`, query: `${top} exam questions walkthrough`, tag: "Exam-focused walkthrough" },
+    { label: `${top} — crash course`, query: `${top} crash course`, tag: "Quick overview" },
+    { label: `${top} — examples`, query: `${top} worked examples`, tag: "Worked examples" },
+    { label: `${top} — review`, query: `${top} revision summary`, tag: "Revision summary" },
+  ];
+}
 
 const PdfViewer = () => {
   const { isPremium } = usePremium();
@@ -52,6 +70,7 @@ const PdfViewer = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [askInput, setAskInput] = useState("");
   const [askContext, setAskContext] = useState("");
+  const [videosOpen, setVideosOpen] = useState(false);
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
@@ -82,7 +101,16 @@ const PdfViewer = () => {
         texts.push(c.items.map((it: any) => it.str).join(" "));
       }
       setPageTexts(texts);
-      toast({ title: "PDF loaded", description: `${doc.numPages} pages ready` });
+      const totalChars = texts.reduce((sum, t) => sum + t.length, 0);
+      const isImageBased = totalChars < doc.numPages * 40;
+      if (isImageBased) {
+        toast({
+          title: "Image-based PDF detected",
+          description: "Text extraction is limited. Use Smart Slide Mode (Pro) on the Slides → Exam page for OCR.",
+        });
+      } else {
+        toast({ title: "PDF loaded", description: `${doc.numPages} pages ready` });
+      }
     } catch {
       toast({ title: "Error", description: "Failed to read PDF.", variant: "destructive" });
       setFile(null);
@@ -340,7 +368,7 @@ const PdfViewer = () => {
         </div>
       </div>
 
-      {/* Floating action button: summarize current page */}
+      {/* Floating action buttons */}
       <div className="absolute right-3 bottom-20 sm:bottom-6 z-30 flex flex-col gap-2 items-end">
         <Button
           size="sm"
@@ -357,6 +385,22 @@ const PdfViewer = () => {
         >
           <ListChecks className="h-3.5 w-3.5" /> Questions
         </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full shadow-lg gap-1.5 h-9 px-3 bg-background"
+          onClick={() => runAction("make_flashcards", pageTexts[currentPage - 1] ?? "")}
+        >
+          <Layers className="h-3.5 w-3.5" /> Flashcards
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full shadow-lg gap-1.5 h-9 px-3 bg-background"
+          onClick={() => setVideosOpen(true)}
+        >
+          <Youtube className="h-3.5 w-3.5 text-destructive" /> Videos
+        </Button>
       </div>
 
       {/* Selection popover */}
@@ -367,16 +411,64 @@ const PdfViewer = () => {
           onMouseDown={(e) => e.preventDefault()}
         >
           <Button size="sm" variant="ghost" className="h-8 px-2 gap-1 text-xs" onClick={() => handleSelectionAction("ask")}>
-            <MessageSquareQuote className="h-3.5 w-3.5" /> Ask AI
+            <MessageSquareQuote className="h-3.5 w-3.5" /> Ask
           </Button>
           <Button size="sm" variant="ghost" className="h-8 px-2 gap-1 text-xs" onClick={() => handleSelectionAction("explain")}>
             <BookOpen className="h-3.5 w-3.5" /> Explain
           </Button>
           <Button size="sm" variant="ghost" className="h-8 px-2 gap-1 text-xs" onClick={() => handleSelectionAction("summarize_page")}>
-            <Sparkles className="h-3.5 w-3.5" /> Summarize
+            <Sparkles className="h-3.5 w-3.5" /> Summary
+          </Button>
+          <Button size="sm" variant="ghost" className="h-8 px-2 gap-1 text-xs" onClick={() => handleSelectionAction("make_flashcards")}>
+            <Layers className="h-3.5 w-3.5" /> Cards
           </Button>
         </div>
       )}
+
+      {/* Related Videos drawer */}
+      <Sheet open={videosOpen} onOpenChange={setVideosOpen}>
+        <SheetContent side="bottom" className="h-[70dvh] flex flex-col p-0">
+          <SheetHeader className="px-4 py-3 border-b border-border">
+            <SheetTitle className="text-base flex items-center gap-2">
+              <Youtube className="h-4 w-4 text-destructive" /> Related Videos
+            </SheetTitle>
+          </SheetHeader>
+          <ScrollArea className="flex-1 px-4 py-3">
+            <p className="text-[11px] text-muted-foreground mb-3">
+              Curated YouTube searches based on this page. Tap to watch.
+            </p>
+            <div className="space-y-2">
+              {buildVideoQueries(pageTexts[currentPage - 1] ?? "").map((q) => (
+                <a
+                  key={q.label}
+                  href={`https://www.youtube.com/results?search_query=${encodeURIComponent(q.query)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
+                >
+                  <div className="h-12 w-16 rounded bg-destructive/10 flex items-center justify-center shrink-0">
+                    <Youtube className="h-5 w-5 text-destructive" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{q.label}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">{q.tag}</p>
+                  </div>
+                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                </a>
+              ))}
+              {!pageTexts[currentPage - 1] && (
+                <p className="text-xs text-muted-foreground">No text detected on this page.</p>
+              )}
+            </div>
+            {!isPremium && (
+              <div className="mt-4 rounded-lg border border-dashed border-border p-3">
+                <p className="text-xs font-semibold mb-1">⭐ Pro: Summarize Video & Extract Notes</p>
+                <p className="text-[11px] text-muted-foreground">Upgrade to summarize videos, extract key notes, and generate questions from them.</p>
+              </div>
+            )}
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
 
       {/* AI result drawer */}
       <Sheet open={aiOpen} onOpenChange={setAiOpen}>
