@@ -16,10 +16,14 @@ import { streamAI } from "@/lib/streaming";
 import { usePremium } from "@/contexts/PremiumContext";
 import { useUsageLimitCheck } from "@/components/UsageLimitToast";
 import { saveOutput } from "@/lib/saved-outputs";
+import { supabase } from "@/integrations/supabase/client";
+import { makeAiCacheKey, getCachedAi, setCachedAi } from "@/lib/ai-action-cache";
+import { Crown } from "lucide-react";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
 type SmartAction = "summarize_page" | "generate_questions" | "explain" | "ask" | "make_flashcards";
+type VideoAction = "summarize_video" | "key_notes" | "video_questions";
 
 const ACTION_LABELS: Record<SmartAction, string> = {
   summarize_page: "Summarize Page",
@@ -28,6 +32,21 @@ const ACTION_LABELS: Record<SmartAction, string> = {
   ask: "Ask AI",
   make_flashcards: "Turn Into Flashcards",
 };
+
+const VIDEO_ACTION_LABELS: Record<VideoAction, string> = {
+  summarize_video: "Summarize Video",
+  key_notes: "Extract Key Notes",
+  video_questions: "Generate Questions",
+};
+
+interface YTVideo {
+  videoId: string;
+  title: string;
+  description: string;
+  channel: string;
+  thumbnail: string;
+  url: string;
+}
 
 function buildVideoQueries(text: string): { label: string; query: string; tag: string }[] {
   const cleaned = text.replace(/\s+/g, " ").trim();
