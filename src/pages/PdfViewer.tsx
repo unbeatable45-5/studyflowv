@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
 import {
   Upload, Loader2, ZoomIn, ZoomOut, ChevronLeft, ChevronRight,
-  FileUp, Sparkles, MessageSquareQuote, BookOpen, ListChecks, X, Send,
+  FileUp, Sparkles, MessageSquareQuote, BookOpen, ListChecks, X, Send, Layers, Youtube, ExternalLink,
 } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
@@ -19,13 +19,14 @@ import { saveOutput } from "@/lib/saved-outputs";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
-type SmartAction = "summarize_page" | "generate_questions" | "explain" | "ask";
+type SmartAction = "summarize_page" | "generate_questions" | "explain" | "ask" | "make_flashcards";
 
 const ACTION_LABELS: Record<SmartAction, string> = {
   summarize_page: "Summarize Page",
   generate_questions: "Generate Questions",
   explain: "Explain This",
   ask: "Ask AI",
+  make_flashcards: "Turn Into Flashcards",
 };
 
 const PdfViewer = () => {
