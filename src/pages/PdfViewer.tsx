@@ -341,7 +341,7 @@ const PdfViewer = () => {
         </div>
       </div>
 
-      {/* Floating action button: summarize current page */}
+      {/* Floating action buttons */}
       <div className="absolute right-3 bottom-20 sm:bottom-6 z-30 flex flex-col gap-2 items-end">
         <Button
           size="sm"
@@ -358,6 +358,22 @@ const PdfViewer = () => {
         >
           <ListChecks className="h-3.5 w-3.5" /> Questions
         </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full shadow-lg gap-1.5 h-9 px-3 bg-background"
+          onClick={() => runAction("make_flashcards", pageTexts[currentPage - 1] ?? "")}
+        >
+          <Layers className="h-3.5 w-3.5" /> Flashcards
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="rounded-full shadow-lg gap-1.5 h-9 px-3 bg-background"
+          onClick={() => setVideosOpen(true)}
+        >
+          <Youtube className="h-3.5 w-3.5 text-destructive" /> Videos
+        </Button>
       </div>
 
       {/* Selection popover */}
@@ -368,16 +384,64 @@ const PdfViewer = () => {
           onMouseDown={(e) => e.preventDefault()}
         >
           <Button size="sm" variant="ghost" className="h-8 px-2 gap-1 text-xs" onClick={() => handleSelectionAction("ask")}>
-            <MessageSquareQuote className="h-3.5 w-3.5" /> Ask AI
+            <MessageSquareQuote className="h-3.5 w-3.5" /> Ask
           </Button>
           <Button size="sm" variant="ghost" className="h-8 px-2 gap-1 text-xs" onClick={() => handleSelectionAction("explain")}>
             <BookOpen className="h-3.5 w-3.5" /> Explain
           </Button>
           <Button size="sm" variant="ghost" className="h-8 px-2 gap-1 text-xs" onClick={() => handleSelectionAction("summarize_page")}>
-            <Sparkles className="h-3.5 w-3.5" /> Summarize
+            <Sparkles className="h-3.5 w-3.5" /> Summary
+          </Button>
+          <Button size="sm" variant="ghost" className="h-8 px-2 gap-1 text-xs" onClick={() => handleSelectionAction("make_flashcards")}>
+            <Layers className="h-3.5 w-3.5" /> Cards
           </Button>
         </div>
       )}
+
+      {/* Related Videos drawer */}
+      <Sheet open={videosOpen} onOpenChange={setVideosOpen}>
+        <SheetContent side="bottom" className="h-[70dvh] flex flex-col p-0">
+          <SheetHeader className="px-4 py-3 border-b border-border">
+            <SheetTitle className="text-base flex items-center gap-2">
+              <Youtube className="h-4 w-4 text-destructive" /> Related Videos
+            </SheetTitle>
+          </SheetHeader>
+          <ScrollArea className="flex-1 px-4 py-3">
+            <p className="text-[11px] text-muted-foreground mb-3">
+              Curated YouTube searches based on this page. Tap to watch.
+            </p>
+            <div className="space-y-2">
+              {buildVideoQueries(pageTexts[currentPage - 1] ?? "").map((q) => (
+                <a
+                  key={q.label}
+                  href={`https://www.youtube.com/results?search_query=${encodeURIComponent(q.query)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors"
+                >
+                  <div className="h-12 w-16 rounded bg-destructive/10 flex items-center justify-center shrink-0">
+                    <Youtube className="h-5 w-5 text-destructive" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{q.label}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">{q.tag}</p>
+                  </div>
+                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                </a>
+              ))}
+              {!pageTexts[currentPage - 1] && (
+                <p className="text-xs text-muted-foreground">No text detected on this page.</p>
+              )}
+            </div>
+            {!isPremium && (
+              <div className="mt-4 rounded-lg border border-dashed border-border p-3">
+                <p className="text-xs font-semibold mb-1">⭐ Pro: Summarize Video & Extract Notes</p>
+                <p className="text-[11px] text-muted-foreground">Upgrade to summarize videos, extract key notes, and generate questions from them.</p>
+              </div>
+            )}
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
 
       {/* AI result drawer */}
       <Sheet open={aiOpen} onOpenChange={setAiOpen}>
