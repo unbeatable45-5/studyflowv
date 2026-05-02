@@ -29,6 +29,23 @@ const ACTION_LABELS: Record<SmartAction, string> = {
   make_flashcards: "Turn Into Flashcards",
 };
 
+function buildVideoQueries(text: string): { label: string; query: string; tag: string }[] {
+  const cleaned = text.replace(/\s+/g, " ").trim();
+  if (!cleaned) return [];
+  // Take first ~80 chars as topic seed
+  const seed = cleaned.slice(0, 100);
+  // Pick top capitalised/keyword-y words for label
+  const words = cleaned.split(/[^A-Za-z]+/).filter((w) => w.length > 4);
+  const top = Array.from(new Set(words)).slice(0, 4).join(" ") || seed.slice(0, 40);
+  return [
+    { label: `${top} — explained`, query: `${top} explained tutorial`, tag: "Explains this concept" },
+    { label: `${top} — exam walkthrough`, query: `${top} exam questions walkthrough`, tag: "Exam-focused walkthrough" },
+    { label: `${top} — crash course`, query: `${top} crash course`, tag: "Quick overview" },
+    { label: `${top} — examples`, query: `${top} worked examples`, tag: "Worked examples" },
+    { label: `${top} — review`, query: `${top} revision summary`, tag: "Revision summary" },
+  ];
+}
+
 const PdfViewer = () => {
   const { isPremium } = usePremium();
   const { checkAndPrompt } = useUsageLimitCheck();
