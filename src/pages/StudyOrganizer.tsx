@@ -415,6 +415,24 @@ const StudyOrganizer = () => {
                                     </p>
                                   </div>
                                   <div className="flex gap-2 flex-wrap">
+                                    {item.tool === "pdf-summarizer" && (
+                                      <Button
+                                        size="sm"
+                                        className="gap-1.5 text-xs"
+                                        onClick={() => {
+                                          const input = item.input_data as any;
+                                          navigate("/pdf-viewer", {
+                                            state: {
+                                              fileName: input?.fileName,
+                                              page: input?.page ?? 1,
+                                              openVideos: input?.tool === "related-videos",
+                                            },
+                                          });
+                                        }}
+                                      >
+                                        <ExternalLink className="h-3.5 w-3.5" /> Reopen
+                                      </Button>
+                                    )}
                                     <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => handleDownloadPdf(item)}>
                                       <FileDown className="h-3.5 w-3.5" /> PDF
                                     </Button>
