@@ -146,6 +146,8 @@ const PdfViewer = () => {
       } else {
         toast({ title: "PDF loaded", description: `${doc.numPages} pages ready` });
       }
+      // Auto-open Related Videos suggestions after upload
+      setTimeout(() => setVideosOpen(true), 600);
     } catch {
       toast({ title: "Error", description: "Failed to read PDF.", variant: "destructive" });
       setFile(null);
