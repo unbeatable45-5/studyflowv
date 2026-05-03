@@ -70,6 +70,14 @@ function buildVideoQueries(text: string): { label: string; query: string; tag: s
 const PdfViewer = () => {
   const { isPremium } = usePremium();
   const { checkAndPrompt } = useUsageLimitCheck();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const reopenState = (location.state ?? null) as null | {
+    fileName?: string;
+    page?: number;
+    action?: SmartAction;
+    openVideos?: boolean;
+  };
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const pageRefs = useRef<Map<number, HTMLDivElement>>(new Map());
