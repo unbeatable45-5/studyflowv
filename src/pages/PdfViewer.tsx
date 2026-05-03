@@ -201,6 +201,48 @@ const PdfViewer = () => {
     return () => observer.disconnect();
   }, [numPages, pdf]);
 
+  // Auto-dismiss pinned toolbar on scroll (keeps view clean)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || !toolbarPinned) return;
+    let lastY = el.scrollTop;
+    const onScroll = () => {
+      if (Math.abs(el.scrollTop - lastY) > 40) {
+        setToolbarPinned(false);
+      }
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [toolbarPinned]);
+
+  // Reopen handling: when navigated from Library with a fileName + page, prompt to reopen the file then jump
+  useEffect(() => {
+    if (!reopenState?.fileName) return;
+    if (!file) {
+      toast({
+        title: "Reopen study session",
+        description: `Re-upload "${reopenState.fileName}" to jump back to page ${reopenState.page ?? 1}.`,
+      });
+      fileInputRef.current?.click();
+    }
+  }, [reopenState, file]);
+
+  // After PDF loads, if a target page was requested, scroll there and trigger action
+  useEffect(() => {
+    if (!pdf || !reopenState?.page) return;
+    const target = Math.min(Math.max(1, reopenState.page), pdf.numPages);
+    const t = setTimeout(() => {
+      const el = pageRefs.current.get(target);
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setCurrentPage(target);
+      if (reopenState.openVideos) setVideosOpen(true);
+      // Clear navigation state so it doesn't re-fire
+      navigate(location.pathname, { replace: true, state: null });
+    }, 500);
+    return () => clearTimeout(t);
+  }, [pdf, reopenState, navigate, location.pathname]);
+
+
   // Selection popover
   useEffect(() => {
     const onSelectionChange = () => {
