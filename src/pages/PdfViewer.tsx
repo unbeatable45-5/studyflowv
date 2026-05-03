@@ -496,27 +496,42 @@ const PdfViewer = () => {
       </div>
 
       {/* Pages */}
-      <div ref={containerRef} className="flex-1 overflow-auto bg-muted/30 px-2 py-3">
+      <div ref={containerRef} className="flex-1 overflow-auto bg-muted/30 px-2 py-3 pb-20">
         <div className="flex flex-col items-center gap-3">
           {Array.from({ length: numPages }).map((_, i) => {
             const n = i + 1;
+            const showText = showExtractedFor.has(n);
             return (
               <div
                 key={n}
                 ref={(el) => { if (el) pageRefs.current.set(n, el); else pageRefs.current.delete(n); }}
                 data-page-num={n}
-                className="bg-background shadow-sm rounded-md overflow-hidden border border-border/50 max-w-full"
+                className="bg-background shadow-sm rounded-md overflow-hidden border border-border/50 max-w-full w-full sm:w-auto"
               >
-                <canvas className="block max-w-full" />
-                {/* Selectable text strip — highlight to ask AI */}
+                <canvas className="block max-w-full mx-auto" />
                 {pageTexts[i] && (
-                  <div className="px-3 py-2 border-t border-dashed border-border/60 bg-muted/40">
-                    <p className="text-[9px] uppercase tracking-wide text-muted-foreground mb-1">
-                      Page {n} text · highlight to ask AI
-                    </p>
-                    <p className="text-[11px] leading-relaxed select-text text-foreground/80 max-w-[800px] whitespace-pre-wrap">
-                      {pageTexts[i]}
-                    </p>
+                  <div className="border-t border-dashed border-border/60">
+                    <button
+                      className="w-full flex items-center justify-between gap-2 px-3 py-1.5 text-[10px] uppercase tracking-wide text-muted-foreground hover:bg-muted/40 transition-colors"
+                      onClick={() => setShowExtractedFor((prev) => {
+                        const next = new Set(prev);
+                        next.has(n) ? next.delete(n) : next.add(n);
+                        return next;
+                      })}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <FileText className="h-3 w-3" />
+                        {showText ? "Hide" : "View"} extracted text · page {n}
+                      </span>
+                      {showText ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                    </button>
+                    {showText && (
+                      <div className="px-3 pb-3 bg-muted/30">
+                        <p className="text-[11px] leading-relaxed select-text text-foreground/80 max-w-[800px] whitespace-pre-wrap">
+                          {pageTexts[i]}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -525,59 +540,68 @@ const PdfViewer = () => {
         </div>
       </div>
 
-      {/* Floating action buttons */}
-      <div className="absolute right-3 bottom-20 sm:bottom-6 z-30 flex flex-col gap-2 items-end">
-        <Button
-          size="sm"
-          className="rounded-full shadow-lg gap-1.5 h-10 px-4"
-          onClick={handleSummarizePage}
-        >
-          <Sparkles className="h-4 w-4" /> Summarize page
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="rounded-full shadow-lg gap-1.5 h-9 px-3 bg-background"
-          onClick={() => runAction("generate_questions", pageTexts[currentPage - 1] ?? "")}
-        >
-          <ListChecks className="h-3.5 w-3.5" /> Questions
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="rounded-full shadow-lg gap-1.5 h-9 px-3 bg-background"
-          onClick={() => runAction("make_flashcards", pageTexts[currentPage - 1] ?? "")}
-        >
-          <Layers className="h-3.5 w-3.5" /> Flashcards
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="rounded-full shadow-lg gap-1.5 h-9 px-3 bg-background"
-          onClick={() => setVideosOpen(true)}
-        >
-          <Youtube className="h-3.5 w-3.5 text-destructive" /> Videos
-        </Button>
-      </div>
+      {/* Compact contextual bottom toolbar */}
+      {(selectedText || toolbarPinned) && (
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-3 z-30 flex items-center gap-1 bg-popover/95 backdrop-blur border border-border rounded-full shadow-lg px-1.5 py-1 animate-in fade-in slide-in-from-bottom-2">
+          <Button
+            size="sm" variant="ghost" className="h-8 px-2.5 gap-1 text-xs rounded-full"
+            onClick={() => selectedText ? handleSelectionAction("summarize_page") : handleSummarizePage()}
+          >
+            <Sparkles className="h-3.5 w-3.5" /> Summary
+          </Button>
+          <Button
+            size="sm" variant="ghost" className="h-8 px-2.5 gap-1 text-xs rounded-full"
+            onClick={() => selectedText ? handleSelectionAction("generate_questions") : runAction("generate_questions", pageTexts[currentPage - 1] ?? "")}
+          >
+            <ListChecks className="h-3.5 w-3.5" /> Quiz
+          </Button>
+          <Button
+            size="sm" variant="ghost" className="h-8 px-2.5 gap-1 text-xs rounded-full"
+            onClick={() => selectedText ? handleSelectionAction("explain") : runAction("explain", pageTexts[currentPage - 1] ?? "")}
+          >
+            <MessageSquareQuote className="h-3.5 w-3.5" /> Explain
+          </Button>
+          <Button
+            size="sm" variant="ghost" className="h-8 px-2.5 gap-1 text-xs rounded-full"
+            onClick={() => selectedText ? handleSelectionAction("make_flashcards") : runAction("make_flashcards", pageTexts[currentPage - 1] ?? "")}
+          >
+            <Layers className="h-3.5 w-3.5" /> Flashcards
+          </Button>
+          <div className="w-px h-5 bg-border mx-0.5" />
+          <Button
+            size="sm" variant="ghost" className="h-8 px-2.5 gap-1 text-xs rounded-full"
+            onClick={() => setVideosOpen(true)}
+          >
+            <Youtube className="h-3.5 w-3.5 text-destructive" /> Videos
+          </Button>
+          {!selectedText && (
+            <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setToolbarPinned(false)}>
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          )}
+        </div>
+      )}
 
-      {/* Selection popover */}
+      {/* Single floating action button to open toolbar when no selection */}
+      {!selectedText && !toolbarPinned && !aiOpen && !videosOpen && (
+        <Button
+          size="sm"
+          className="absolute right-4 bottom-4 z-30 rounded-full shadow-lg gap-1.5 h-11 px-4"
+          onClick={() => setToolbarPinned(true)}
+        >
+          <Sparkles className="h-4 w-4" /> AI tools
+        </Button>
+      )}
+
+      {/* Selection mini-popover above selection (kept for quick Ask) */}
       {selectedText && popoverPos && (
         <div
-          className="fixed z-50 bg-popover border border-border rounded-lg shadow-lg p-1 flex items-center gap-1 -translate-x-1/2 -translate-y-[110%]"
+          className="fixed z-50 bg-popover border border-border rounded-full shadow-lg px-1 py-0.5 flex items-center -translate-x-1/2 -translate-y-[120%]"
           style={{ left: popoverPos.x, top: popoverPos.y }}
           onMouseDown={(e) => e.preventDefault()}
         >
-          <Button size="sm" variant="ghost" className="h-8 px-2 gap-1 text-xs" onClick={() => handleSelectionAction("ask")}>
-            <MessageSquareQuote className="h-3.5 w-3.5" /> Ask
-          </Button>
-          <Button size="sm" variant="ghost" className="h-8 px-2 gap-1 text-xs" onClick={() => handleSelectionAction("explain")}>
-            <BookOpen className="h-3.5 w-3.5" /> Explain
-          </Button>
-          <Button size="sm" variant="ghost" className="h-8 px-2 gap-1 text-xs" onClick={() => handleSelectionAction("summarize_page")}>
-            <Sparkles className="h-3.5 w-3.5" /> Summary
-          </Button>
-          <Button size="sm" variant="ghost" className="h-8 px-2 gap-1 text-xs" onClick={() => handleSelectionAction("make_flashcards")}>
-            <Layers className="h-3.5 w-3.5" /> Cards
+          <Button size="sm" variant="ghost" className="h-7 px-2 gap-1 text-[11px] rounded-full" onClick={() => handleSelectionAction("ask")}>
+            <MessageSquareQuote className="h-3 w-3" /> Ask AI
           </Button>
         </div>
       )}
