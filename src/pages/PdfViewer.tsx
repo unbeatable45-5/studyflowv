@@ -95,6 +95,8 @@ const PdfViewer = () => {
   const [ytVideos, setYtVideos] = useState<YTVideo[]>([]);
   const [ytLoading, setYtLoading] = useState(false);
   const [ytError, setYtError] = useState<string | null>(null);
+  const [showExtractedFor, setShowExtractedFor] = useState<Set<number>>(new Set());
+  const [toolbarPinned, setToolbarPinned] = useState(false);
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
