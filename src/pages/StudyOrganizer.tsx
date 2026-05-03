@@ -126,6 +126,7 @@ interface SavedItem {
 
 const StudyOrganizer = () => {
   const { isPremium } = usePremium();
+  const navigate = useNavigate();
   const [items, setItems] = useState<SavedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
