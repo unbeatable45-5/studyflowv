@@ -270,7 +270,7 @@ const PdfViewer = () => {
         onDone: () => {
           setAiLoading(false);
           setCachedAi(cacheKey, full);
-          saveOutput("pdf-summarizer", { tool: "smart-viewer", action, fileName: file?.name }, full);
+          saveOutput("pdf-summarizer", { tool: "smart-viewer", action, fileName: file?.name, page: currentPage }, full);
         },
         onError: (err) => {
           setAiLoading(false);
