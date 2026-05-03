@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import {
   Upload, Loader2, ZoomIn, ZoomOut, ChevronLeft, ChevronRight,
   FileUp, Sparkles, MessageSquareQuote, BookOpen, ListChecks, X, Send, Layers, Youtube, ExternalLink,
+  ChevronDown, ChevronUp, FileText,
 } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
