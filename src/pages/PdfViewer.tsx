@@ -793,9 +793,23 @@ const PdfViewer = () => {
             {aiLoading && !aiOutput ? (
               <AIThinking message="Thinking…" />
             ) : aiOutput ? (
-              <MarkdownWithMath className="prose prose-sm max-w-none dark:prose-invert prose-p:text-sm prose-headings:text-base">
-                {aiOutput}
-              </MarkdownWithMath>
+              <>
+                <MarkdownWithMath className="prose prose-sm max-w-none dark:prose-invert prose-p:text-sm prose-headings:text-base">
+                  {aiOutput}
+                </MarkdownWithMath>
+                {!aiLoading && (
+                  <div className="mt-4 pt-3 border-t border-border">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-1.5 text-xs"
+                      onClick={() => { setAiOpen(false); setVideosOpen(true); }}
+                    >
+                      <Youtube className="h-3.5 w-3.5 text-destructive" /> See related videos
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : aiAction === "ask" ? (
               <p className="text-xs text-muted-foreground">Type a question above to ask the AI about the selected text or current page.</p>
             ) : null}
