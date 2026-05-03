@@ -48,6 +48,7 @@ import {
   HeartPulse,
   Wrench,
   HelpCircle,
+  ExternalLink,
 } from "lucide-react";
 import {
   Select,
