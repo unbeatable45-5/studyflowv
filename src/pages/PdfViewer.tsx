@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -69,6 +70,14 @@ function buildVideoQueries(text: string): { label: string; query: string; tag: s
 const PdfViewer = () => {
   const { isPremium } = usePremium();
   const { checkAndPrompt } = useUsageLimitCheck();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const reopenState = (location.state ?? null) as null | {
+    fileName?: string;
+    page?: number;
+    action?: SmartAction;
+    openVideos?: boolean;
+  };
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const pageRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -137,6 +146,8 @@ const PdfViewer = () => {
       } else {
         toast({ title: "PDF loaded", description: `${doc.numPages} pages ready` });
       }
+      // Auto-open Related Videos suggestions after upload
+      setTimeout(() => setVideosOpen(true), 600);
     } catch {
       toast({ title: "Error", description: "Failed to read PDF.", variant: "destructive" });
       setFile(null);
@@ -189,6 +200,48 @@ const PdfViewer = () => {
     pageRefs.current.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [numPages, pdf]);
+
+  // Auto-dismiss pinned toolbar on scroll (keeps view clean)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || !toolbarPinned) return;
+    let lastY = el.scrollTop;
+    const onScroll = () => {
+      if (Math.abs(el.scrollTop - lastY) > 40) {
+        setToolbarPinned(false);
+      }
+    };
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [toolbarPinned]);
+
+  // Reopen handling: when navigated from Library with a fileName + page, prompt to reopen the file then jump
+  useEffect(() => {
+    if (!reopenState?.fileName) return;
+    if (!file) {
+      toast({
+        title: "Reopen study session",
+        description: `Re-upload "${reopenState.fileName}" to jump back to page ${reopenState.page ?? 1}.`,
+      });
+      fileInputRef.current?.click();
+    }
+  }, [reopenState, file]);
+
+  // After PDF loads, if a target page was requested, scroll there and trigger action
+  useEffect(() => {
+    if (!pdf || !reopenState?.page) return;
+    const target = Math.min(Math.max(1, reopenState.page), pdf.numPages);
+    const t = setTimeout(() => {
+      const el = pageRefs.current.get(target);
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setCurrentPage(target);
+      if (reopenState.openVideos) setVideosOpen(true);
+      // Clear navigation state so it doesn't re-fire
+      navigate(location.pathname, { replace: true, state: null });
+    }, 500);
+    return () => clearTimeout(t);
+  }, [pdf, reopenState, navigate, location.pathname]);
+
 
   // Selection popover
   useEffect(() => {
@@ -259,7 +312,7 @@ const PdfViewer = () => {
         onDone: () => {
           setAiLoading(false);
           setCachedAi(cacheKey, full);
-          saveOutput("pdf-summarizer", { tool: "smart-viewer", action, fileName: file?.name }, full);
+          saveOutput("pdf-summarizer", { tool: "smart-viewer", action, fileName: file?.name, page: currentPage }, full);
         },
         onError: (err) => {
           setAiLoading(false);
@@ -740,9 +793,23 @@ const PdfViewer = () => {
             {aiLoading && !aiOutput ? (
               <AIThinking message="Thinking…" />
             ) : aiOutput ? (
-              <MarkdownWithMath className="prose prose-sm max-w-none dark:prose-invert prose-p:text-sm prose-headings:text-base">
-                {aiOutput}
-              </MarkdownWithMath>
+              <>
+                <MarkdownWithMath className="prose prose-sm max-w-none dark:prose-invert prose-p:text-sm prose-headings:text-base">
+                  {aiOutput}
+                </MarkdownWithMath>
+                {!aiLoading && (
+                  <div className="mt-4 pt-3 border-t border-border">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-1.5 text-xs"
+                      onClick={() => { setAiOpen(false); setVideosOpen(true); }}
+                    >
+                      <Youtube className="h-3.5 w-3.5 text-destructive" /> See related videos
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : aiAction === "ask" ? (
               <p className="text-xs text-muted-foreground">Type a question above to ask the AI about the selected text or current page.</p>
             ) : null}

@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,7 @@ import {
   HeartPulse,
   Wrench,
   HelpCircle,
+  ExternalLink,
 } from "lucide-react";
 import {
   Select,
@@ -124,6 +126,7 @@ interface SavedItem {
 
 const StudyOrganizer = () => {
   const { isPremium } = usePremium();
+  const navigate = useNavigate();
   const [items, setItems] = useState<SavedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -412,6 +415,24 @@ const StudyOrganizer = () => {
                                     </p>
                                   </div>
                                   <div className="flex gap-2 flex-wrap">
+                                    {item.tool === "pdf-summarizer" && (
+                                      <Button
+                                        size="sm"
+                                        className="gap-1.5 text-xs"
+                                        onClick={() => {
+                                          const input = item.input_data as any;
+                                          navigate("/pdf-viewer", {
+                                            state: {
+                                              fileName: input?.fileName,
+                                              page: input?.page ?? 1,
+                                              openVideos: input?.tool === "related-videos",
+                                            },
+                                          });
+                                        }}
+                                      >
+                                        <ExternalLink className="h-3.5 w-3.5" /> Reopen
+                                      </Button>
+                                    )}
                                     <Button size="sm" variant="outline" className="gap-1.5 text-xs" onClick={() => handleDownloadPdf(item)}>
                                       <FileDown className="h-3.5 w-3.5" /> PDF
                                     </Button>
