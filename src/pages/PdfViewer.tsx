@@ -414,7 +414,7 @@ const PdfViewer = () => {
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-20">
         <div className="flex items-center gap-1 min-w-0">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setFile(null); setPdf(null); }}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setFile(null); setPdf(null); clearLastPdf(); }}>
             <X className="h-4 w-4" />
           </Button>
           <span className="text-xs font-medium truncate max-w-[120px] sm:max-w-[240px]">{file.name}</span>
