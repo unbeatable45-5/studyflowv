@@ -425,7 +425,6 @@ const StudyOrganizer = () => {
                                             state: {
                                               fileName: input?.fileName,
                                               page: input?.page ?? 1,
-                                              openVideos: input?.tool === "related-videos",
                                             },
                                           });
                                         }}
