@@ -108,6 +108,49 @@ const PdfViewer = () => {
   const [showExtractedFor, setShowExtractedFor] = useState<Set<number>>(new Set());
   const [toolbarPinned, setToolbarPinned] = useState(false);
 
+  const loadPdfFile = useCallback(async (selected: File, opts?: { silent?: boolean; persist?: boolean }) => {
+    setFile(selected);
+    setExtracting(true);
+    setPageTexts([]);
+    setCurrentPage(1);
+    try {
+      const buf = await selected.arrayBuffer();
+      const doc = await pdfjsLib.getDocument({ data: buf }).promise;
+      setPdf(doc);
+      setNumPages(doc.numPages);
+
+      const texts: string[] = [];
+      for (let i = 1; i <= doc.numPages; i++) {
+        const page = await doc.getPage(i);
+        const c = await page.getTextContent();
+        texts.push(c.items.map((it: any) => it.str).join(" "));
+      }
+      setPageTexts(texts);
+      const totalChars = texts.reduce((sum, t) => sum + t.length, 0);
+      const isImageBased = totalChars < doc.numPages * 40;
+      if (!opts?.silent) {
+        if (isImageBased) {
+          toast({
+            title: "Image-based PDF detected",
+            description: "Text extraction is limited. Use Smart Slide Mode (Pro) on the Slides → Exam page for OCR.",
+          });
+        } else {
+          toast({ title: "PDF loaded", description: `${doc.numPages} pages ready` });
+        }
+      }
+      if (opts?.persist !== false) {
+        saveLastPdf(selected);
+      }
+      setTimeout(() => setVideosOpen(true), 600);
+    } catch {
+      toast({ title: "Error", description: "Failed to read PDF.", variant: "destructive" });
+      setFile(null);
+      setPdf(null);
+    } finally {
+      setExtracting(false);
+    }
+  }, []);
+
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
@@ -119,44 +162,22 @@ const PdfViewer = () => {
       toast({ title: "File too large", description: "Max 20MB.", variant: "destructive" });
       return;
     }
-    setFile(selected);
-    setExtracting(true);
-    setPageTexts([]);
-    setCurrentPage(1);
-    try {
-      const buf = await selected.arrayBuffer();
-      const doc = await pdfjsLib.getDocument({ data: buf }).promise;
-      setPdf(doc);
-      setNumPages(doc.numPages);
-
-      // Extract text per page in background for AI actions
-      const texts: string[] = [];
-      for (let i = 1; i <= doc.numPages; i++) {
-        const page = await doc.getPage(i);
-        const c = await page.getTextContent();
-        texts.push(c.items.map((it: any) => it.str).join(" "));
-      }
-      setPageTexts(texts);
-      const totalChars = texts.reduce((sum, t) => sum + t.length, 0);
-      const isImageBased = totalChars < doc.numPages * 40;
-      if (isImageBased) {
-        toast({
-          title: "Image-based PDF detected",
-          description: "Text extraction is limited. Use Smart Slide Mode (Pro) on the Slides → Exam page for OCR.",
-        });
-      } else {
-        toast({ title: "PDF loaded", description: `${doc.numPages} pages ready` });
-      }
-      // Auto-open Related Videos suggestions after upload
-      setTimeout(() => setVideosOpen(true), 600);
-    } catch {
-      toast({ title: "Error", description: "Failed to read PDF.", variant: "destructive" });
-      setFile(null);
-      setPdf(null);
-    } finally {
-      setExtracting(false);
-    }
+    await loadPdfFile(selected);
   };
+
+  // Restore last PDF from IndexedDB on mount (so users don't re-upload after refresh)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (file) return;
+      const restored = await loadLastPdf();
+      if (cancelled || !restored) return;
+      await loadPdfFile(restored, { silent: true, persist: false });
+      toast({ title: "Resumed last PDF", description: restored.name });
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Render pages whenever pdf or scale changes
   useEffect(() => {
