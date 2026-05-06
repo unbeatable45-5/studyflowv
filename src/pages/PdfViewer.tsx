@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
 import {
   Upload, Loader2, ZoomIn, ZoomOut, ChevronLeft, ChevronRight,
-  FileUp, Sparkles, MessageSquareQuote, BookOpen, ListChecks, X, Send, Layers, Youtube, ExternalLink,
+  Sparkles, MessageSquareQuote, BookOpen, ListChecks, X, Send, Layers,
   ChevronDown, ChevronUp, FileText,
 } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
@@ -18,15 +18,12 @@ import { streamAI } from "@/lib/streaming";
 import { usePremium } from "@/contexts/PremiumContext";
 import { useUsageLimitCheck } from "@/components/UsageLimitToast";
 import { saveOutput } from "@/lib/saved-outputs";
-import { supabase } from "@/integrations/supabase/client";
 import { makeAiCacheKey, getCachedAi, setCachedAi } from "@/lib/ai-action-cache";
 import { saveLastPdf, loadLastPdf, clearLastPdf } from "@/lib/pdf-persist";
-import { Crown } from "lucide-react";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
 type SmartAction = "summarize_page" | "generate_questions" | "explain" | "ask" | "make_flashcards";
-type VideoAction = "summarize_video" | "key_notes" | "video_questions";
 
 const ACTION_LABELS: Record<SmartAction, string> = {
   summarize_page: "Summarize Page",
@@ -35,38 +32,6 @@ const ACTION_LABELS: Record<SmartAction, string> = {
   ask: "Ask AI",
   make_flashcards: "Turn Into Flashcards",
 };
-
-const VIDEO_ACTION_LABELS: Record<VideoAction, string> = {
-  summarize_video: "Summarize Video",
-  key_notes: "Extract Key Notes",
-  video_questions: "Generate Questions",
-};
-
-interface YTVideo {
-  videoId: string;
-  title: string;
-  description: string;
-  channel: string;
-  thumbnail: string;
-  url: string;
-}
-
-function buildVideoQueries(text: string): { label: string; query: string; tag: string }[] {
-  const cleaned = text.replace(/\s+/g, " ").trim();
-  if (!cleaned) return [];
-  // Take first ~80 chars as topic seed
-  const seed = cleaned.slice(0, 100);
-  // Pick top capitalised/keyword-y words for label
-  const words = cleaned.split(/[^A-Za-z]+/).filter((w) => w.length > 4);
-  const top = Array.from(new Set(words)).slice(0, 4).join(" ") || seed.slice(0, 40);
-  return [
-    { label: `${top} — explained`, query: `${top} explained tutorial`, tag: "Explains this concept" },
-    { label: `${top} — exam walkthrough`, query: `${top} exam questions walkthrough`, tag: "Exam-focused walkthrough" },
-    { label: `${top} — crash course`, query: `${top} crash course`, tag: "Quick overview" },
-    { label: `${top} — examples`, query: `${top} worked examples`, tag: "Worked examples" },
-    { label: `${top} — review`, query: `${top} revision summary`, tag: "Revision summary" },
-  ];
-}
 
 const PdfViewer = () => {
   const { isPremium } = usePremium();
@@ -95,16 +60,12 @@ const PdfViewer = () => {
   const [popoverPos, setPopoverPos] = useState<{ x: number; y: number } | null>(null);
 
   const [aiOpen, setAiOpen] = useState(false);
-  const [aiAction, setAiAction] = useState<SmartAction | VideoAction | null>(null);
+  const [aiAction, setAiAction] = useState<SmartAction | null>(null);
   const [aiOutput, setAiOutput] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiFromCache, setAiFromCache] = useState(false);
   const [askInput, setAskInput] = useState("");
   const [askContext, setAskContext] = useState("");
-  const [videosOpen, setVideosOpen] = useState(false);
-  const [ytVideos, setYtVideos] = useState<YTVideo[]>([]);
-  const [ytLoading, setYtLoading] = useState(false);
-  const [ytError, setYtError] = useState<string | null>(null);
   const [showExtractedFor, setShowExtractedFor] = useState<Set<number>>(new Set());
   const [toolbarPinned, setToolbarPinned] = useState(false);
 
@@ -141,7 +102,7 @@ const PdfViewer = () => {
       if (opts?.persist !== false) {
         saveLastPdf(selected);
       }
-      setTimeout(() => setVideosOpen(true), 600);
+      
     } catch {
       toast({ title: "Error", description: "Failed to read PDF.", variant: "destructive" });
       setFile(null);
@@ -273,7 +234,7 @@ const PdfViewer = () => {
       const el = pageRefs.current.get(target);
       el?.scrollIntoView({ behavior: "smooth", block: "start" });
       setCurrentPage(target);
-      if (reopenState.openVideos) setVideosOpen(true);
+      // (video panel removed)
       // Clear navigation state so it doesn't re-fire
       navigate(location.pathname, { replace: true, state: null });
     }, 500);
@@ -391,117 +352,8 @@ const PdfViewer = () => {
     runAction("ask", ctx, askInput.trim());
   };
 
-  // ----- Video features -----
-  const buildPrimaryQuery = (text: string) => {
-    const words = text.replace(/\s+/g, " ").split(/[^A-Za-z]+/).filter((w) => w.length > 4);
-    return Array.from(new Set(words)).slice(0, 5).join(" ").trim() || text.slice(0, 80);
-  };
+  // (Video recommendation features removed — focusing on exam prep core.)
 
-  const loadVideos = useCallback(async () => {
-    const text = pageTexts[currentPage - 1] ?? "";
-    if (!text.trim()) {
-      setYtVideos([]);
-      setYtError("No text detected on this page.");
-      return;
-    }
-    const query = buildPrimaryQuery(text);
-    const cacheKey = `yt::${file?.name ?? "doc"}::${currentPage}::${query}`;
-    const cached = getCachedAi(cacheKey);
-    if (cached) {
-      try { setYtVideos(JSON.parse(cached)); setYtError(null); return; } catch { /* refetch */ }
-    }
-    setYtLoading(true);
-    setYtError(null);
-    try {
-      const { data, error } = await supabase.functions.invoke("youtube-search", {
-        body: { query, maxResults: 6 },
-      });
-      if (error) throw error;
-      const videos: YTVideo[] = data?.videos ?? [];
-      setYtVideos(videos);
-      setCachedAi(cacheKey, JSON.stringify(videos));
-    } catch (e) {
-      setYtError(e instanceof Error ? e.message : "Failed to load videos");
-    } finally {
-      setYtLoading(false);
-    }
-  }, [pageTexts, currentPage, file?.name]);
-
-  useEffect(() => {
-    if (videosOpen) loadVideos();
-  }, [videosOpen, loadVideos]);
-
-  const runVideoAction = useCallback(
-    (action: VideoAction, video: YTVideo) => {
-      if (!isPremium) {
-        toast({ title: "Pro feature", description: "Upgrade to summarize videos and extract notes.", variant: "destructive" });
-        return;
-      }
-      const cacheKey = makeAiCacheKey({
-        scope: `yt::${video.videoId}`,
-        action,
-        content: `${video.title}\n${video.description}`,
-      });
-      const cached = getCachedAi(cacheKey);
-      if (cached) {
-        setAiAction(action);
-        setAiOpen(true);
-        setAiOutput(cached);
-        setAiLoading(false);
-        setAiFromCache(true);
-        return;
-      }
-
-      setAiAction(action);
-      setAiOpen(true);
-      setAiOutput("");
-      setAiLoading(true);
-      setAiFromCache(false);
-
-      let full = "";
-      streamAI({
-        functionName: "video-smart-action",
-        body: { action, video },
-        onDelta: (t) => { full += t; setAiOutput(full); },
-        onDone: () => {
-          setAiLoading(false);
-          setCachedAi(cacheKey, full);
-          saveOutput("pdf-summarizer", { tool: "video", action, videoId: video.videoId, title: video.title, url: video.url }, full);
-        },
-        onError: (err) => {
-          setAiLoading(false);
-          toast({ title: "Error", description: err, variant: "destructive" });
-        },
-      });
-    },
-    [isPremium]
-  );
-
-  const saveVideosToLibrary = async () => {
-    if (!ytVideos.length) {
-      toast({ title: "Nothing to save", description: "Load some videos first.", variant: "destructive" });
-      return;
-    }
-    const text = pageTexts[currentPage - 1] ?? "";
-    const topic = buildPrimaryQuery(text).slice(0, 80);
-    const md = [
-      `# Related videos for ${file?.name ?? "document"} — page ${currentPage}`,
-      ``,
-      `**Topic:** ${topic || "—"}`,
-      ``,
-      ...ytVideos.map((v) => `- [${v.title}](${v.url}) — ${v.channel}`),
-    ].join("\n");
-    try {
-      await saveOutput(
-        "pdf-summarizer",
-        { tool: "related-videos", topic, page: currentPage, fileName: file?.name, videos: ytVideos },
-        md,
-      );
-      toast({ title: "Saved to Library", description: `${ytVideos.length} videos saved as a study entry.` });
-    } catch {
-      toast({ title: "Error", description: "Could not save to Library.", variant: "destructive" });
-    }
-  };
 
   // No PDF: upload screen
   if (!file || !pdf) {
@@ -562,7 +414,7 @@ const PdfViewer = () => {
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-20">
         <div className="flex items-center gap-1 min-w-0">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setFile(null); setPdf(null); }}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setFile(null); setPdf(null); clearLastPdf(); }}>
             <X className="h-4 w-4" />
           </Button>
           <span className="text-xs font-medium truncate max-w-[120px] sm:max-w-[240px]">{file.name}</span>
@@ -658,13 +510,6 @@ const PdfViewer = () => {
           >
             <Layers className="h-3.5 w-3.5" /> Flashcards
           </Button>
-          <div className="w-px h-5 bg-border mx-0.5" />
-          <Button
-            size="sm" variant="ghost" className="h-8 px-2.5 gap-1 text-xs rounded-full"
-            onClick={() => setVideosOpen(true)}
-          >
-            <Youtube className="h-3.5 w-3.5 text-destructive" /> Videos
-          </Button>
           {!selectedText && (
             <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setToolbarPinned(false)}>
               <X className="h-3.5 w-3.5" />
@@ -674,7 +519,7 @@ const PdfViewer = () => {
       )}
 
       {/* Single floating action button to open toolbar when no selection */}
-      {!selectedText && !toolbarPinned && !aiOpen && !videosOpen && (
+      {!selectedText && !toolbarPinned && !aiOpen && (
         <Button
           size="sm"
           className="absolute right-4 bottom-4 z-30 rounded-full shadow-lg gap-1.5 h-11 px-4"
@@ -697,97 +542,7 @@ const PdfViewer = () => {
         </div>
       )}
 
-      {/* Related Videos drawer */}
-      <Sheet open={videosOpen} onOpenChange={setVideosOpen}>
-        <SheetContent side="bottom" className="h-[80dvh] flex flex-col p-0">
-          <SheetHeader className="px-4 py-3 border-b border-border">
-            <SheetTitle className="text-base flex items-center justify-between gap-2">
-              <span className="flex items-center gap-2">
-                <Youtube className="h-4 w-4 text-destructive" /> Related Videos
-              </span>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 px-2 text-[11px] gap-1"
-                onClick={saveVideosToLibrary}
-                disabled={!ytVideos.length}
-              >
-                <BookOpen className="h-3 w-3" /> Save to Library
-              </Button>
-            </SheetTitle>
-          </SheetHeader>
-          <ScrollArea className="flex-1 px-4 py-3">
-            <p className="text-[11px] text-muted-foreground mb-3">
-              YouTube videos for page {currentPage}{file ? ` of ${file.name}` : ""}.
-            </p>
-            {ytLoading && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading videos…
-              </div>
-            )}
-            {ytError && !ytLoading && (
-              <p className="text-xs text-destructive">{ytError}</p>
-            )}
-            <div className="space-y-3">
-              {ytVideos.map((v) => (
-                <div key={v.videoId} className="rounded-lg border border-border bg-card overflow-hidden">
-                  <a href={v.url} target="_blank" rel="noopener noreferrer" className="flex gap-3 p-3 hover:bg-muted/50 transition-colors">
-                    {v.thumbnail ? (
-                      <img src={v.thumbnail} alt="" className="h-16 w-24 object-cover rounded shrink-0" loading="lazy" />
-                    ) : (
-                      <div className="h-16 w-24 rounded bg-destructive/10 flex items-center justify-center shrink-0">
-                        <Youtube className="h-5 w-5 text-destructive" />
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground line-clamp-2">{v.title}</p>
-                      <p className="text-[11px] text-muted-foreground truncate mt-0.5">{v.channel}</p>
-                    </div>
-                    <ExternalLink className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-1" />
-                  </a>
-                  <div className="flex items-center gap-1 px-3 pb-2 flex-wrap">
-                    <Button
-                      size="sm" variant="ghost"
-                      className="h-7 px-2 text-[11px] gap-1"
-                      onClick={() => runVideoAction("summarize_video", v)}
-                    >
-                      {!isPremium && <Crown className="h-3 w-3 text-warning" />}
-                      <Sparkles className="h-3 w-3" /> Summarize
-                    </Button>
-                    <Button
-                      size="sm" variant="ghost"
-                      className="h-7 px-2 text-[11px] gap-1"
-                      onClick={() => runVideoAction("key_notes", v)}
-                    >
-                      {!isPremium && <Crown className="h-3 w-3 text-warning" />}
-                      <BookOpen className="h-3 w-3" /> Key notes
-                    </Button>
-                    <Button
-                      size="sm" variant="ghost"
-                      className="h-7 px-2 text-[11px] gap-1"
-                      onClick={() => runVideoAction("video_questions", v)}
-                    >
-                      {!isPremium && <Crown className="h-3 w-3 text-warning" />}
-                      <ListChecks className="h-3 w-3" /> Questions
-                    </Button>
-                  </div>
-                </div>
-              ))}
-              {!ytLoading && !ytError && ytVideos.length === 0 && (
-                <p className="text-xs text-muted-foreground">No videos found.</p>
-              )}
-            </div>
-            {!isPremium && (
-              <div className="mt-4 rounded-lg border border-dashed border-warning/40 p-3 bg-warning/5">
-                <p className="text-xs font-semibold mb-1 flex items-center gap-1">
-                  <Crown className="h-3 w-3 text-warning" /> Pro: Summarize, key notes & questions from videos
-                </p>
-                <p className="text-[11px] text-muted-foreground">Upgrade to unlock AI actions on YouTube results.</p>
-              </div>
-            )}
-          </ScrollArea>
-        </SheetContent>
-      </Sheet>
+      {/* (Related Videos drawer removed) */}
 
       {/* AI result drawer */}
       <Sheet open={aiOpen} onOpenChange={setAiOpen}>
@@ -795,9 +550,7 @@ const PdfViewer = () => {
           <SheetHeader className="px-4 py-3 border-b border-border">
             <SheetTitle className="text-base flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-primary" />
-              {aiAction
-                ? (ACTION_LABELS as Record<string, string>)[aiAction] ?? (VIDEO_ACTION_LABELS as Record<string, string>)[aiAction] ?? "AI"
-                : "AI"}
+              {aiAction ? ACTION_LABELS[aiAction] ?? "AI" : "AI"}
               {aiFromCache && (
                 <span className="ml-auto text-[10px] font-normal text-muted-foreground bg-muted px-1.5 py-0.5 rounded">cached</span>
               )}
@@ -835,18 +588,6 @@ const PdfViewer = () => {
                 <MarkdownWithMath className="prose prose-sm max-w-none dark:prose-invert prose-p:text-sm prose-headings:text-base">
                   {aiOutput}
                 </MarkdownWithMath>
-                {!aiLoading && (
-                  <div className="mt-4 pt-3 border-t border-border">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="gap-1.5 text-xs"
-                      onClick={() => { setAiOpen(false); setVideosOpen(true); }}
-                    >
-                      <Youtube className="h-3.5 w-3.5 text-destructive" /> See related videos
-                    </Button>
-                  </div>
-                )}
               </>
             ) : aiAction === "ask" ? (
               <p className="text-xs text-muted-foreground">Type a question above to ask the AI about the selected text or current page.</p>
