@@ -104,7 +104,7 @@ const PdfViewer = () => {
       if (opts?.persist !== false) {
         saveLastPdf(selected);
       }
-      setTimeout(() => setVideosOpen(true), 600);
+      
     } catch {
       toast({ title: "Error", description: "Failed to read PDF.", variant: "destructive" });
       setFile(null);
