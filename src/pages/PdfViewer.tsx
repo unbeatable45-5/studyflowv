@@ -62,16 +62,12 @@ const PdfViewer = () => {
   const [popoverPos, setPopoverPos] = useState<{ x: number; y: number } | null>(null);
 
   const [aiOpen, setAiOpen] = useState(false);
-  const [aiAction, setAiAction] = useState<SmartAction | VideoAction | null>(null);
+  const [aiAction, setAiAction] = useState<SmartAction | null>(null);
   const [aiOutput, setAiOutput] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiFromCache, setAiFromCache] = useState(false);
   const [askInput, setAskInput] = useState("");
   const [askContext, setAskContext] = useState("");
-  const [videosOpen, setVideosOpen] = useState(false);
-  const [ytVideos, setYtVideos] = useState<YTVideo[]>([]);
-  const [ytLoading, setYtLoading] = useState(false);
-  const [ytError, setYtError] = useState<string | null>(null);
   const [showExtractedFor, setShowExtractedFor] = useState<Set<number>>(new Set());
   const [toolbarPinned, setToolbarPinned] = useState(false);
 
