@@ -20,6 +20,7 @@ import { useUsageLimitCheck } from "@/components/UsageLimitToast";
 import { saveOutput } from "@/lib/saved-outputs";
 import { supabase } from "@/integrations/supabase/client";
 import { makeAiCacheKey, getCachedAi, setCachedAi } from "@/lib/ai-action-cache";
+import { saveLastPdf, loadLastPdf, clearLastPdf } from "@/lib/pdf-persist";
 import { Crown } from "lucide-react";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
@@ -107,6 +108,49 @@ const PdfViewer = () => {
   const [showExtractedFor, setShowExtractedFor] = useState<Set<number>>(new Set());
   const [toolbarPinned, setToolbarPinned] = useState(false);
 
+  const loadPdfFile = useCallback(async (selected: File, opts?: { silent?: boolean; persist?: boolean }) => {
+    setFile(selected);
+    setExtracting(true);
+    setPageTexts([]);
+    setCurrentPage(1);
+    try {
+      const buf = await selected.arrayBuffer();
+      const doc = await pdfjsLib.getDocument({ data: buf }).promise;
+      setPdf(doc);
+      setNumPages(doc.numPages);
+
+      const texts: string[] = [];
+      for (let i = 1; i <= doc.numPages; i++) {
+        const page = await doc.getPage(i);
+        const c = await page.getTextContent();
+        texts.push(c.items.map((it: any) => it.str).join(" "));
+      }
+      setPageTexts(texts);
+      const totalChars = texts.reduce((sum, t) => sum + t.length, 0);
+      const isImageBased = totalChars < doc.numPages * 40;
+      if (!opts?.silent) {
+        if (isImageBased) {
+          toast({
+            title: "Image-based PDF detected",
+            description: "Text extraction is limited. Use Smart Slide Mode (Pro) on the Slides → Exam page for OCR.",
+          });
+        } else {
+          toast({ title: "PDF loaded", description: `${doc.numPages} pages ready` });
+        }
+      }
+      if (opts?.persist !== false) {
+        saveLastPdf(selected);
+      }
+      setTimeout(() => setVideosOpen(true), 600);
+    } catch {
+      toast({ title: "Error", description: "Failed to read PDF.", variant: "destructive" });
+      setFile(null);
+      setPdf(null);
+    } finally {
+      setExtracting(false);
+    }
+  }, []);
+
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
@@ -118,44 +162,22 @@ const PdfViewer = () => {
       toast({ title: "File too large", description: "Max 20MB.", variant: "destructive" });
       return;
     }
-    setFile(selected);
-    setExtracting(true);
-    setPageTexts([]);
-    setCurrentPage(1);
-    try {
-      const buf = await selected.arrayBuffer();
-      const doc = await pdfjsLib.getDocument({ data: buf }).promise;
-      setPdf(doc);
-      setNumPages(doc.numPages);
-
-      // Extract text per page in background for AI actions
-      const texts: string[] = [];
-      for (let i = 1; i <= doc.numPages; i++) {
-        const page = await doc.getPage(i);
-        const c = await page.getTextContent();
-        texts.push(c.items.map((it: any) => it.str).join(" "));
-      }
-      setPageTexts(texts);
-      const totalChars = texts.reduce((sum, t) => sum + t.length, 0);
-      const isImageBased = totalChars < doc.numPages * 40;
-      if (isImageBased) {
-        toast({
-          title: "Image-based PDF detected",
-          description: "Text extraction is limited. Use Smart Slide Mode (Pro) on the Slides → Exam page for OCR.",
-        });
-      } else {
-        toast({ title: "PDF loaded", description: `${doc.numPages} pages ready` });
-      }
-      // Auto-open Related Videos suggestions after upload
-      setTimeout(() => setVideosOpen(true), 600);
-    } catch {
-      toast({ title: "Error", description: "Failed to read PDF.", variant: "destructive" });
-      setFile(null);
-      setPdf(null);
-    } finally {
-      setExtracting(false);
-    }
+    await loadPdfFile(selected);
   };
+
+  // Restore last PDF from IndexedDB on mount (so users don't re-upload after refresh)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (file) return;
+      const restored = await loadLastPdf();
+      if (cancelled || !restored) return;
+      await loadPdfFile(restored, { silent: true, persist: false });
+      toast({ title: "Resumed last PDF", description: restored.name });
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Render pages whenever pdf or scale changes
   useEffect(() => {
@@ -215,17 +237,33 @@ const PdfViewer = () => {
     return () => el.removeEventListener("scroll", onScroll);
   }, [toolbarPinned]);
 
-  // Reopen handling: when navigated from Library with a fileName + page, prompt to reopen the file then jump
+  // Reopen handling: try cached PDF first; only prompt re-upload if name doesn't match.
   useEffect(() => {
     if (!reopenState?.fileName) return;
-    if (!file) {
-      toast({
-        title: "Reopen study session",
-        description: `Re-upload "${reopenState.fileName}" to jump back to page ${reopenState.page ?? 1}.`,
-      });
-      fileInputRef.current?.click();
-    }
-  }, [reopenState, file]);
+    let cancelled = false;
+    (async () => {
+      // If we already have the right file loaded, the page-jump effect will handle it.
+      if (file && file.name === reopenState.fileName) return;
+      // Try restoring from IndexedDB
+      const cached = await loadLastPdf();
+      if (cancelled) return;
+      if (cached && cached.name === reopenState.fileName) {
+        await loadPdfFile(cached, { silent: true, persist: false });
+        toast({ title: "Reopened", description: `${cached.name} — jumping to page ${reopenState.page ?? 1}` });
+        return;
+      }
+      // Fallback: prompt user to re-select the file
+      if (!file) {
+        toast({
+          title: "Reopen study session",
+          description: `Re-upload "${reopenState.fileName}" to jump back to page ${reopenState.page ?? 1}.`,
+        });
+        fileInputRef.current?.click();
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reopenState]);
 
   // After PDF loads, if a target page was requested, scroll there and trigger action
   useEffect(() => {
