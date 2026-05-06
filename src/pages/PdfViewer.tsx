@@ -552,9 +552,7 @@ const PdfViewer = () => {
           <SheetHeader className="px-4 py-3 border-b border-border">
             <SheetTitle className="text-base flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-primary" />
-              {aiAction
-                ? (ACTION_LABELS as Record<string, string>)[aiAction] ?? (VIDEO_ACTION_LABELS as Record<string, string>)[aiAction] ?? "AI"
-                : "AI"}
+              {aiAction ? ACTION_LABELS[aiAction] ?? "AI" : "AI"}
               {aiFromCache && (
                 <span className="ml-auto text-[10px] font-normal text-muted-foreground bg-muted px-1.5 py-0.5 rounded">cached</span>
               )}
