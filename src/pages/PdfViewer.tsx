@@ -521,7 +521,7 @@ const PdfViewer = () => {
       )}
 
       {/* Single floating action button to open toolbar when no selection */}
-      {!selectedText && !toolbarPinned && !aiOpen && !videosOpen && (
+      {!selectedText && !toolbarPinned && !aiOpen && (
         <Button
           size="sm"
           className="absolute right-4 bottom-4 z-30 rounded-full shadow-lg gap-1.5 h-11 px-4"
