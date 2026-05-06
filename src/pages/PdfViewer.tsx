@@ -236,7 +236,7 @@ const PdfViewer = () => {
       const el = pageRefs.current.get(target);
       el?.scrollIntoView({ behavior: "smooth", block: "start" });
       setCurrentPage(target);
-      if (reopenState.openVideos) setVideosOpen(true);
+      // (video panel removed)
       // Clear navigation state so it doesn't re-fire
       navigate(location.pathname, { replace: true, state: null });
     }, 500);
