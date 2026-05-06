@@ -20,6 +20,7 @@ import { useUsageLimitCheck } from "@/components/UsageLimitToast";
 import { saveOutput } from "@/lib/saved-outputs";
 import { supabase } from "@/integrations/supabase/client";
 import { makeAiCacheKey, getCachedAi, setCachedAi } from "@/lib/ai-action-cache";
+import { saveLastPdf, loadLastPdf, clearLastPdf } from "@/lib/pdf-persist";
 import { Crown } from "lucide-react";
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
