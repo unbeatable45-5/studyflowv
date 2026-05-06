@@ -237,17 +237,33 @@ const PdfViewer = () => {
     return () => el.removeEventListener("scroll", onScroll);
   }, [toolbarPinned]);
 
-  // Reopen handling: when navigated from Library with a fileName + page, prompt to reopen the file then jump
+  // Reopen handling: try cached PDF first; only prompt re-upload if name doesn't match.
   useEffect(() => {
     if (!reopenState?.fileName) return;
-    if (!file) {
-      toast({
-        title: "Reopen study session",
-        description: `Re-upload "${reopenState.fileName}" to jump back to page ${reopenState.page ?? 1}.`,
-      });
-      fileInputRef.current?.click();
-    }
-  }, [reopenState, file]);
+    let cancelled = false;
+    (async () => {
+      // If we already have the right file loaded, the page-jump effect will handle it.
+      if (file && file.name === reopenState.fileName) return;
+      // Try restoring from IndexedDB
+      const cached = await loadLastPdf();
+      if (cancelled) return;
+      if (cached && cached.name === reopenState.fileName) {
+        await loadPdfFile(cached, { silent: true, persist: false });
+        toast({ title: "Reopened", description: `${cached.name} — jumping to page ${reopenState.page ?? 1}` });
+        return;
+      }
+      // Fallback: prompt user to re-select the file
+      if (!file) {
+        toast({
+          title: "Reopen study session",
+          description: `Re-upload "${reopenState.fileName}" to jump back to page ${reopenState.page ?? 1}.`,
+        });
+        fileInputRef.current?.click();
+      }
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reopenState]);
 
   // After PDF loads, if a target page was requested, scroll there and trigger action
   useEffect(() => {
