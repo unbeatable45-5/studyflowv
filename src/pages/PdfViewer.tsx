@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
 import {
   Upload, Loader2, ZoomIn, ZoomOut, ChevronLeft, ChevronRight,
-  FileUp, Sparkles, MessageSquareQuote, BookOpen, ListChecks, X, Send, Layers, Youtube, ExternalLink,
+  Sparkles, MessageSquareQuote, BookOpen, ListChecks, X, Send, Layers,
   ChevronDown, ChevronUp, FileText,
 } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
