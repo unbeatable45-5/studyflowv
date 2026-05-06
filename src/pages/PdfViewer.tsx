@@ -512,13 +512,6 @@ const PdfViewer = () => {
           >
             <Layers className="h-3.5 w-3.5" /> Flashcards
           </Button>
-          <div className="w-px h-5 bg-border mx-0.5" />
-          <Button
-            size="sm" variant="ghost" className="h-8 px-2.5 gap-1 text-xs rounded-full"
-            onClick={() => setVideosOpen(true)}
-          >
-            <Youtube className="h-3.5 w-3.5 text-destructive" /> Videos
-          </Button>
           {!selectedText && (
             <Button size="sm" variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setToolbarPinned(false)}>
               <X className="h-3.5 w-3.5" />
