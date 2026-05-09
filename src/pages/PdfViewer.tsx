@@ -462,6 +462,31 @@ const PdfViewer = () => {
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setScale((s) => Math.min(2.5, +(s + 0.2).toFixed(2)))}>
             <ZoomIn className="h-4 w-4" />
           </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            title="Fit to width"
+            onClick={async () => {
+              if (!pdf || !containerRef.current) return;
+              const page = await pdf.getPage(1);
+              const baseViewport = page.getViewport({ scale: 1 });
+              const containerWidth = containerRef.current.clientWidth - 24;
+              const fit = Math.min(2.0, Math.max(0.6, containerWidth / baseViewport.width));
+              setScale(+fit.toFixed(2));
+            }}
+          >
+            <Maximize2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={extractedTextEnabled ? "secondary" : "ghost"}
+            size="icon"
+            className="h-8 w-8"
+            title={extractedTextEnabled ? "Hide extracted text panels" : "Show extracted text panels"}
+            onClick={() => setExtractedTextEnabled((v) => !v)}
+          >
+            <FileText className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
@@ -479,7 +504,7 @@ const PdfViewer = () => {
                 className="bg-background shadow-sm rounded-md overflow-hidden border border-border/50 max-w-full w-full sm:w-auto"
               >
                 <canvas className="block max-w-full mx-auto" />
-                {pageTexts[i] && (
+                {extractedTextEnabled && pageTexts[i] && (
                   <div className="border-t border-dashed border-border/60">
                     <button
                       className="w-full flex items-center justify-between gap-2 px-3 py-1.5 text-[10px] uppercase tracking-wide text-muted-foreground hover:bg-muted/40 transition-colors"
