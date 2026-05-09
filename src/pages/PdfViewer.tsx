@@ -141,10 +141,11 @@ const PdfViewer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Render pages whenever pdf or scale changes
+  // Render pages whenever pdf or scale changes (with cancellation guard)
   useEffect(() => {
     if (!pdf) return;
     let cancelled = false;
+    const renderTasks: any[] = [];
     (async () => {
       for (let i = 1; i <= pdf.numPages; i++) {
         if (cancelled) return;
@@ -162,11 +163,36 @@ const PdfViewer = () => {
         canvas.style.width = `${viewport.width}px`;
         canvas.style.height = `${viewport.height}px`;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        await page.render({ canvasContext: ctx, viewport }).promise;
+        const task = page.render({ canvasContext: ctx, viewport });
+        renderTasks.push(task);
+        try {
+          await task.promise;
+        } catch {
+          /* render cancelled — safe to ignore */
+        }
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      renderTasks.forEach((t) => { try { t.cancel?.(); } catch { /* noop */ } });
+    };
   }, [pdf, scale]);
+
+  // Fit-to-width on first load + on container resize
+  useEffect(() => {
+    if (!pdf || !containerRef.current) return;
+    let cancelled = false;
+    (async () => {
+      const page = await pdf.getPage(1);
+      if (cancelled) return;
+      const baseViewport = page.getViewport({ scale: 1 });
+      const containerWidth = containerRef.current!.clientWidth - 24; // padding
+      if (containerWidth <= 0) return;
+      const fit = Math.min(2.0, Math.max(0.6, containerWidth / baseViewport.width));
+      setScale((prev) => (Math.abs(prev - fit) > 0.05 ? +fit.toFixed(2) : prev));
+    })();
+    return () => { cancelled = true; };
+  }, [pdf]);
 
   // Track current page on scroll
   useEffect(() => {
