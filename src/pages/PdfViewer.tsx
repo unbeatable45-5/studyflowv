@@ -9,7 +9,7 @@ import { toast } from "@/hooks/use-toast";
 import {
   Upload, Loader2, ZoomIn, ZoomOut, ChevronLeft, ChevronRight,
   Sparkles, MessageSquareQuote, BookOpen, ListChecks, X, Send, Layers,
-  ChevronDown, ChevronUp, FileText,
+  ChevronDown, ChevronUp, FileText, Maximize2,
 } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
@@ -67,6 +67,7 @@ const PdfViewer = () => {
   const [askInput, setAskInput] = useState("");
   const [askContext, setAskContext] = useState("");
   const [showExtractedFor, setShowExtractedFor] = useState<Set<number>>(new Set());
+  const [extractedTextEnabled, setExtractedTextEnabled] = useState(false);
   const [toolbarPinned, setToolbarPinned] = useState(false);
 
   const loadPdfFile = useCallback(async (selected: File, opts?: { silent?: boolean; persist?: boolean }) => {
@@ -140,10 +141,11 @@ const PdfViewer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Render pages whenever pdf or scale changes
+  // Render pages whenever pdf or scale changes (with cancellation guard)
   useEffect(() => {
     if (!pdf) return;
     let cancelled = false;
+    const renderTasks: any[] = [];
     (async () => {
       for (let i = 1; i <= pdf.numPages; i++) {
         if (cancelled) return;
@@ -161,11 +163,36 @@ const PdfViewer = () => {
         canvas.style.width = `${viewport.width}px`;
         canvas.style.height = `${viewport.height}px`;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        await page.render({ canvasContext: ctx, viewport }).promise;
+        const task = page.render({ canvasContext: ctx, viewport });
+        renderTasks.push(task);
+        try {
+          await task.promise;
+        } catch {
+          /* render cancelled — safe to ignore */
+        }
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      renderTasks.forEach((t) => { try { t.cancel?.(); } catch { /* noop */ } });
+    };
   }, [pdf, scale]);
+
+  // Fit-to-width on first load + on container resize
+  useEffect(() => {
+    if (!pdf || !containerRef.current) return;
+    let cancelled = false;
+    (async () => {
+      const page = await pdf.getPage(1);
+      if (cancelled) return;
+      const baseViewport = page.getViewport({ scale: 1 });
+      const containerWidth = containerRef.current!.clientWidth - 24; // padding
+      if (containerWidth <= 0) return;
+      const fit = Math.min(2.0, Math.max(0.6, containerWidth / baseViewport.width));
+      setScale((prev) => (Math.abs(prev - fit) > 0.05 ? +fit.toFixed(2) : prev));
+    })();
+    return () => { cancelled = true; };
+  }, [pdf]);
 
   // Track current page on scroll
   useEffect(() => {
@@ -435,6 +462,31 @@ const PdfViewer = () => {
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setScale((s) => Math.min(2.5, +(s + 0.2).toFixed(2)))}>
             <ZoomIn className="h-4 w-4" />
           </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            title="Fit to width"
+            onClick={async () => {
+              if (!pdf || !containerRef.current) return;
+              const page = await pdf.getPage(1);
+              const baseViewport = page.getViewport({ scale: 1 });
+              const containerWidth = containerRef.current.clientWidth - 24;
+              const fit = Math.min(2.0, Math.max(0.6, containerWidth / baseViewport.width));
+              setScale(+fit.toFixed(2));
+            }}
+          >
+            <Maximize2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={extractedTextEnabled ? "secondary" : "ghost"}
+            size="icon"
+            className="h-8 w-8"
+            title={extractedTextEnabled ? "Hide extracted text panels" : "Show extracted text panels"}
+            onClick={() => setExtractedTextEnabled((v) => !v)}
+          >
+            <FileText className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
@@ -452,7 +504,7 @@ const PdfViewer = () => {
                 className="bg-background shadow-sm rounded-md overflow-hidden border border-border/50 max-w-full w-full sm:w-auto"
               >
                 <canvas className="block max-w-full mx-auto" />
-                {pageTexts[i] && (
+                {extractedTextEnabled && pageTexts[i] && (
                   <div className="border-t border-dashed border-border/60">
                     <button
                       className="w-full flex items-center justify-between gap-2 px-3 py-1.5 text-[10px] uppercase tracking-wide text-muted-foreground hover:bg-muted/40 transition-colors"

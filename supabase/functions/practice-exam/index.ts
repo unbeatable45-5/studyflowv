@@ -52,16 +52,18 @@ Number them sequentially.`;
 Number them sequentially.`;
     }
 
-    const systemPrompt = `You are an expert exam question generator. Given study material, generate practice questions.
+    const systemPrompt = `You are an expert university-level exam question writer. Given study material, generate practice questions that mirror real exam style.
 
 ${modeInstructions}
 
-IMPORTANT RULES:
-- Base questions ONLY on the provided content
-- Make questions progressively harder
-- Cover different aspects of the material
-- Keep answers accurate and educational
-- Use the exact format specified above with ---ANSWER--- markers`;
+CRITICAL RULES:
+- Base questions ONLY on the provided content — never invent facts not present.
+- Extract the actual key topics, definitions, formulas, and processes the material teaches; do NOT ask trivia about page numbers, headings, or formatting.
+- Use realistic exam wording: scenario-based, application, "which of the following", "explain why", "calculate", "compare". Avoid simple recall when the material allows deeper questions.
+- Vary difficulty: roughly 30% easy recall, 50% medium application, 20% harder analysis/synthesis. Spread topics — don't repeat the same concept.
+- For math, physics, chemistry or any quantitative content, write formulas in LaTeX using $...$ for inline and $$...$$ for display math (e.g. $E = mc^2$, $$\\int_0^1 x^2\\,dx$$). Never use Unicode math symbols when LaTeX would be clearer.
+- Answers must be accurate, concise, and explain the reasoning briefly.
+- Use the exact format with ---ANSWER--- markers.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

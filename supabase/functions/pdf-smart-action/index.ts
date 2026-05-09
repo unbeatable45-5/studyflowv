@@ -8,12 +8,14 @@ const corsHeaders = {
 
 type Action = "summarize_page" | "generate_questions" | "explain" | "ask" | "make_flashcards";
 
+const MATH_RULE = `When the content contains math, physics, chemistry or any formula, write it in LaTeX: use $...$ for inline math and $$...$$ for display equations (e.g. $a^2 + b^2 = c^2$, $$\\frac{d}{dx}\\sin x = \\cos x$$). Do NOT use Unicode math symbols when LaTeX is clearer. This keeps formulas renderable and copyable.`;
+
 const PROMPTS: Record<Action, string> = {
-  summarize_page: `You are an expert tutor. Summarize the provided page/section in clear bullet points. Focus on key concepts, definitions, and important details. Use markdown. Be concise (5-10 bullets) and student-friendly.`,
-  generate_questions: `You are an exam coach. Generate 5 high-quality practice questions from the provided content. Mix multiple-choice (with 4 options and the correct answer marked) and 1-2 short-answer questions. Format as markdown with clear numbering. Include a brief answer key at the bottom.`,
-  explain: `You are a patient tutor. Explain the provided concept/section in simple, clear language a student can understand. Use analogies where helpful. Use markdown. Keep it focused (around 150-250 words).`,
-  ask: `You are a helpful study tutor. Answer the user's question using the provided context. If the context does not contain the answer, say so briefly and provide your best general answer. Use markdown.`,
-  make_flashcards: `You are a flashcard creator. Turn the provided content into 6-10 high-quality study flashcards. Format as markdown with each card as: **Q:** question on one line, **A:** answer on the next line, separated by a blank line. Keep questions concise and answers clear.`,
+  summarize_page: `You are an expert tutor. Summarize the provided page/section in clear bullet points. Focus on key concepts, definitions, and important details. Use markdown. Be concise (5-10 bullets) and student-friendly. ${MATH_RULE}`,
+  generate_questions: `You are an exam coach writing realistic exam questions from the provided content. Generate 5 high-quality questions that mirror real exam style: scenario/application-based where possible, varied difficulty (mix recall, application, analysis), covering distinct topics. Mix multiple-choice (4 options, mark correct one) and 1-2 short-answer. Format as markdown with clear numbering and a brief answer key at the bottom. ${MATH_RULE}`,
+  explain: `You are a patient tutor. Explain the provided concept/section in simple, clear language a student can understand. Use analogies where helpful. Use markdown. Keep it focused (around 150-250 words). ${MATH_RULE}`,
+  ask: `You are a helpful study tutor. Answer the user's question using the provided context. If the context does not contain the answer, say so briefly and provide your best general answer. Use markdown. ${MATH_RULE}`,
+  make_flashcards: `You are a flashcard creator. Turn the provided content into 6-10 high-quality study flashcards. Format as markdown with each card as: **Q:** question on one line, **A:** answer on the next line, separated by a blank line. Keep questions concise and answers clear. ${MATH_RULE}`,
 };
 
 serve(async (req) => {
