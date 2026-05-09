@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Lightbulb, TrendingUp, MoreHorizontal, FileText, Clock, Layers, Calendar, FileUp, Brain, BookOpen, ClipboardList, Bot } from "lucide-react";
+import { Home, TrendingUp, MoreHorizontal, FileText, Calendar, FileUp, BookOpen, ClipboardList, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
@@ -7,22 +7,18 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/u
 
 const mainNavItems = [
   { to: "/", icon: Home, label: "Home" },
-  { to: "/history", icon: Layers, label: "Library" },
+  { to: "/practice-exam", icon: ClipboardList, label: "Exam" },
+  { to: "/pdf-viewer", icon: BookOpen, label: "Viewer" },
   { to: "/progress", icon: TrendingUp, label: "Progress" },
-  { to: "/profile", icon: FileText, label: "Profile" },
 ];
 
+// Only stable, end-to-end tested entries
 const moreItems = [
-  { to: "/study", icon: Lightbulb, label: "Study Helper" },
-  { to: "/practice-exam", icon: ClipboardList, label: "Practice Exam" },
-  { to: "/ai-tutor", icon: Bot, label: "AI Tutor" },
-  { to: "/notes", icon: FileText, label: "Notes" },
-  { to: "/pomodoro", icon: Clock, label: "Focus Timer" },
-  { to: "/flashcards", icon: Layers, label: "Flashcards" },
-  { to: "/planner", icon: Calendar, label: "Revision Planner" },
-  { to: "/pdf-summarizer", icon: FileUp, label: "PDF Summarizer" },
-  { to: "/mind-map", icon: Brain, label: "Mind Map" },
-  { to: "/spaced-review", icon: BookOpen, label: "Spaced Review" },
+  { to: "/pdf-summarizer", icon: FileUp, label: "Upload Slides" },
+  { to: "/planner", icon: Calendar, label: "Quick Revision" },
+  { to: "/history", icon: FileText, label: "Library" },
+  { to: "/reminders", icon: Bell, label: "Reminders" },
+  { to: "/profile", icon: FileText, label: "Profile" },
 ];
 
 const BottomNav = () => {

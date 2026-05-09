@@ -1,14 +1,9 @@
-import { 
-  Home, 
-  Lightbulb, 
-  FileText, 
-  Clock, 
-  TrendingUp, 
-  Layers, 
+import {
+  Home,
+  TrendingUp,
   Calendar,
   FileUp,
   BookOpen,
-  Brain,
   History,
   Bell,
   Crown,
@@ -18,7 +13,6 @@ import {
   Sun,
   Search,
   ClipboardList,
-  Bot
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, Link } from "react-router-dom";
@@ -43,20 +37,15 @@ import {
 
 const mainItems = [
   { title: "Home", url: "/", icon: Home },
-  { title: "Study Helper", url: "/study", icon: Lightbulb },
-  { title: "Note Organizer", url: "/notes", icon: FileText },
   { title: "Progress", url: "/progress", icon: TrendingUp },
 ];
 
+// Core stable tools only — others are accessible via deep link / library
 const toolItems = [
-  { title: "Flashcards", url: "/flashcards", icon: Layers },
-  { title: "Revision Planner", url: "/planner", icon: Calendar },
-  { title: "PDF Summarizer", url: "/pdf-summarizer", icon: FileUp },
-  { title: "Mind Map", url: "/mind-map", icon: Brain },
-  { title: "Pomodoro", url: "/pomodoro", icon: Clock },
-  { title: "Spaced Review", url: "/spaced-review", icon: BookOpen },
   { title: "Practice Exam", url: "/practice-exam", icon: ClipboardList },
-  { title: "AI Tutor", url: "/ai-tutor", icon: Bot },
+  { title: "Upload Slides", url: "/pdf-summarizer", icon: FileUp },
+  { title: "Smart Viewer", url: "/pdf-viewer", icon: BookOpen },
+  { title: "Quick Revision", url: "/planner", icon: Calendar },
 ];
 
 const accountItems = [
