@@ -9,7 +9,7 @@ import { toast } from "@/hooks/use-toast";
 import {
   Upload, Loader2, ZoomIn, ZoomOut, ChevronLeft, ChevronRight,
   Sparkles, MessageSquareQuote, BookOpen, ListChecks, X, Send, Layers,
-  ChevronDown, ChevronUp, FileText,
+  ChevronDown, ChevronUp, FileText, Maximize2,
 } from "lucide-react";
 import * as pdfjsLib from "pdfjs-dist";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
@@ -67,6 +67,7 @@ const PdfViewer = () => {
   const [askInput, setAskInput] = useState("");
   const [askContext, setAskContext] = useState("");
   const [showExtractedFor, setShowExtractedFor] = useState<Set<number>>(new Set());
+  const [extractedTextEnabled, setExtractedTextEnabled] = useState(false);
   const [toolbarPinned, setToolbarPinned] = useState(false);
 
   const loadPdfFile = useCallback(async (selected: File, opts?: { silent?: boolean; persist?: boolean }) => {
