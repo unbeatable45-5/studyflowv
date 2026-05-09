@@ -30,8 +30,7 @@ const ToolGrid = () => {
                   <Icon className="h-5 w-5" />
                 </MotionIcon>
                 <span className="text-[10px] font-semibold text-foreground text-center leading-tight">{title}</span>
-              </MotionIcon>
-            </MotionCard>
+              </MotionCard>
             </Link>
           </StaggerItem>
         ))}
