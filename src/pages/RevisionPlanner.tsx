@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { saveOutput } from "@/lib/saved-outputs";
 import { Button } from "@/components/ui/button";
@@ -8,9 +9,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import OutputActions from "@/components/OutputActions";
+import ShareResultButton from "@/components/ShareResultButton";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
 import { streamAI } from "@/lib/streaming";
-import { CalendarDays, Loader2, Plus, X } from "lucide-react";
+import { CalendarDays, Loader2, Plus, X, FileDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -119,13 +121,24 @@ const RevisionPlanner = () => {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">Your Study Plan</CardTitle>
-              <OutputActions text={output} title="Revision Plan" />
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={() => navigate(`/pdf-export?source=revision-planner&title=${encodeURIComponent("Revision Plan")}&content=${encodeURIComponent(output)}`)}
+                >
+                  <FileDown className="h-4 w-4" /> PDF
+                </Button>
+                <OutputActions text={output} title="Revision Plan" />
+              </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <MarkdownWithMath className="prose prose-sm max-w-none text-foreground dark:prose-invert break-words overflow-hidden">
               {output}
             </MarkdownWithMath>
+            {!loading && <ShareResultButton text={output} title="Revision Plan" />}
           </CardContent>
         </Card>
       )}

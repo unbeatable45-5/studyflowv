@@ -30,7 +30,6 @@ const Signup = () => {
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin,
         data: { full_name: name, referral_code: referralCode || undefined },
       },
     });
