@@ -62,7 +62,8 @@ const Signup = () => {
           // Silently fail referral redemption
         }
       }
-      toast({ title: "Check your email", description: "We sent you a confirmation link." });
+      toast({ title: "Welcome to StudyFlow!", description: "Your account has been created." });
+      navigate("/");
     }
   };
 
