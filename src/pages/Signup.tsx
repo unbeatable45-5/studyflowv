@@ -17,6 +17,7 @@ const Signup = () => {
   const [referralCode, setReferralCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const ref = searchParams.get("ref");
@@ -30,7 +31,6 @@ const Signup = () => {
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin,
         data: { full_name: name, referral_code: referralCode || undefined },
       },
     });
@@ -63,7 +63,8 @@ const Signup = () => {
           // Silently fail referral redemption
         }
       }
-      toast({ title: "Check your email", description: "We sent you a confirmation link." });
+      toast({ title: "Welcome to StudyFlow!", description: "Your account has been created." });
+      navigate("/");
     }
   };
 
