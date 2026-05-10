@@ -90,3 +90,49 @@ describe("Signup flow", () => {
     expect(navigateMock).not.toHaveBeenCalled();
   });
 });
+
+describe("Signup form validation", () => {
+  beforeEach(() => {
+    navigateMock.mockClear();
+    toastMock.mockClear();
+    signUpMock.mockReset();
+  });
+
+  it("blocks submission when required fields are empty", () => {
+    renderSignup();
+    fireEvent.click(screen.getByRole("button", { name: /create account/i }));
+    expect(signUpMock).not.toHaveBeenCalled();
+    const nameInput = screen.getByLabelText(/full name/i) as HTMLInputElement;
+    expect(nameInput.checkValidity()).toBe(false);
+    expect(nameInput.validity.valueMissing).toBe(true);
+  });
+
+  it("blocks submission when email format is invalid", () => {
+    renderSignup();
+    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: "Jane" } });
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "not-an-email" } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: "password123" } });
+    fireEvent.click(screen.getByRole("button", { name: /create account/i }));
+    expect(signUpMock).not.toHaveBeenCalled();
+    const emailInput = screen.getByLabelText(/email/i) as HTMLInputElement;
+    expect(emailInput.checkValidity()).toBe(false);
+    expect(emailInput.validity.typeMismatch).toBe(true);
+  });
+
+  it("enforces a minimum password length of 6 characters", () => {
+    renderSignup();
+    const passwordInput = screen.getByLabelText(/password/i) as HTMLInputElement;
+    expect(passwordInput.minLength).toBe(6);
+    expect(passwordInput.getAttribute("required")).not.toBeNull();
+  });
+
+  it("allows submission once all fields meet validation rules", async () => {
+    signUpMock.mockResolvedValue({ data: { user: { id: "u1" } }, error: null });
+    renderSignup();
+    fireEvent.change(screen.getByLabelText(/full name/i), { target: { value: "Jane Doe" } });
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: "jane@example.com" } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: "password123" } });
+    fireEvent.click(screen.getByRole("button", { name: /create account/i }));
+    await waitFor(() => expect(signUpMock).toHaveBeenCalled());
+  });
+});
