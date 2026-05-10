@@ -32,6 +32,7 @@ const RevisionPlanner = () => {
   const [hours, setHours] = useState([3]);
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const addCourse = () => setCourses([...courses, { name: "", examDate: undefined, unknownDate: false }]);
   const removeCourse = (i: number) => { if (courses.length <= 1) return; setCourses(courses.filter((_, idx) => idx !== i)); };
