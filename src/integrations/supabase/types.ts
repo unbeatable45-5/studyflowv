@@ -46,6 +46,45 @@ export type Database = {
           },
         ]
       }
+      exam_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          mode: string
+          recommended_focus: string | null
+          score: number
+          time_used_seconds: number
+          topics_strong: string[]
+          topics_weak: string[]
+          total_questions: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mode: string
+          recommended_focus?: string | null
+          score?: number
+          time_used_seconds?: number
+          topics_strong?: string[]
+          topics_weak?: string[]
+          total_questions?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mode?: string
+          recommended_focus?: string | null
+          score?: number
+          time_used_seconds?: number
+          topics_strong?: string[]
+          topics_weak?: string[]
+          total_questions?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       flashcard_reviews: {
         Row: {
           card_back: string
