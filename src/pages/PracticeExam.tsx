@@ -128,6 +128,8 @@ const PracticeExam = () => {
   const [showAnswers, setShowAnswers] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [analysis, setAnalysis] = useState<ResultAnalysis | null>(null);
+
 
   useEffect(() => {
     if (!timerRunning || timeLeft <= 0) return;
