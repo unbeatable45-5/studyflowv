@@ -110,6 +110,7 @@ function analyzeResults(questions: ParsedQuestion[], answers: Record<number, str
 const PracticeExam = () => {
   const { toast } = useToast();
   const { isPremium, promptUpgrade } = usePremium();
+  const { user } = useAuth();
 
   const [inputSource, setInputSource] = useState<InputSource>("text");
   const [content, setContent] = useState("");
