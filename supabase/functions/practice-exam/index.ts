@@ -25,7 +25,7 @@ serve(async (req) => {
     if (mode === "cbt") {
       modeInstructions = `Generate exactly ${numQuestions} multiple-choice questions (CBT style). Format each as:
 
-**Q1. [question]**
+**Q1. [question]** [TOPIC: short topic name, 1-4 words]
 A) [option]
 B) [option]
 C) [option]
@@ -33,11 +33,11 @@ D) [option]
 
 ---ANSWER--- A) [correct option with brief explanation]
 
-Number them sequentially. The ---ANSWER--- marker separates each question's answer.`;
+Number them sequentially. The ---ANSWER--- marker separates each question's answer. The [TOPIC: ...] tag must appear on the same line as the question and name the specific concept being tested.`;
     } else if (mode === "fill") {
       modeInstructions = `Generate exactly ${numQuestions} fill-in-the-blank questions. Format each as:
 
-**Q1.** [sentence with ______ for the blank]
+**Q1.** [sentence with ______ for the blank] [TOPIC: short topic name, 1-4 words]
 
 ---ANSWER--- [correct answer with brief explanation]
 
@@ -45,12 +45,13 @@ Number them sequentially.`;
     } else {
       modeInstructions = `Generate exactly ${numQuestions} theory/essay questions that require written answers. Format each as:
 
-**Q1.** [question]
+**Q1.** [question] [TOPIC: short topic name, 1-4 words]
 
 ---ANSWER--- [model answer - concise but thorough, 2-4 sentences]
 
 Number them sequentially.`;
     }
+
 
     const systemPrompt = `You are an expert university-level exam question writer. Given study material, generate practice questions that mirror real exam style.
 
