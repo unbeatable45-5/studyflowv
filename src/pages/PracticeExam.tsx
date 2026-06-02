@@ -200,15 +200,33 @@ const PracticeExam = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setTimerRunning(false);
     setShowAnswers(true);
+    const result = analyzeResults(questions, userAnswers, mode);
+    setAnalysis(result);
     setPhase("results");
-    // After submitting, show upgrade prompt for free users
+
+    // Persist to Supabase
+    if (user) {
+      try {
+        await supabase.from("exam_sessions").insert({
+          user_id: user.id,
+          mode,
+          score: result.score,
+          total_questions: result.total,
+          topics_weak: result.weak,
+          topics_strong: result.strong,
+          recommended_focus: result.recommended,
+          time_used_seconds: timerMinutes * 60 - timeLeft,
+        });
+      } catch (e) {
+        console.error("Failed to save exam session", e);
+      }
+    }
+
     if (!isPremium) {
-      setTimeout(() => {
-        promptUpgrade();
-      }, 2000);
+      setTimeout(() => promptUpgrade(), 2000);
     }
   };
 
@@ -218,7 +236,9 @@ const PracticeExam = () => {
     setUserAnswers({});
     setShowAnswers(false);
     setTimerRunning(false);
+    setAnalysis(null);
   };
+
 
   const answeredCount = Object.keys(userAnswers).filter((k) => userAnswers[Number(k)]?.trim()).length;
 
