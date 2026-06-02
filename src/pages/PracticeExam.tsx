@@ -423,20 +423,72 @@ const PracticeExam = () => {
         )}
       </div>
 
-      {showAnswers && (
-        <Card className="border-primary/30">
-          <CardContent className="p-4 text-center space-y-3">
-            <p className="text-2xl font-bold text-foreground">{answeredCount}/{questions.length}</p>
-            <p className="text-sm text-muted-foreground">Questions answered</p>
-            <p className="text-xs text-muted-foreground">Time used: {formatTime(timerMinutes * 60 - timeLeft)}</p>
+      {showAnswers && analysis && (
+        <Card className="border-primary/30 animate-fade-in">
+          <CardHeader className="p-4 pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-primary" /> Your Results
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-4 space-y-4">
+            {/* Score */}
+            <div className="text-center space-y-2">
+              <p className="text-4xl font-bold text-foreground">
+                {analysis.score}<span className="text-2xl text-muted-foreground">/{analysis.total}</span>
+              </p>
+              <p className="text-sm font-semibold text-primary">{analysis.percent}% score</p>
+              <Progress value={analysis.percent} className="h-2" />
+              <p className="text-xs text-muted-foreground">
+                Time used: {formatTime(timerMinutes * 60 - timeLeft)}
+                {mode === "theory" && " • Theory mode counts attempts ≥ 30 chars as completed"}
+              </p>
+            </div>
+
+            {/* Strong topics */}
+            {analysis.strong.length > 0 && (
+              <div className="rounded-lg border border-success/30 bg-success/5 p-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-success mb-2">
+                  <TrendingUp className="h-4 w-4" /> Strong topics
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {analysis.strong.map((t) => (
+                    <Badge key={t} variant="outline" className="border-success/40 text-success bg-success/10">{t}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Weak topics */}
+            {analysis.weak.length > 0 && (
+              <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-destructive mb-2">
+                  <TrendingDown className="h-4 w-4" /> Topics to review
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {analysis.weak.map((t) => (
+                    <Badge key={t} variant="outline" className="border-destructive/40 text-destructive bg-destructive/10">{t}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Recommendation */}
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-primary mb-1">
+                <Target className="h-4 w-4" /> Recommended focus
+              </div>
+              <p className="text-sm text-foreground">{analysis.recommended}</p>
+            </div>
+
             <TimeSavedIndicator wordCount={content.split(/\s+/).length} type="exam" />
-            <ShareResultButton 
-              text={`🎯 I scored ${answeredCount}/${questions.length} on my ${mode === "cbt" ? "CBT" : mode === "fill" ? "Fill-in" : "Theory"} practice exam!\n⏱️ Time: ${formatTime(timerMinutes * 60 - timeLeft)}\n\nTurn your notes into practice exams instantly with StudyFlow!`} 
-              title="My Practice Exam Result" 
+            <ShareResultButton
+              text={`🎯 I scored ${analysis.score}/${analysis.total} (${analysis.percent}%) on my ${mode === "cbt" ? "CBT" : mode === "fill" ? "Fill-in" : "Theory"} practice exam!${analysis.weak.length ? `\n📚 Reviewing: ${analysis.weak.slice(0, 3).join(", ")}` : ""}\n\nTurn your notes into practice exams instantly with StudyFlow!`}
+              title="My Practice Exam Result"
             />
           </CardContent>
         </Card>
       )}
+
     </div>
   );
 };
