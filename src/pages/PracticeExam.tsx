@@ -28,12 +28,28 @@ interface ParsedQuestion {
   question: string;
   answer: string;
   topic: string;
+  options?: Record<string, string>;
 }
 
 function extractTopic(text: string): { text: string; topic: string } {
   const m = text.match(/\[TOPIC:\s*([^\]]+)\]/i);
-  if (!m) return { text: text.trim(), topic: "General" };
-  return { text: text.replace(m[0], "").trim(), topic: m[1].trim() };
+  const stripped = (s: string) => s.replace(/\*\*/g, "").trim();
+  if (!m) return { text: stripped(text), topic: "General" };
+  return { text: stripped(text.replace(m[0], "")), topic: m[1].trim() };
+}
+
+function extractOptions(text: string): { stem: string; options: Record<string, string> } {
+  const options: Record<string, string> = {};
+  // Match A) ... B) ... C) ... D) ... (also tolerates A. style)
+  const regex = /\b([A-D])[\)\.]\s*([\s\S]*?)(?=\s+[A-D][\)\.]\s|$)/g;
+  let match;
+  let firstIdx = -1;
+  while ((match = regex.exec(text)) !== null) {
+    if (firstIdx === -1) firstIdx = match.index;
+    options[match[1]] = match[2].trim().replace(/\*\*/g, "").trim();
+  }
+  const stem = firstIdx === -1 ? text : text.slice(0, firstIdx).trim();
+  return { stem, options };
 }
 
 function parseQuestions(raw: string): ParsedQuestion[] {
@@ -44,7 +60,14 @@ function parseQuestions(raw: string): ParsedQuestion[] {
     const rawQ = splitIdx === -1 ? part : part.slice(0, splitIdx);
     const rawA = splitIdx === -1 ? "" : part.slice(splitIdx + 12).trim();
     const { text, topic } = extractTopic(rawQ);
-    questions.push({ question: text, answer: rawA, topic });
+    const { stem, options } = extractOptions(text);
+    const hasOptions = Object.keys(options).length > 0;
+    questions.push({
+      question: hasOptions ? stem : text,
+      answer: rawA,
+      topic,
+      options: hasOptions ? options : undefined,
+    });
   }
   return questions;
 }
