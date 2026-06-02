@@ -401,7 +401,7 @@ const PracticeExam = () => {
                       <div className="flex items-center gap-2">
                         {isCorrect && <CheckCircle2 className="h-4 w-4 text-success shrink-0" />}
                         {isWrong && <XCircle className="h-4 w-4 text-destructive shrink-0" />}
-                        <span>{letter})</span>
+                        <span>{letter}) {q.options?.[letter] || ""}</span>
                       </div>
                     </button>
                   );
