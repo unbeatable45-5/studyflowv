@@ -1,16 +1,20 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { ClipboardList, Upload, Sparkles, Clock, Hash, Play, Square, CheckCircle2, XCircle, Eye, RotateCcw, Share2 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { ClipboardList, Upload, Sparkles, Clock, Hash, Square, CheckCircle2, XCircle, Eye, RotateCcw, Target, TrendingUp, TrendingDown, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ShareResultButton from "@/components/ShareResultButton";
 import TimeSavedIndicator from "@/components/TimeSavedIndicator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { streamAI } from "@/lib/streaming";
 import AIThinking from "@/components/AIThinking";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
 import { usePremium } from "@/contexts/PremiumContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import * as pdfjs from "pdfjs-dist";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +27,13 @@ type ExamPhase = "setup" | "exam" | "results";
 interface ParsedQuestion {
   question: string;
   answer: string;
+  topic: string;
+}
+
+function extractTopic(text: string): { text: string; topic: string } {
+  const m = text.match(/\[TOPIC:\s*([^\]]+)\]/i);
+  if (!m) return { text: text.trim(), topic: "General" };
+  return { text: text.replace(m[0], "").trim(), topic: m[1].trim() };
 }
 
 function parseQuestions(raw: string): ParsedQuestion[] {
@@ -30,14 +41,10 @@ function parseQuestions(raw: string): ParsedQuestion[] {
   const questions: ParsedQuestion[] = [];
   for (const part of parts) {
     const splitIdx = part.indexOf("---ANSWER---");
-    if (splitIdx === -1) {
-      questions.push({ question: part.trim(), answer: "" });
-      continue;
-    }
-    questions.push({
-      question: part.slice(0, splitIdx).trim(),
-      answer: part.slice(splitIdx + 12).trim(),
-    });
+    const rawQ = splitIdx === -1 ? part : part.slice(0, splitIdx);
+    const rawA = splitIdx === -1 ? "" : part.slice(splitIdx + 12).trim();
+    const { text, topic } = extractTopic(rawQ);
+    questions.push({ question: text, answer: rawA, topic });
   }
   return questions;
 }
@@ -46,6 +53,58 @@ function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
+
+interface ResultAnalysis {
+  score: number;
+  total: number;
+  percent: number;
+  weak: string[];
+  strong: string[];
+  recommended: string;
+}
+
+function analyzeResults(questions: ParsedQuestion[], answers: Record<number, string>, mode: ExamMode): ResultAnalysis {
+  const topicCounts: Record<string, { right: number; wrong: number }> = {};
+  let score = 0;
+  const total = questions.length;
+
+  questions.forEach((q, i) => {
+    const topic = q.topic || "General";
+    if (!topicCounts[topic]) topicCounts[topic] = { right: 0, wrong: 0 };
+    const userAns = (answers[i] || "").trim();
+
+    let correct = false;
+    if (mode === "cbt") {
+      const correctLetter = q.answer.trim().charAt(0).toUpperCase();
+      correct = userAns.toUpperCase() === correctLetter;
+    } else if (mode === "fill") {
+      const model = q.answer.toLowerCase().replace(/[^a-z0-9\s]/g, " ").trim();
+      const ua = userAns.toLowerCase().replace(/[^a-z0-9\s]/g, " ").trim();
+      correct = ua.length > 0 && (model.includes(ua) || ua.includes(model.split(/\s+/)[0] || ""));
+    } else {
+      correct = userAns.length >= 30;
+    }
+
+    if (correct) { score++; topicCounts[topic].right++; }
+    else { topicCounts[topic].wrong++; }
+  });
+
+  const weak: string[] = [];
+  const strong: string[] = [];
+  Object.entries(topicCounts).forEach(([topic, { right, wrong }]) => {
+    const t = right + wrong;
+    const ratio = right / t;
+    if (ratio < 0.5) weak.push(topic);
+    else if (ratio >= 0.75) strong.push(topic);
+  });
+
+  const percent = total > 0 ? Math.round((score / total) * 100) : 0;
+  let recommended = "Excellent work — try a harder set or new material next!";
+  if (weak.length > 0) recommended = `Focus your next session on: ${weak.slice(0, 3).join(", ")}.`;
+  else if (percent < 70) recommended = "Review the model answers and re-attempt this exam to lock in the concepts.";
+
+  return { score, total, percent, weak, strong, recommended };
 }
 
 const PracticeExam = () => {
