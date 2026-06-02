@@ -21,18 +21,25 @@ const UsageDashboard = () => {
   const fetchUsage = useCallback(async () => {
     if (!user) return;
     const today = new Date().toISOString().split("T")[0];
-    const { data } = await supabase
-      .from("saved_outputs")
-      .select("tool")
-      .eq("user_id", user.id)
-      .gte("created_at", `${today}T00:00:00`);
+    const [{ data: outputsData }, { count: examsCount }] = await Promise.all([
+      supabase
+        .from("saved_outputs")
+        .select("tool")
+        .eq("user_id", user.id)
+        .gte("created_at", `${today}T00:00:00`),
+      supabase
+        .from("exam_sessions")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .gte("created_at", `${today}T00:00:00`),
+    ]);
 
-    const outputs = data ?? [];
+    const outputs = outputsData ?? [];
     setUsage({
       pdfs: outputs.filter((o) => o.tool === "pdf-summarizer").length,
       deep_think: outputs.filter((o) => o.tool === "ai-tutor-deep").length,
       summaries: outputs.filter((o) => ["study-helper", "note-organizer", "pdf-summarizer"].includes(o.tool)).length,
-      exams: outputs.filter((o) => o.tool === "practice-exam").length,
+      exams: examsCount ?? 0,
       mind_maps: outputs.filter((o) => o.tool === "mind-map").length,
     });
   }, [user]);
@@ -65,7 +72,7 @@ const UsageDashboard = () => {
     return [
       { label: "PDF Summaries", used: usage.pdfs, limit: 3 },
       { label: "Deep Think", used: usage.deep_think, limit: 2 },
-      { label: "Mind Maps", used: usage.mind_maps, limit: 1 },
+      { label: "Practice Exams", used: usage.exams, limit: 1 },
     ];
   }, [isPremium, usage]);
 
