@@ -72,6 +72,11 @@ const UsageDashboard = () => {
     return [
       { label: "PDF Summaries", used: usage.pdfs, limit: 3 },
       { label: "Deep Think", used: usage.deep_think, limit: 2 },
+      { label: "Practice Exams", used: usage.exams, limit: 1 },
+    ];
+    return [
+      { label: "PDF Summaries", used: usage.pdfs, limit: 3 },
+      { label: "Deep Think", used: usage.deep_think, limit: 2 },
       { label: "Mind Maps", used: usage.mind_maps, limit: 1 },
     ];
   }, [isPremium, usage]);
