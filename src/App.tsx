@@ -8,6 +8,7 @@ import { PremiumProvider } from "./contexts/PremiumContext";
 import { TimerProvider } from "./contexts/TimerContext";
 import AppLayout from "./components/AppLayout";
 import PageSkeleton from "./components/PageSkeleton";
+import SEO from "./components/SEO";
 import Index from "./pages/Index";
 import Profile from "@/pages/Profile";
 import StudyHelper from "./pages/StudyHelper";
