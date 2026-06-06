@@ -62,6 +62,7 @@ const App = () => (
         <AuthProvider>
           <PremiumProvider>
             <TimerProvider>
+              <SEO />
               <Routes>
                 <Route path="/landing" element={<Landing />} />
                 <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
