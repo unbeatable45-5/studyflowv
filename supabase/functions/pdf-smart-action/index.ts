@@ -1,10 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { requireAuth, corsHeaders } from "../_shared/auth.ts";
 
 type Action = "summarize_page" | "generate_questions" | "explain" | "ask" | "make_flashcards";
 
@@ -20,6 +15,9 @@ const PROMPTS: Record<Action, string> = {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const auth = await requireAuth(req);
+  if (auth instanceof Response) return auth;
 
   try {
     const { action, content, question } = await req.json();

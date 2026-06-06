@@ -8,6 +8,7 @@ import AIThinking from "@/components/AIThinking";
 import { cn } from "@/lib/utils";
 import { usePremium } from "@/contexts/PremiumContext";
 import { useUsageLimitCheck } from "@/components/UsageLimitToast";
+import { supabase } from "@/integrations/supabase/client";
 
 type Message = { role: "user" | "assistant"; content: string; deepThink?: boolean; ts?: number };
 
@@ -67,11 +68,19 @@ const AiTutor = () => {
     const endpoint = isDeep ? "ai-tutor-deep" : "ai-tutor";
 
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        toast({ title: "Please sign in", description: "You must be signed in to use the AI Tutor.", variant: "destructive" });
+        setIsLoading(false);
+        return;
+      }
       const resp = await fetch(`${SUPABASE_URL}/functions/v1/${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${token}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({ messages: allMessages.map(m => ({ role: m.role, content: m.content })) }),
       });
