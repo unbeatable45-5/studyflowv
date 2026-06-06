@@ -8,6 +8,7 @@ import AIThinking from "@/components/AIThinking";
 import { cn } from "@/lib/utils";
 import { usePremium } from "@/contexts/PremiumContext";
 import { useUsageLimitCheck } from "@/components/UsageLimitToast";
+import { supabase } from "@/integrations/supabase/client";
 
 type Message = { role: "user" | "assistant"; content: string; deepThink?: boolean; ts?: number };
 
