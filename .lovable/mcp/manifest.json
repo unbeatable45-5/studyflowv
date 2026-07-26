@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "sdk_version": "0.24.0",
+  "path": "/functions/v1/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://eyugxzdotdsqlcuqcgkc.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "studyflow-mcp",
+      "version": "0.1.0",
+      "title": "StudyFlow"
+    },
+    "tools": [
+      {
+        "name": "list_saved_outputs",
+        "title": "List saved study outputs",
+        "description": "List the signed-in user's saved AI study outputs (summaries, notes, flashcards, exam questions, etc.), most recent first. Optionally filter by tool or subject.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "tool": {
+              "type": "string",
+              "description": "Filter by tool name (e.g. 'study-helper', 'pdf-summarizer', 'flashcard-generator', 'practice-exam', 'note-organizer')."
+            },
+            "subject": {
+              "type": "string",
+              "description": "Filter by subject tag."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "description": "Max rows to return (default 20)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_saved_output",
+        "title": "Get saved study output",
+        "description": "Fetch the full text and metadata of a single saved study output by id (must belong to the signed-in user).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "The saved output id."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_exam_sessions",
+        "title": "List practice exam sessions",
+        "description": "List the signed-in user's recent practice exam results, including score, weak/strong topics, and recommended focus areas.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "description": "Max sessions to return (default 10)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "save_note",
+        "title": "Save a study note",
+        "description": "Save a note or summary into the signed-in user's StudyFlow Library so it appears alongside other study outputs.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Short title for the note."
+            },
+            "content": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Markdown content of the note."
+            },
+            "subject": {
+              "type": "string",
+              "description": "Optional subject tag."
+            }
+          },
+          "required": [
+            "title",
+            "content"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
