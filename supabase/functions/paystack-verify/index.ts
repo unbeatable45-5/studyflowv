@@ -42,9 +42,34 @@ Deno.serve(async (req) => {
     }
 
     const { reference } = await req.json();
+    if (!reference || typeof reference !== "string") {
+      return new Response(JSON.stringify({ error: "Missing reference" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+
+    // Prevent replay: reject if this reference was already redeemed.
+    const { data: existingRef } = await supabaseAdmin
+      .from("used_payment_references")
+      .select("reference")
+      .eq("reference", reference)
+      .maybeSingle();
+
+    if (existingRef) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Reference already redeemed" }),
+        {
+          status: 409,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
     const response = await fetch(
-      `https://api.paystack.co/transaction/verify/${reference}`,
+      `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
       {
         headers: {
           Authorization: `Bearer ${paystackSecretKey}`,
@@ -55,18 +80,42 @@ Deno.serve(async (req) => {
     const data = await response.json();
 
     if (data.status && data.data.status === "success") {
+      // Enforce that the reference was paid by this authenticated user.
+      const metaUserId = data.data.metadata?.user_id;
+      if (metaUserId && metaUserId !== user.id) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Reference does not belong to user" }),
+          {
+            status: 403,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
+      // Atomically record the reference; if a concurrent request already claimed it, reject.
+      const { error: insertRefError } = await supabaseAdmin
+        .from("used_payment_references")
+        .insert({ reference, user_id: user.id });
+
+      if (insertRefError) {
+        // Unique violation => already redeemed by a concurrent request.
+        return new Response(
+          JSON.stringify({ success: false, error: "Reference already redeemed" }),
+          {
+            status: 409,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
       const plan = data.data.metadata?.plan || "weekly";
       const periodEnd = new Date();
-      
-      // Set period end based on plan
+
       if (plan === "monthly") {
         periodEnd.setMonth(periodEnd.getMonth() + 1);
       } else {
-        // weekly
         periodEnd.setDate(periodEnd.getDate() + 7);
       }
-
-      const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
 
       await supabaseAdmin.from("subscriptions").upsert(
         {
@@ -96,7 +145,7 @@ Deno.serve(async (req) => {
       }
     );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: (error as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
