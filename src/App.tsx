@@ -51,7 +51,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   if (loading) return <PageSkeleton variant="default" />;
-  if (user) return <Navigate to="/" replace />;
+  if (user) {
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get("next");
+    const target = next && next.startsWith("/") && !next.startsWith("//") ? decodeURIComponent(next) : "/";
+    return <Navigate to={target} replace />;
+  }
   return <>{children}</>;
 };
 
