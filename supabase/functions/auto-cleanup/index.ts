@@ -10,6 +10,27 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  // Require a shared cron secret to prevent public triggering of mass deletion.
+  const expected = Deno.env.get("CRON_SECRET");
+  if (!expected) {
+    return new Response(JSON.stringify({ error: "Server misconfigured" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+  const authHeader = req.headers.get("Authorization") || req.headers.get("authorization") || "";
+  const providedFromBearer = authHeader.toLowerCase().startsWith("bearer ")
+    ? authHeader.slice(7).trim()
+    : "";
+  const providedFromHeader = req.headers.get("x-cron-secret") || "";
+  const provided = providedFromBearer || providedFromHeader;
+  if (!provided || provided !== expected) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -17,7 +38,6 @@ Deno.serve(async (req) => {
 
     const cutoff = new Date(Date.now() - 36 * 60 * 60 * 1000).toISOString();
 
-    // Get free users (no active subscription)
     const { data: activeSubs } = await supabase
       .from("subscriptions")
       .select("user_id")
@@ -25,15 +45,7 @@ Deno.serve(async (req) => {
 
     const premiumUserIds = (activeSubs || []).map((s: any) => s.user_id);
 
-    // Delete saved_outputs older than 36h for non-premium users
-    let query = supabase
-      .from("saved_outputs")
-      .delete()
-      .lt("created_at", cutoff);
-
     if (premiumUserIds.length > 0) {
-      // Filter out premium users - delete only free users' old outputs
-      // We need to get the IDs first, then delete
       const { data: toDelete } = await supabase
         .from("saved_outputs")
         .select("id, user_id")
@@ -60,8 +72,10 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     } else {
-      // No premium users, delete all old outputs
-      const { error, count } = await query;
+      const { error, count } = await supabase
+        .from("saved_outputs")
+        .delete({ count: "exact" })
+        .lt("created_at", cutoff);
       if (error) throw error;
 
       return new Response(JSON.stringify({ deleted: count ?? 0, message: "Cleanup complete (no premium users)" }), {
@@ -70,7 +84,7 @@ Deno.serve(async (req) => {
     }
   } catch (err) {
     console.error("Cleanup error:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
